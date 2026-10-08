@@ -310,9 +310,13 @@ nav.main .btn{padding:10px 16px;color:#fff}
 @media (max-width:820px){.hero:after{background:linear-gradient(180deg,rgba(12,16,22,.55) 0%,rgba(12,16,22,.78) 100%)}}
 .hero .wrap{position:relative;z-index:2;padding-top:48px;padding-bottom:48px;width:100%}
 .hero h1{font-size:clamp(46px,7vw,84px);margin-bottom:.25em;text-shadow:0 2px 24px rgba(0,0,0,.35)}
-.hero .eyebrow{color:#f7d2b2}.hero p{color:#fff;max-width:46ch;margin:0}
+.hero .eyebrow{color:#f7d2b2;max-width:none}.hero p{color:#fff;max-width:46ch;margin:0}
 .hero .hero-what{font-size:clamp(20px,2.4vw,26px);font-weight:700;line-height:1.3;margin-bottom:8px;text-shadow:0 1px 12px rgba(0,0,0,.4)}
-.hero .hero-sub{font-size:clamp(16px,1.8vw,18px);color:#e9e4dc;margin-bottom:22px}
+.hero .hero-sub{font-size:clamp(17px,2vw,20px);line-height:1.5;color:#fff;max-width:48ch;margin-bottom:24px;text-shadow:0 1px 12px rgba(0,0,0,.45)}
+.sec-sub{margin:8px 0 0;max-width:56ch}
+.pillars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin:30px 0 8px}.pillars>div{border-left:3px solid #f3c9a6;padding:4px 0 4px 18px}.pillars h3{margin:0 0 6px;color:#fff;text-transform:uppercase;letter-spacing:.06em}.pillars p{margin:0;color:#dfe8e0}
+.believe{text-align:center}.believe h2{max-width:26ch;margin:0 auto 18px}.believe p{font-size:clamp(17px,2vw,20px);line-height:1.6;color:var(--ink2);margin:0 auto 14px}.believe .more{font-weight:700;color:var(--clay);text-decoration:none}
+@media(max-width:640px){.pillars{grid-template-columns:1fr}}
 .trust{background:var(--card);border-bottom:1px solid var(--line)}
 .trust .wrap{display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap;padding-top:14px;padding-bottom:14px}
 .trust-label{font:700 12px/1.2 "DM Sans",system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
@@ -523,32 +527,37 @@ function home(data) {
   const pick = (slug, i) => { const x = bySlug(data, slug); const p = x && x.photos && (x.photos[i] || x.photos[0]); return p ? p.thumb : ''; };
   const anyPhoto = (n) => { const all = exps.flatMap((x) => x.photos || []); return all.length ? all[n % all.length].thumb : ''; };
   const why = [
-    ['Safety first', 'Certified outdoor educators trained in wilderness first response and search and rescue. First aid on every trip.', pick('winter-trekking', 1) || anyPhoto(1)],
-    ['Hidden places', 'Crowd-free trails, waterfalls, lakes and dark skies most people never find on their own.', pick('ridge-and-lake', 0) || anyPhoto(5)],
-    ['Village hosts', 'Home-cooked Maharashtrian food and families who have lived here for generations.', pick('be-a-villager', 3) || anyPhoto(9)],
-    ['Made for your group', 'Small groups, all permits handled, private days for birthdays, schools and companies.', pick('young-explorers-winter-school', 0) || anyPhoto(13)],
+    ['Safety first', 'Experienced leaders, thoughtful planning and the skills to handle the outdoors responsibly.', pick('winter-trekking', 1) || anyPhoto(1)],
+    ['Hidden places', 'Crowd-free trails, quiet villages, forests, lakes and night skies across the Sahyadris.', pick('ridge-and-lake', 0) || anyPhoto(5)],
+    ['Local knowledge', 'Experiences shaped and hosted with people who know these places as home.', pick('be-a-villager', 3) || anyPhoto(9)],
+    ['Meant to be experienced', "Small groups, thoughtful activities and experiences designed around the people you're with.", pick('young-explorers-winter-school', 0) || anyPhoto(13)],
   ];
   const body = `
 <section class="hero"><img class="bg" src="${esc(cover(hero, true))}" alt="" fetchpriority="high"><div class="wrap">
-<p class="eyebrow">Rock & Anchor · Sahyadris, near Mumbai</p><h1>Get outside.<br>Come back changed.</h1>
-<p class="hero-what">Outdoor experiences that connect people, nature and rural communities.</p>
-<p class="hero-sub">Treks, stargazing, village experiences and nature days in the Sahyadris, close to Mumbai.</p>
-<div class="row"><a class="btn btn-clay" href="/experiences">See experiences</a><a class="btn btn-ghost" href="${waLink('Hi Rock & Anchor, I would like to know more about your experiences.')}">${ICON.wa}WhatsApp us</a></div></div></section>
+<p class="eyebrow">Outdoor experiences in the Sahyadris</p><h1>Come outside.<br>Find something real.</h1>
+<p class="hero-sub">Treks, stargazing, village experiences and outdoor learning that reconnect you with nature and the communities that call the Sahyadris home.</p>
+<div class="row"><a class="btn btn-clay" href="/experiences">Explore experiences</a><a class="btn btn-ghost" href="${waLink('Hi Rock & Anchor, I would like to know more about your experiences.')}">${ICON.wa}WhatsApp us</a></div></div></section>
 <div class="trust"><div class="wrap"><span class="trust-label">Led by certified outdoor educators</span>${certBadges(CERTS.slice(0, 5))}</div></div>
 
-<section class="first"><div class="wrap"><div class="sec-head"><div><p class="eyebrow">This season</p><h2>Coming up</h2></div><a href="/experiences">All experiences →</a></div>
+<section class="first"><div class="wrap"><div class="sec-head"><div><h2>Find your way outside</h2><p class="lead sec-sub">From a few hours in the forest to a night under the stars, there's an experience for every kind of explorer.</p></div><a href="/experiences">All experiences →</a></div>
 <div class="grid">${featured.map((e) => card(data, e)).join('')}</div></div></section>
 
-${data.impact.length ? `<section class="band"><div class="wrap"><p class="eyebrow">Impact created</p><h2>Every experience gives back</h2>
-<p class="lead">A share of every booking goes to schools in the mountain villages we work in, and our trips are run with local guides and hosts who earn a fair living close to home.</p>
-<div class="stats">${data.impact.map((i) => `<div class="stat"><b>${esc(i.value)}</b><span>${esc(i.metric)}</span></div>`).join('')}</div>
-<p style="margin-top:34px"><a class="btn btn-ghost" style="color:#fff" href="/impact">See our impact</a></p></div></section>` : ''}
-
-<section><div class="wrap"><p class="eyebrow">Why Rock & Anchor</p><h2>Outdoors, done properly</h2>
+<section><div class="wrap"><h2>Outdoors, with purpose</h2>
 <div class="why">${why.map(([h, t, img]) => `<div>${photoBox(img, h, 'why-img')}<div class="why-body"><h3>${h}</h3><p>${t}</p></div></div>`).join('')}</div></div></section>
 
+<section class="band"><div class="wrap"><h2>The outdoors should give back</h2>
+<p class="lead">We use outdoor experiences to create opportunities for people, support village schools and build a deeper connection with the places we visit.</p>
+<div class="pillars"><div><h3>Educate</h3><p>We help people understand nature, sustainability, survival and local culture.</p></div><div><h3>Employ</h3><p>We create meaningful work for people who call these mountains home.</p></div></div>
+${data.impact.length ? `<div class="stats">${data.impact.map((i) => `<div class="stat"><b>${esc(i.value)}</b><span>${esc(i.metric)}</span></div>`).join('')}</div>` : ''}
+<p style="margin-top:34px"><a class="btn btn-ghost" style="color:#fff" href="/impact">See our impact</a></p></div></section>
+
+<section class="believe"><div class="wrap"><h2>We believe the best adventures leave something behind.</h2>
+<p>A little more curiosity.<br>A little more confidence.<br>A little more respect for the places and people we encounter.</p>
+<p><a class="more" href="/about">About Rock & Anchor →</a></p></div></section>
+
 ${data.reviews.length ? `<section style="padding-top:0"><div class="wrap"><div class="sec-head"><div><p class="eyebrow">In their words</p><h2>What people say</h2></div></div>${reviewsBlock(data.reviews.slice(0, 6))}</div></section>` : ''}
-${ctaBlock()}`;
+<section class="tight"><div class="wrap"><div class="cta"><div class="cta-text"><h2>Your next adventure is out there.</h2><p>Come explore the Sahyadris with us.</p></div>
+<div class="cta-actions"><a class="btn btn-clay" href="/experiences">Explore experiences</a><a class="btn btn-ghost" href="${waLink('Hi Rock & Anchor, I would like to plan an experience.')}">${ICON.wa}Talk to us on WhatsApp</a></div></div></div></section>`;
   return layout({ title: '', desc: 'Authentic outdoor experiences in the Sahyadris near Mumbai: treks, stargazing, village stays and nature days for families, schools and teams.', path: '/', body, image: cover(hero, true), data });
 }
 
