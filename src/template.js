@@ -551,7 +551,6 @@ function home(data) {
 <p class="eyebrow">Outdoor experiences in the Sahyadris</p><h1>Come outside.<br>Find something real.</h1>
 <p class="hero-sub">Treks, stargazing, village experiences and outdoor learning that reconnect you with nature and the communities that call the Sahyadris home.</p>
 <div class="row"><a class="btn btn-clay" href="/experiences">Explore experiences</a><a class="btn btn-ghost" href="${waLink('Hi Rock & Anchor, I would like to know more about your experiences.')}">${ICON.wa}WhatsApp us</a></div></div></section>
-<div class="trust"><div class="wrap"><span class="trust-label">Led by certified outdoor educators</span>${certBadges(CERTS.slice(0, 5))}</div></div>
 
 <section class="first"><div class="wrap"><div class="sec-head"><div><h2>Find your way outside</h2><p class="lead sec-sub">From a few hours in the forest to a night under the stars, there's an experience for every kind of explorer.</p></div><a href="/experiences">All experiences →</a></div>
 <div class="grid">${featured.map((e) => card(data, e)).join('')}</div></div></section>
