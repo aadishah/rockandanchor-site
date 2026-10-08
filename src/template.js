@@ -5,13 +5,14 @@
 const BASE = 'app0sjg0lmpX4ERo1';
 const T = { exp: 'tblG7E0qqHtLi6FWF', ev: 'tblnbaixvh6vsXuj2', rev: 'tblj3xNFQV7dKuine', imp: 'tblpfX3SNtM7qTNNf', team: 'tblBOYVbIlfeBRg4w' };
 const EF = {
+  name: 'fldlKTxLU6u6l2qFm',
   show: 'fldPkhXdD91l3gZ8Y', title: 'fldM3NSq47YsF9tR2', slug: 'fld4JwhapQZdKtBcA', order: 'fld0ZNPcdfO412lmd',
   summary: 'fldQm3jgyBV5X1nzK', description: 'fldylkcJyzF9uK0Xi', photos: 'fldiamuh0iIFn0Fjs', itinerary: 'fldePmvVNr0Plgo4D',
   faqs: 'fld89jnU68Zl9q6nM', prices: 'fldLEraHeNPgjjG8T', age: 'fldF1U1n4ks9FSFtP', location: 'fld2m8zyHAoKGlZEi',
   timing: 'fldlwqH0kyOcnhSm3', categories: 'fldIyJ28XTWNtfRm3', fromPrice: 'fldiOgiemRJAEgWdP', datesAhead: 'fld99ABUSbxPmP0v7',
 };
 const VF = { start: 'fldWr96uilLEjfI24', end: 'fldLWXxoeM3Xr7Qkd', exp: 'fldTwb0rZY39trwD4', status: 'fldEueCyQC6zJEEux', hide: 'fldYwt0HrpvixX8gg' };
-const RF = { name: 'fldIgYRm1oIN51m2Z', text: 'fldoiPyv0cAhFNMtJ', exp: 'fldCKUcXdn2vivo5h', show: 'fldwAqYVwcDDwqxLf' };
+const RF = { name: 'fldIgYRm1oIN51m2Z', text: 'fldoiPyv0cAhFNMtJ', exp: 'fldCKUcXdn2vivo5h', show: 'fldwAqYVwcDDwqxLf', photo: 'fldsq62JdBgiw4j8A' };
 const TF = { name: 'fldOCEREnRFIAh8zc', role: 'fldgPjOaXv7pTdwmD', group: 'fldfnCycPmtEiabk9', bio: 'fldKNHwt0dVNiP8td', photo: 'fldx0IblfxhE0GYqL', order: 'fldH11Xe1zRMSZjm6', show: 'fldEH77VIUX1fdM6c' };
 const TEAM_GROUPS = ['Founders', 'Experience Leaders', 'Business Development', 'Social Media'];
 const IF = { metric: 'fldX1aQLHwAWY4A0C', value: 'fldcFhyLkZhdUiyF2', order: 'fldWCIzvRPTsj0hQW', show: 'fldMKHdAIyLWJJsKQ' };
@@ -57,19 +58,19 @@ async function loadLive(env) {
   const [exps, evs, revs, imps, tms] = await Promise.all([
     atList(env, T.exp, Object.values(EF)),
     atList(env, T.ev, Object.values(VF), "IS_AFTER({Start}, DATEADD(NOW(), -2, 'days'))").catch(() => atList(env, T.ev, Object.values(VF))),
-    atList(env, T.rev, Object.values(RF)),
-    atList(env, T.imp, Object.values(IF)),
+    atList(env, T.rev, Object.values(RF)).catch(() => null),
+    atList(env, T.imp, Object.values(IF)).catch(() => null),
     atList(env, T.team, Object.values(TF)).catch(() => []),
   ]);
   const experiences = exps
-    .filter((r) => r.fields[EF.show] && r.fields[EF.slug])
+    .filter((r) => r.fields[EF.show] && String(r.fields[EF.slug] || '').trim() && (r.fields[EF.title] || r.fields[EF.name]))
     .map((r) => {
       const f = r.fields;
       return {
         id: r.id,
-        title: f[EF.title] || '',
-        slug: String(f[EF.slug]).trim(),
-        order: f[EF.order] ?? 999,
+        title: String(f[EF.title] || f[EF.name]).trim(),
+        slug: String(f[EF.slug]).trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-'),
+        order: typeof f[EF.order] === 'number' ? f[EF.order] : 999,
         summary: f[EF.summary] || '',
         description: f[EF.description] || '',
         itinerary: f[EF.itinerary] || '',
@@ -94,14 +95,15 @@ async function loadLive(env) {
       return f[VF.start] && f[VF.exp] && f[VF.exp].length && LIVE_STATUSES.includes(st) && !f[VF.hide];
     })
     .map((r) => ({ exp: r.fields[VF.exp][0], start: r.fields[VF.start], end: r.fields[VF.end] || null }));
-  const reviews = revs
+  const att = (a) => (a && a[0] ? (a[0].thumbnails && a[0].thumbnails.large && a[0].thumbnails.large.url) || a[0].url : '');
+  const reviews = revs === null ? (MEMO && MEMO.d.reviews) || SNAPSHOT.reviews : revs
     .filter((r) => r.fields[RF.show] && r.fields[RF.text])
-    .map((r) => ({ name: r.fields[RF.name] || '', text: r.fields[RF.text], exp: r.fields[RF.exp] || [] }));
-  const impact = imps
+    .map((r) => ({ name: r.fields[RF.name] || '', text: r.fields[RF.text], exp: r.fields[RF.exp] || [], photo: att(r.fields[RF.photo]) }));
+  const impact = imps === null ? (MEMO && MEMO.d.impact) || SNAPSHOT.impact : imps
     .filter((r) => r.fields[IF.show] && r.fields[IF.metric])
     .map((r) => ({ metric: r.fields[IF.metric], value: r.fields[IF.value] || '', order: r.fields[IF.order] ?? 99 }))
     .sort((a, b) => a.order - b.order);
-  const team = tms
+  const team = !tms.length && SNAPSHOT.team ? SNAPSHOT.team : tms
     .filter((r) => r.fields[TF.show] && r.fields[TF.name])
     .map((r) => {
       const f = r.fields, g = f[TF.group];
@@ -165,7 +167,7 @@ function priceInfo(e) {
     if (i < 0) continue;
     const label = raw.slice(0, i).trim(), val = raw.slice(i + 1);
     if (/optional|add.?on|^transport|^travel/i.test(label)) continue;
-    const m = val.match(/₹\s*([\d,]+)/);
+    const m = val.match(/(?:₹|rs\.?|inr)\s*([\d,]+)/i);
     if (!m) continue;
     const n = Number(m[1].replace(/,/g, ''));
     if (n && (min === null || n < min)) { min = n; group = /people|group/i.test(label) && !/per person/i.test(val); }
@@ -176,6 +178,32 @@ function priceInfo(e) {
 const priceOnRequest = (e) => priceInfo(e).min === null;
 const lowest = (e) => priceInfo(e).min;
 const rupees = (n) => '₹' + Number(n).toLocaleString('en-IN');
+// Consistent display values. Airtable stays free text; the site normalises the wording.
+const fmtAge = (a) => String(a || '').trim().replace(/(\d+)\s*(?:to|-|–)\s*(\d+)/g, '$1–$2').replace(/\s*\(([^)]*)\)/, ', $1') || 'Ask us';
+const fmtPlace = (l) => String(l || '').trim().replace(/\s*,\s*within\s+/i, ' · ').replace(/\s*,\s*/, ' · ') || 'Shared on booking';
+const fmtPrice = (e) => (priceOnRequest(e) ? 'On request' : `From ${rupees(lowest(e))}`);
+const INCLUDED_RE = /^what'?s included|^included|^inclusions/i;
+const BRING_RE = /^what to (bring|carry|pack)|^packing|^what we need/i;
+function sections(e) {
+  // Splits Website Description into intro text, ordinary sections and the two special sections.
+  const out = { intro: [], other: [], included: null, bring: null };
+  let cur = null;
+  for (const raw of String(e.description || '').split('\n')) {
+    const l = raw.trim();
+    if (l.startsWith('## ')) {
+      const h = l.slice(3).trim();
+      cur = { h, lines: [] };
+      if (INCLUDED_RE.test(h)) out.included = cur; else if (BRING_RE.test(h)) out.bring = cur; else out.other.push(cur);
+      continue;
+    }
+    (cur ? cur.lines : out.intro).push(raw);
+  }
+  if (!out.included) {
+    const inc = String(e.prices || '').split('\n').find((l) => /^includes?\b/i.test(l.trim()));
+    if (inc) out.included = { h: "What's included", lines: inc.trim().replace(/^includes?:?\s*/i, '').replace(/\.$/, '').split(/,\s*/).map((x) => '- ' + x.charAt(0).toUpperCase() + x.slice(1)) };
+  }
+  return out;
+}
 const cover = (e, big) => (e && e.photos && e.photos[0] ? (big ? e.photos[0].url : e.photos[0].thumb) : '');
 
 function md(text) {
@@ -218,7 +246,7 @@ function pricesHtml(text) {
   const rows = [], notes = [];
   for (const raw of String(text || '').split('\n')) {
     const l = raw.trim();
-    if (!l) continue;
+    if (!l || /^includes?\b/i.test(l)) continue;
     const i = l.indexOf('|');
     if (i > 0) rows.push(`<tr><th>${esc(l.slice(0, i).trim())}</th><td>${esc(l.slice(i + 1).trim())}</td></tr>`);
     else notes.push(`<p class="note">${esc(l)}</p>`);
@@ -241,6 +269,7 @@ const ICON = {
   pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 1 7 7c0 5-7 13-7 13S5 14 5 9a7 7 0 0 1 7-7Zm0 4.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"/></svg>',
   clock: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm1 3v5.4l3.6 2.1-1 1.7L11 13.5V7h2Z"/></svg>',
   people: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm8 0a3 3 0 1 1 0-6 3 3 0 0 1 0 6ZM2 20c0-3.3 3.1-6 7-6s7 2.7 7 6v1H2v-1Zm16 1v-1c0-1.6-.5-3-1.4-4.2 3 .4 5.4 2.4 5.4 4.9V21h-4Z"/></svg>',
+  shield: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3Zm-1.2 13.6-3.4-3.4 1.4-1.4 2 2 4.6-4.6 1.4 1.4-6 6Z"/></svg>',
   tag: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 3h8l10 10-8 8L3 11V3Zm4.5 2.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/></svg>',
 };
 
@@ -274,13 +303,25 @@ nav.main .btn{padding:10px 16px;color:#fff}
 .menu[open] .panel{position:absolute;left:0;right:0;top:68px;background:var(--paper);border-bottom:1px solid var(--line);padding:8px 20px 20px;display:flex;flex-direction:column}
 .menu .panel a{padding:14px 0;border-bottom:1px solid var(--line);text-decoration:none;font-size:20px;font-weight:500}
 .menu .panel .btn{margin-top:16px;justify-content:center;border:0;color:#fff}}
-.hero{position:relative;min-height:min(86vh,760px);display:flex;align-items:flex-end;color:#fff;overflow:hidden;background:var(--night)}
+.hero{position:relative;min-height:clamp(440px,64vh,600px);display:flex;align-items:center;color:#fff;overflow:hidden;background:var(--night)}
 .hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,26,36,.15) 0%,rgba(20,26,36,.25) 45%,rgba(20,26,36,.82) 100%)}
-.hero .wrap{position:relative;z-index:2;padding-bottom:64px;padding-top:120px;width:100%}
-.hero .eyebrow{color:#f3c9a6}.hero p{color:#f1ece4;max-width:56ch;font-size:clamp(18px,2.2vw,21px)}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(12,16,22,.86) 0%,rgba(12,16,22,.66) 45%,rgba(12,16,22,.2) 100%),linear-gradient(0deg,rgba(12,16,22,.45),rgba(12,16,22,0) 40%)}
+@media (max-width:820px){.hero:after{background:linear-gradient(180deg,rgba(12,16,22,.55) 0%,rgba(12,16,22,.78) 100%)}}
+.hero .wrap{position:relative;z-index:2;padding-top:48px;padding-bottom:48px;width:100%}
+.hero h1{font-size:clamp(46px,7vw,84px);margin-bottom:.25em;text-shadow:0 2px 24px rgba(0,0,0,.35)}
+.hero .eyebrow{color:#f7d2b2}.hero p{color:#fff;max-width:46ch;margin:0}
+.hero .hero-what{font-size:clamp(20px,2.4vw,26px);font-weight:700;line-height:1.3;margin-bottom:8px;text-shadow:0 1px 12px rgba(0,0,0,.4)}
+.hero .hero-sub{font-size:clamp(16px,1.8vw,18px);color:#e9e4dc;margin-bottom:22px}
+.trust{background:var(--card);border-bottom:1px solid var(--line)}
+.trust .wrap{display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap;padding-top:14px;padding-bottom:14px}
+.trust-label{font:700 12px/1.2 "DM Sans",system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.certs{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.certs li{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border:1px solid var(--line);border-radius:999px;background:var(--paper);font-size:13.5px;font-weight:500;color:var(--ink2)}
+.certs svg{width:15px;height:15px;color:var(--forest2);flex:0 0 15px}
+@media (max-width:820px){.trust .wrap{flex-wrap:nowrap;flex-direction:column;align-items:flex-start;gap:8px}.trust .certs{flex-wrap:nowrap;overflow-x:auto;max-width:100%;padding-bottom:4px;scrollbar-width:none}.trust .certs li{white-space:nowrap}
+.facts{grid-template-columns:1fr 1fr}}
 .hero .btn-ghost{color:#fff}
-section{padding:84px 0}section.tight{padding:56px 0}
+section{padding:64px 0}section.tight{padding:48px 0}section.first{padding-top:44px}
 .sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:34px;flex-wrap:wrap}
 .sec-head h2{margin:0}.sec-head a{font-weight:700;color:var(--clay);text-decoration:none}
 .grid{display:grid;gap:24px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
@@ -292,7 +333,11 @@ section{padding:84px 0}section.tight{padding:56px 0}
 .badge.next{background:var(--forest);color:#fff}.badge.soon{background:#fff3e8;color:var(--clay2)}
 .card .body{padding:18px 20px 22px;display:flex;flex-direction:column;gap:8px;flex:1}
 .card h3{font-size:28px;margin:0}
-.card p{color:var(--ink2);font-size:15.5px;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card p{color:var(--ink2);font-size:15.5px;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:3.2em}
+.meta3{margin:auto 0 0;padding-top:14px;border-top:1px solid var(--line);display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14.5px}
+.meta3 div{display:contents}.meta3 dt{color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding-top:2px}
+.meta3 dd{margin:0;color:var(--ink);font-weight:500}.meta3 dd.price{font-weight:700}
+.noimg{width:100%;height:100%;display:grid;place-items:center;background:linear-gradient(135deg,#e7dfd2,#d8cebe)}.noimg img{width:72px!important;height:auto!important;opacity:.35}
 .meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;color:var(--muted);margin-top:auto;padding-top:10px}
 .meta span{display:inline-flex;align-items:center;gap:5px}.meta svg{width:15px;height:15px}
 .price{font-weight:700;color:var(--ink)}
@@ -305,16 +350,21 @@ section{padding:84px 0}section.tight{padding:56px 0}
 .stat b{display:block;font:800 clamp(42px,4.4vw,60px)/1 "Big Shoulders Display","Arial Narrow",sans-serif;color:#f3c9a6}
 .stat span{display:block;margin-top:8px;color:#dfe8e0;font-size:16px}
 .why{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px;margin-top:30px}
-.why div{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px}
+.why>div{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+.why .why-img{width:100%;aspect-ratio:3/2;object-fit:cover;display:block;height:auto}
+.why .why-body{padding:18px 20px 22px}
 .why h3{font-size:24px;margin:0 0 8px}.why p{margin:0;color:var(--ink2);font-size:15.5px}
 .reviews{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px}
 .review{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px;margin:0}
 .review blockquote{margin:0 0 16px;font-size:16px;color:var(--ink2);display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;overflow:hidden}
 .review blockquote:before{content:"\\201C";display:block;font:800 54px/0.6 "Big Shoulders Display","Arial Narrow",sans-serif;color:var(--clay);margin-bottom:6px}
-.review figcaption{font-weight:700}
-.cta{background:var(--night);color:#fff;border-radius:22px;padding:clamp(32px,6vw,64px);display:grid;gap:22px;grid-template-columns:1.4fr 1fr;align-items:center}
-.cta p{color:#c9ced8;margin:0}.cta .btn-ghost{color:#fff}
-@media (max-width:820px){.cta{grid-template-columns:1fr}}
+.review figcaption{display:flex;align-items:center;gap:12px}
+.review figcaption img,.review .avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;flex:0 0 44px}
+.review .avatar{display:grid;place-items:center;background:var(--moss);color:var(--forest);font-weight:700;font-size:15px}
+.cta{background:var(--night);color:#fff;border-radius:22px;padding:clamp(28px,5vw,52px);display:grid;gap:28px 48px;grid-template-columns:minmax(0,1fr) auto;align-items:center}
+.cta .eyebrow{color:#f3c9a6;margin:0 0 10px}.cta h2{margin:0 0 12px}.cta p{color:#c9ced8;margin:0;max-width:52ch}
+.cta-actions{display:flex;flex-direction:column;gap:12px;min-width:250px}.cta-actions .btn{justify-content:center}.cta .btn-ghost{color:#fff}
+@media (max-width:820px){.cta{grid-template-columns:1fr}.cta-actions{min-width:0}}
 .page-head{padding:64px 0 34px}
 .page-head .lead{margin-top:10px}
 .exp-hero{display:grid;grid-template-columns:1.25fr 1fr;gap:12px;margin-top:6px;height:min(520px,46vw)}
@@ -326,13 +376,20 @@ section{padding:84px 0}section.tight{padding:56px 0}
 .exp-hero .side img:first-child:nth-last-child(3){grid-column:span 2}
 @media (max-width:820px){.exp-hero{height:auto;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;margin:0 -20px;padding:0 20px}
 .exp-hero .main,.exp-hero .side img{flex:0 0 86%;scroll-snap-align:center;aspect-ratio:4/3;height:auto}.exp-hero.one .main{flex-basis:100%}.exp-hero .side{display:contents}}
-.exp-layout{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:56px;align-items:start;margin-top:44px}
+.exp-layout{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:56px;align-items:start;margin-top:40px}
 @media (max-width:960px){.exp-layout{grid-template-columns:1fr;gap:28px}}
-.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:26px 0 34px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
 .facts div{display:flex;gap:12px;align-items:flex-start}.facts svg{width:22px;height:22px;flex:0 0 22px;color:var(--clay);margin-top:2px}
 .facts small{display:block;color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.08em}
 .facts b{font-weight:600}
-.content h3{font-size:30px}
+.content h3{font-size:24px;margin-top:1.2em}
+.xhead{padding-top:48px}.xhead .lead{margin:0 0 26px}
+.facts{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;margin:22px 0 0}
+.facts em{display:block;font-style:normal;color:var(--muted);font-size:13.5px;margin-top:2px}
+.toc{display:flex;gap:6px 18px;flex-wrap:wrap;margin:18px 0 0;font-size:14.5px;font-weight:500}.toc a{text-decoration:none;color:var(--ink2);border-bottom:1.5px solid var(--line)}.toc a:hover{color:var(--clay);border-color:var(--clay)}
+.xsec{padding:0 0 34px;margin:0 0 34px;border-bottom:1px solid var(--line);scroll-margin-top:90px}.xsec:last-child{border-bottom:0}
+.xh{font-size:clamp(28px,3.4vw,36px);margin:0 0 14px}
+.steps{margin:0 0 18px;padding-left:22px}.steps li{margin:8px 0;padding-left:6px}
 .ticks{list-style:none;padding:0;margin:0 0 1em}.ticks li{padding-left:30px;position:relative;margin:8px 0}
 .ticks li:before{content:"";position:absolute;left:4px;top:.55em;width:12px;height:7px;border-left:2.5px solid var(--forest2);border-bottom:2.5px solid var(--forest2);transform:rotate(-45deg)}
 .day{font-size:24px;color:var(--clay)}
@@ -429,24 +486,30 @@ function badgeFor(data, e) {
   if (e.categories.includes('Monsoon')) return '<span class="badge soon">Back next monsoon</span>';
   return '<span class="badge">Dates on request</span>';
 }
-function priceLine(e) {
-  return priceOnRequest(e) ? '<span class="price">Price on request</span>' : `<span>From <span class="price">${rupees(lowest(e))}</span></span>`;
+function cardMeta(e) {
+  return `<dl class="meta3"><div><dt>Age</dt><dd>${esc(fmtAge(e.age))}</dd></div><div><dt>Location</dt><dd>${esc(fmtPlace(e.location))}</dd></div><div><dt>Price</dt><dd class="price">${esc(fmtPrice(e))}</dd></div></dl>`;
+}
+function photoBox(src, alt, cls) {
+  return src ? `<img ${cls ? `class="${cls}" ` : ''}src="${esc(src)}" alt="${esc(alt)}" loading="lazy">` : `<div class="noimg${cls ? ' ' + cls : ''}"><img src="/logo.png" alt=""></div>`;
 }
 function card(data, e) {
-  const img = cover(e);
   return `<a class="card" href="/experiences/${esc(e.slug)}" data-cats="${esc(e.categories.join('|'))}">
-<div class="ph">${img ? `<img src="${esc(img)}" alt="${esc(e.title)}" loading="lazy">` : ''}${badgeFor(data, e)}</div>
-<div class="body"><span class="cat">${esc(e.categories.slice(0, 2).join(' · '))}</span><h3>${esc(e.title)}</h3><p>${esc(e.summary)}</p>
-<div class="meta">${e.age ? `<span>${ICON.people}${esc(e.age)}</span>` : ''}${e.location ? `<span>${ICON.pin}${esc(e.location)}</span>` : ''}${priceLine(e)}</div></div></a>`;
+<div class="ph">${photoBox(cover(e), e.title)}${badgeFor(data, e)}</div>
+<div class="body"><span class="cat">${esc(e.categories.slice(0, 2).join(' · ') || 'Experience')}</span><h3>${esc(e.title)}</h3><p>${esc(e.summary || firstLine(e))}</p>
+${cardMeta(e)}</div></a>`;
 }
+const firstLine = (e) => (String(e.description || '').split('\n').find((l) => l.trim() && !/^(##|-)/.test(l.trim())) || '').trim();
 function reviewsBlock(list) {
   if (!list.length) return '';
-  return `<div class="reviews">${list.map((r) => `<figure class="review"><blockquote>${esc(clean(r.text).trim())}</blockquote><figcaption>${esc(r.name)}</figcaption></figure>`).join('')}</div>`;
+  const initials = (n) => String(n || '?').split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+  return `<div class="reviews">${list.map((r) => `<figure class="review"><blockquote>${esc(clean(r.text).trim())}</blockquote><figcaption>${r.photo ? `<img src="${esc(r.photo)}" alt="" loading="lazy">` : `<span class="avatar">${esc(initials(r.name))}</span>`}<b>${esc(r.name)}</b></figcaption></figure>`).join('')}</div>`;
 }
 function ctaBlock(msg) {
-  return `<section class="tight"><div class="wrap"><div class="cta"><div><p class="eyebrow">Plan your day outdoors</p><h2>Ready when you are</h2><p>We take bookings over call and WhatsApp, so a real person answers your questions, checks dates and suggests the right experience for your group.</p></div>
-<div class="row"><a class="btn btn-clay" href="${waLink(msg || 'Hi Rock & Anchor, I would like to plan an experience.')}">${ICON.wa}WhatsApp us</a><a class="btn btn-ghost" href="tel:${SITE.tel}">${ICON.phone}${SITE.phone}</a></div></div></div></section>`;
+  return `<section class="tight"><div class="wrap"><div class="cta"><div class="cta-text"><p class="eyebrow">Plan your day outdoors</p><h2>Ready when you are</h2><p>Bookings happen over call and WhatsApp, so a real person answers your questions, checks dates and suggests the right experience for your group.</p></div>
+<div class="cta-actions"><a class="btn btn-clay" href="${waLink(msg || 'Hi Rock & Anchor, I would like to plan an experience.')}">${ICON.wa}WhatsApp us</a><a class="btn btn-ghost" href="tel:${SITE.tel}">${ICON.phone}Call ${SITE.phone}</a></div></div></div></section>`;
 }
+const CERTS = ['Wilderness First Responder', 'Wilderness First Aid', 'Advanced First Aid, CPR & AED', 'Basic Mountaineering (NIM)', 'Diploma in Mountaineering', 'Sahyadri Search & Rescue'];
+const certBadges = (list) => `<ul class="certs">${list.map((c) => `<li>${ICON.shield}${esc(c)}</li>`).join('')}</ul>`;
 const sorted = (data) => [...data.experiences].sort((a, b) => a.order - b.order);
 const bySlug = (data, s) => data.experiences.find((e) => e.slug === s);
 
@@ -456,14 +519,23 @@ function home(data) {
   const hero = bySlug(data, SITE.heroSlug) || exps[0];
   const nexts = exps.map((e) => ({ e, n: upcoming(data, e)[0] })).filter((x) => x.n).sort((a, b) => Date.parse(a.n.start) - Date.parse(b.n.start)).slice(0, 6);
   const featured = nexts.length >= 3 ? nexts.map((x) => x.e) : exps.slice(0, 6);
-  const village = bySlug(data, 'be-a-villager');
+  const pick = (slug, i) => { const x = bySlug(data, slug); const p = x && x.photos && (x.photos[i] || x.photos[0]); return p ? p.thumb : ''; };
+  const anyPhoto = (n) => { const all = exps.flatMap((x) => x.photos || []); return all.length ? all[n % all.length].thumb : ''; };
+  const why = [
+    ['Safety first', 'Certified outdoor educators trained in wilderness first response and search and rescue. First aid on every trip.', pick('winter-trekking', 1) || anyPhoto(1)],
+    ['Hidden places', 'Crowd-free trails, waterfalls, lakes and dark skies most people never find on their own.', pick('ridge-and-lake', 0) || anyPhoto(5)],
+    ['Village hosts', 'Home-cooked Maharashtrian food and families who have lived here for generations.', pick('be-a-villager', 3) || anyPhoto(9)],
+    ['Made for your group', 'Small groups, all permits handled, private days for birthdays, schools and companies.', pick('young-explorers-winter-school', 0) || anyPhoto(13)],
+  ];
   const body = `
 <section class="hero"><img class="bg" src="${esc(cover(hero, true))}" alt="" fetchpriority="high"><div class="wrap">
-<p class="eyebrow">Sahyadris · Since 2021</p><h1>Get outside.<br>Come back changed.</h1>
-<p>Treks, stargazing, village stays and nature days for families, schools and teams, a short drive from Mumbai. Small groups, certified leaders, and villagers who know every trail.</p>
+<p class="eyebrow">Rock & Anchor · Sahyadris, near Mumbai</p><h1>Get outside.<br>Come back changed.</h1>
+<p class="hero-what">Outdoor experiences that connect people, nature and rural communities.</p>
+<p class="hero-sub">Treks, stargazing, village experiences and nature days in the Sahyadris, close to Mumbai.</p>
 <div class="row"><a class="btn btn-clay" href="/experiences">See experiences</a><a class="btn btn-ghost" href="${waLink('Hi Rock & Anchor, I would like to know more about your experiences.')}">${ICON.wa}WhatsApp us</a></div></div></section>
+<div class="trust"><div class="wrap"><span class="trust-label">Led by certified outdoor educators</span>${certBadges(CERTS.slice(0, 5))}</div></div>
 
-<section><div class="wrap"><div class="sec-head"><div><p class="eyebrow">This season</p><h2>Coming up</h2></div><a href="/experiences">All experiences →</a></div>
+<section class="first"><div class="wrap"><div class="sec-head"><div><p class="eyebrow">This season</p><h2>Coming up</h2></div><a href="/experiences">All experiences →</a></div>
 <div class="grid">${featured.map((e) => card(data, e)).join('')}</div></div></section>
 
 ${data.impact.length ? `<section class="band"><div class="wrap"><p class="eyebrow">Impact created</p><h2>Every experience gives back</h2>
@@ -472,12 +544,7 @@ ${data.impact.length ? `<section class="band"><div class="wrap"><p class="eyebro
 <p style="margin-top:34px"><a class="btn btn-ghost" style="color:#fff" href="/impact">See our impact</a></p></div></section>` : ''}
 
 <section><div class="wrap"><p class="eyebrow">Why Rock & Anchor</p><h2>Outdoors, done properly</h2>
-<div class="why">
-<div><h3>Safety first</h3><p>Led by certified outdoor educators trained in wilderness first response and search and rescue. First aid on every trip.</p></div>
-<div><h3>Hidden places</h3><p>Crowd-free trails, waterfalls, lakes and dark skies that most people never find on their own.</p></div>
-<div><h3>Village hosts</h3><p>Home-cooked Maharashtrian food and the warmth of families who have lived here for generations.</p></div>
-<div><h3>Made for your group</h3><p>Small groups, all permits handled, and private days for birthdays, schools and companies.</p></div>
-</div></div></section>
+<div class="why">${why.map(([h, t, img]) => `<div>${photoBox(img, h, 'why-img')}<div class="why-body"><h3>${h}</h3><p>${t}</p></div></div>`).join('')}</div></div></section>
 
 ${data.reviews.length ? `<section style="padding-top:0"><div class="wrap"><div class="sec-head"><div><p class="eyebrow">In their words</p><h2>What people say</h2></div></div>${reviewsBlock(data.reviews.slice(0, 6))}</div></section>` : ''}
 ${ctaBlock()}`;
@@ -505,24 +572,33 @@ function experiencePage(data, e) {
     ? `<p class="muted" style="font-size:14px;margin:0 0 8px">Upcoming dates</p><ul class="dates">${up.slice(0, 6).map(dateLi).join('')}</ul>${up.length > 6 ? `<details class="dates"><summary>${up.length - 6} more dates</summary><ul class="dates" style="margin-top:8px">${up.slice(6).map(dateLi).join('')}</ul></details>` : ''}`
     : `<div class="nodates">${e.categories.includes('Monsoon') ? 'This one runs in the monsoon (June to September). Message us to hear when dates open.' : 'Dates on request. Tell us your group size and preferred day and we will plan it with you.'}</div>`;
   const revs = data.reviews.filter((r) => (r.exp || []).includes(e.id));
-  const fact = (icon, label, val) => (val ? `<div>${icon}<span><small>${label}</small><b>${esc(val)}</b></span></div>` : '');
-  const body = `<section class="page-head" style="padding-bottom:0"><div class="wrap">
+  const sec = sections(e);
+  const block = (id, title, inner) => `<section class="xsec" id="${id}"><h2 class="xh">${title}</h2>${inner}</section>`;
+  const fallback = (t) => `<p class="muted">${t}</p>`;
+  const nextLbl = up.length ? `Next: ${esc(eventLabel(up[0]))}` : (e.categories.includes('Monsoon') ? 'Runs in the monsoon' : 'Dates on request');
+  const fact = (icon, label, val, extra) => `<div>${icon}<span><small>${label}</small><b>${esc(val)}</b>${extra ? `<em>${extra}</em>` : ''}</span></div>`;
+  const aboutHtml = md(sec.intro.join('\n')) + sec.other.map((o) => `<h3>${esc(o.h)}</h3>${md(o.lines.join('\n'))}`).join('');
+  const steps = ['Message us on WhatsApp or call with the date and your group size.', 'We confirm availability and share the payment details.', 'Pay to reserve your spot. You get a confirmation with the meeting point and packing list.'];
+  const body = `<section class="page-head xhead"><div class="wrap">
 <p class="eyebrow"><a href="/experiences" style="text-decoration:none">Experiences</a> · ${esc(e.categories.join(' · '))}</p><h1>${esc(e.title)}</h1>
+<p class="lead">${esc(e.summary || firstLine(e))}</p>
 ${ph.length ? `<div class="exp-hero${ph.length === 1 ? ' one' : ''}"><img class="main" src="${esc(ph[0].url)}" alt="${esc(e.title)}" fetchpriority="high">${ph.length > 1 ? `<div class="side">${ph.slice(1, 5).map((p) => `<img src="${esc(p.thumb)}" alt="${esc(e.title)}" loading="lazy">`).join('')}</div>` : ''}</div>` : ''}
+<div class="facts">${fact(ICON.people, 'Who is it for', fmtAge(e.age))}${fact(ICON.pin, 'Where', fmtPlace(e.location))}${fact(ICON.clock, 'When', e.timing || 'On request', nextLbl)}${fact(ICON.tag, 'Price', fmtPrice(e), priceOnRequest(e) ? '' : (priceInfo(e).group ? 'per group' : 'per person'))}</div>
+<nav class="toc"><a href="#about">About</a><a href="#included">Included</a><a href="#plan">Itinerary</a><a href="#pricing">Price</a><a href="#bring">What to bring</a><a href="#faqs">FAQs</a><a href="#how">How to book</a></nav>
 <div class="exp-layout"><div class="content">
-<p class="lead">${esc(e.summary)}</p>
-<div class="facts">${fact(ICON.people, 'Who', e.age)}${fact(ICON.pin, 'Where', e.location)}${fact(ICON.clock, 'When', e.timing)}${fact(ICON.tag, 'Price', priceOnRequest(e) ? 'On request' : 'From ' + rupees(lowest(e)))}</div>
-${md(e.description)}
-${e.itinerary ? `<h3>The plan</h3>${itineraryHtml(e.itinerary)}` : ''}
-${e.prices && !/^price on request/i.test(e.prices.trim()) ? `<h3>Pricing</h3>${pricesHtml(e.prices)}` : ''}
-${e.faqs ? `<h3>Good to know</h3>${faqsHtml(e.faqs)}` : ''}
+${block('about', 'What is it?', aboutHtml || fallback('Message us and we will tell you all about it.'))}
+${block('included', "What's included", sec.included ? md(sec.included.lines.join('\n')) : fallback('We share the full list of inclusions when you enquire.'))}
+${block('plan', 'Itinerary', e.itinerary ? itineraryHtml(e.itinerary) : fallback('The detailed plan is shared when you book.'))}
+${block('pricing', 'Price', priceOnRequest(e) ? fallback('Price depends on your group size and date. Message us for a quote.') + pricesHtml(String(e.prices || '').split('\n').filter((l) => !/price on request/i.test(l)).join('\n')) : pricesHtml(e.prices))}
+${block('bring', sec.bring ? esc(sec.bring.h) : 'What to bring', sec.bring ? md(sec.bring.lines.join('\n')) : fallback('We share a packing list when you book.'))}
+${block('faqs', 'FAQs', e.faqs ? faqsHtml(e.faqs) : fallback('Have a question? WhatsApp us and a real person will answer.'))}
+${block('how', 'How to book', `<ol class="steps">${steps.map((t) => `<li>${t}</li>`).join('')}</ol><div class="row"><a class="btn btn-wa" href="${ask('')}">${ICON.wa}Book on WhatsApp</a><a class="btn btn-ghost" href="tel:${SITE.tel}">${ICON.phone}Call ${SITE.phone}</a></div>`)}
 </div>
 <aside class="side-card" id="book"><h3>${esc(e.title)}</h3><div class="from">${priceOnRequest(e) ? 'Price on request' : `From <b>${rupees(lowest(e))}</b> ${priceInfo(e).group ? 'per group' : 'per person'}`}</div>
 ${datesHtml}
 <a class="btn btn-wa" href="${ask('')}">${ICON.wa}Book on WhatsApp</a><a class="btn btn-ghost" href="tel:${SITE.tel}">${ICON.phone}Call ${SITE.phone}</a>
 <p class="small">No online payment. We confirm your spot over call or WhatsApp.</p></aside></div></div></section>
 ${revs.length ? `<section><div class="wrap"><h2>What people say</h2>${reviewsBlock(revs)}</div></section>` : ''}
-${ctaBlock(`Hi Rock & Anchor, I would like to book ${e.title}.`)}
 <div class="bookbar"><a href="#book" style="text-decoration:none"><small>${up.length ? 'Next date' : 'Dates'}</small><b>${up.length ? esc(dayStr(up[0].start)) : 'On request'}</b> <span style="color:var(--clay);font-size:13px;font-weight:700">${up.length > 1 ? 'All dates ↓' : ''}</span></a><a class="btn btn-wa" href="${ask('')}">${ICON.wa}Book</a></div>
 <script>document.body.classList.add('has-bookbar')</script>`;
   return layout({ title: e.title, desc: e.summary, path: `/experiences/${e.slug}`, body, image: cover(e, true), data });
@@ -538,9 +614,9 @@ function aboutPage(data) {
 <h3>Our two pillars</h3><ul class="ticks"><li><b>Educate.</b> Our programmes teach nature, survival and life skills, and we reinvest in village schools with infrastructure, books and stationery.</li><li><b>Employ.</b> We hire and train villagers to lead and host, so families can earn a dignified living without leaving home.</li></ul></div></div></section>
 <section><div class="wrap"><p class="eyebrow">The founders</p><h2>Who you will be outside with</h2><div class="people">
 <div class="person"><span class="role">The Rock · Co-founder &amp; Outdoor Educator</span><h3>Aaditya Shah</h3><p>A former software engineer turned mountaineer and outdoor education leader. Thirteen years of exploring and leading hundreds of experiences in the US and India for people of all ages.</p>
-<ul class="ticks"><li>Wilderness First Responder (USA)</li><li>Glacier travel, crevasse rescue and AIARE avalanche rescue</li><li>Diploma in Mountaineering and Allied Sports (topped the course)</li><li>Sahyadri Search &amp; Rescue</li></ul></div>
+${certBadges(['Wilderness First Responder (USA)', 'Glacier Travel & Crevasse Rescue', 'AIARE Avalanche Rescue', 'Basic Mountaineering (NIM)', 'Diploma in Mountaineering (topped the course)', 'Advanced First Aid, CPR & AED', 'Sahyadri Search & Rescue'])}</div>
 <div class="person"><span class="role">The Anchor · Co-founder &amp; Outdoor Educator</span><h3>Mansi Nayyar</h3><p>A creative supervisor and trekker who has spent ten years leading offbeat treks across the Sahyadris, with treks led in Vietnam, Bhutan and Nepal and 450+ travel experiences curated.</p>
-<ul class="ticks"><li>Wilderness First Aid</li><li>Basic Rock Climbing and Mountain Biking</li><li>Cannes Lions Silver and Bronze 2025</li></ul></div>
+${certBadges(['Wilderness First Aid', 'Basic Rock Climbing', 'Basic Mountain Biking', 'Paragliding Level 1', 'Cannes Lions Silver & Bronze 2025'])}</div>
 </div><p class="lead" style="margin-top:34px">Our team today includes villagers from the communities we work in, trained in leadership, first aid and our safety procedures.</p></div></section>
 ${ctaBlock()}`;
   return layout({ title: 'About Us', desc: 'Rock & Anchor was founded by Aaditya Shah and Mansi Nayyar to create safe, local, meaningful outdoor experiences in the Sahyadris.', path: '/about', body, image: img, data });

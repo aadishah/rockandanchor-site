@@ -17,7 +17,37 @@ The public site for Rock & Anchor (rockandanchor.in). One Cloudflare Worker rend
 | Impact Created | Website Impact | Metric, Value, Order, Show on Website |
 | Team page | Website Team | Name, Role, Group, Bio, Photo, Order, Show on Website |
 
-Text formats: Description uses `## ` headings and `- ` bullets. Itinerary is one `time | activity` per line, with `## Day 1` headings. Price Details is `Label | ₹X` per line; plain lines are notes. The card "From" price is the lowest ₹ value, ignoring optional add-ons and transport. FAQs are a question line, the answer below, and a blank line between.
+### How each experience field shows on the site
+
+Only experiences with **Show on Website** ticked and a **Website Slug** appear. Everything below comes from Airtable; nothing about individual experiences is hard-coded.
+
+| Field | Where it shows | If empty |
+| --- | --- | --- |
+| Website Title (falls back to Experience Name) | Card title, page title | Experience hidden if both are empty |
+| Website Slug | Page address `/experiences/<slug>` | Experience hidden |
+| Website Order | Order on the site (lowest first) | Goes to the end |
+| Website Summary | Card text, "What is it?" lead line | First sentence of the description |
+| Website Description | "What is it?" section. Two special headings are pulled into their own sections: `## What's included` and `## What to bring` (or `## What we need at your venue`) | Polite fallback line |
+| Website Itinerary | "Itinerary" timeline | "Detailed plan shared when you book" |
+| Website Price Details | "Price" table; card and page "From" price | "Price on request" |
+| Website Age Group | Card "Age", page "Who is it for" | "Ask us" |
+| Website Location | Card "Location", page "Where" | "Shared on booking" |
+| Website Timing | Page "When" | "On request" |
+| Website FAQs | "FAQs" | "Have a question? WhatsApp us" |
+| Website Category | Card label and the filter on /experiences | No label |
+| Website Photos | Card image and page gallery (first photo is the cover) | Logo placeholder |
+| Website Dates Ahead (days) | Limits how far ahead dates are listed | All upcoming dates |
+
+Text formats:
+- Description: `## ` starts a heading, `- ` starts a bullet. Keep `## What's included` and `## What to bring` as headings so they land in the right sections.
+- Itinerary: one `time | activity` per line, `## Day 1` for multi-day plans.
+- Price Details: `Label | ₹X` per line. Plain lines are notes (for example "Excludes travel"). The "From" price is the lowest ₹ value, ignoring rows whose label contains "optional", "add on" or starts with "Transport"/"Travel". A row like "Up to 20 people | ₹20,000" is shown "per group". If the text says "Price on request", no price is shown.
+- Age: write "Ages 4 to 12, with a parent"; the site shows "Ages 4–12, with a parent".
+- Location: write "Place · X hrs from Dadar".
+- FAQs: question on one line, answer below, blank line between questions.
+- Reviews: tick Show on Website; add a Photo (with the person's permission) to show their picture.
+
+Check every experience after edits: `python3 build.py && node scripts/check.mjs` (uses the snapshot), or open the live pages.
 
 ## Code layout
 
