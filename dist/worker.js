@@ -319,13 +319,13 @@ nav.main .btn{padding:10px 16px;color:#fff}
 .menu .panel .btn{margin-top:16px;justify-content:center;border:0;color:#fff}}
 .hero{position:relative;min-height:clamp(440px,64vh,600px);display:flex;align-items:center;color:#fff;overflow:hidden;background:var(--night)}
 .hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(12,16,22,.86) 0%,rgba(12,16,22,.66) 45%,rgba(12,16,22,.2) 100%),linear-gradient(0deg,rgba(12,16,22,.45),rgba(12,16,22,0) 40%)}
-@media (max-width:820px){.hero:after{background:linear-gradient(180deg,rgba(12,16,22,.55) 0%,rgba(12,16,22,.78) 100%)}}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(12,16,22,.5) 0%,rgba(12,16,22,.22) 45%,rgba(12,16,22,0) 70%)}
+@media (max-width:820px){.hero:after{background:linear-gradient(180deg,rgba(12,16,22,.25) 0%,rgba(12,16,22,.5) 100%)}}
 .hero .wrap{position:relative;z-index:2;padding-top:48px;padding-bottom:48px;width:100%}
-.hero h1{font-size:clamp(46px,7vw,84px);margin-bottom:.25em;text-shadow:0 2px 24px rgba(0,0,0,.35)}
-.hero .eyebrow{color:#f7d2b2;max-width:none}.hero p{color:#fff;max-width:46ch;margin:0}
+.hero h1{font-size:clamp(46px,7vw,84px);margin-bottom:.25em;text-shadow:0 2px 18px rgba(0,0,0,.55),0 1px 3px rgba(0,0,0,.35)}
+.hero .eyebrow{color:#f7d2b2;max-width:none;text-shadow:0 1px 6px rgba(0,0,0,.6)}.hero p{color:#fff;max-width:46ch;margin:0}
 .hero .hero-what{font-size:clamp(20px,2.4vw,26px);font-weight:700;line-height:1.3;margin-bottom:8px;text-shadow:0 1px 12px rgba(0,0,0,.4)}
-.hero .hero-sub{font-size:clamp(17px,2vw,20px);line-height:1.5;color:#fff;max-width:48ch;margin-bottom:24px;text-shadow:0 1px 12px rgba(0,0,0,.45)}
+.hero .hero-sub{font-size:clamp(17px,2vw,20px);line-height:1.5;color:#fff;max-width:48ch;margin-bottom:24px;text-shadow:0 1px 10px rgba(0,0,0,.7),0 1px 2px rgba(0,0,0,.5)}
 .sec-sub{margin:8px 0 0;max-width:56ch}
 .pillars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin:30px 0 8px}.pillars>div{border-left:3px solid #f3c9a6;padding:4px 0 4px 18px}.pillars h3{margin:0 0 6px;color:#fff;text-transform:uppercase;letter-spacing:.06em}.pillars p{margin:0;color:#dfe8e0}
 .believe{text-align:center}.believe h2{max-width:26ch;margin:0 auto 18px}.believe p{font-size:clamp(17px,2vw,20px);line-height:1.6;color:var(--ink2);margin:0 auto 14px}.believe .more{font-weight:700;color:var(--clay);text-decoration:none}
