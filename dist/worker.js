@@ -625,7 +625,7 @@ function experiencePage(data, e) {
   const nextLbl = up.length ? `Next: ${esc(eventLabel(up[0]))}` : (e.categories.includes('Monsoon') ? 'Runs in the monsoon' : 'Dates on request');
   const fact = (icon, label, val, extra) => `<div>${icon}<span><small>${label}</small><b>${esc(val)}</b>${extra ? `<em>${extra}</em>` : ''}</span></div>`;
   const aboutHtml = md(sec.intro.join('\n')) + sec.other.map((o) => `<h3>${esc(o.h)}</h3>${md(o.lines.join('\n'))}`).join('');
-  const steps = ['Message us on WhatsApp or call with the date and your group size.', 'We confirm availability and share the payment details.', 'Pay to reserve your spot. You get a confirmation with the meeting point and packing list.'];
+  const steps = ['Message us on WhatsApp or call with the date and your group size.', 'We confirm availability and share the payment and registration details.', 'Pay to reserve your spot. Register to receive pre experience details. You get a confirmation with the meeting point, packing list and any other important details.'];
   const body = `<section class="page-head xhead"><div class="wrap">
 <p class="eyebrow"><a href="/experiences" style="text-decoration:none">Experiences</a> · ${esc(e.categories.join(' · '))}</p><h1>${esc(e.title)}</h1>
 <p class="lead">${esc(e.summary || firstLine(e))}</p>
