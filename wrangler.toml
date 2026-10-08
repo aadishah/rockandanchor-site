@@ -1,0 +1,10 @@
+name = "rockandanchor-site"
+main = "dist/worker.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[observability]
+enabled = true
+
+# Secret (set once, never commit it):
+#   npx wrangler secret put AIRTABLE_TOKEN
