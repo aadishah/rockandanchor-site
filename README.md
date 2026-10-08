@@ -27,7 +27,7 @@ Only experiences with **Show on Website** ticked and a **Website Slug** appear. 
 | Website Slug | Page address `/experiences/<slug>` | Experience hidden |
 | Website Order | Order on the site (lowest first) | Goes to the end |
 | Website Summary | Card text, "What is it?" lead line | First sentence of the description |
-| Website Description | "What is it?" section. Two special headings are pulled into their own sections: `## What's included` and `## What to bring` (or `## What we need at your venue`) | Polite fallback line |
+| Website Description | "What is it?" section. `## What's included` is pulled into its own section. Any `## What to bring` or packing heading is hidden from the site (packing lists go privately on WhatsApp) | Polite fallback line |
 | Website Itinerary | "Itinerary" timeline | "Detailed plan shared when you book" |
 | Website Price Details | "Price" table; card and page "From" price | "Price on request" |
 | Website Age Group | Card "Age", page "Who is it for" | "Ask us" |
@@ -39,7 +39,7 @@ Only experiences with **Show on Website** ticked and a **Website Slug** appear. 
 | Website Dates Ahead (days) | Limits how far ahead dates are listed | All upcoming dates |
 
 Text formats:
-- Description: `## ` starts a heading, `- ` starts a bullet. Keep `## What's included` and `## What to bring` as headings so they land in the right sections.
+- Description: `## ` starts a heading, `- ` starts a bullet. Keep `## What's included` as a heading so it lands in its own section. Do not put packing lists here; they are hidden.
 - Itinerary: one `time | activity` per line, `## Day 1` for multi-day plans.
 - Price Details: `Label | ₹X` per line. Plain lines are notes (for example "Excludes travel"). The "From" price is the lowest ₹ value, ignoring rows whose label contains "optional", "add on" or starts with "Transport"/"Travel". A row like "Up to 20 people | ₹20,000" is shown "per group". If the text says "Price on request", no price is shown.
 - Age: write "Ages 4 to 12, with a parent"; the site shows "Ages 4–12, with a parent".

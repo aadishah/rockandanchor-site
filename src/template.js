@@ -183,17 +183,18 @@ const fmtAge = (a) => String(a || '').trim().replace(/(\d+)\s*(?:to|-|–)\s*(\d
 const fmtPlace = (l) => String(l || '').trim().replace(/\s*,\s*within\s+/i, ' · ').replace(/\s*,\s*/, ' · ') || 'Shared on booking';
 const fmtPrice = (e) => (priceOnRequest(e) ? 'On request' : `From ${rupees(lowest(e))}`);
 const INCLUDED_RE = /^what'?s included|^included|^inclusions/i;
-const BRING_RE = /^what to (bring|carry|pack)|^packing|^what we need/i;
+// Packing lists are private (sent on WhatsApp after booking), so these sections are never shown.
+const PRIVATE_RE = /^what to (bring|carry|pack)|^packing/i;
 function sections(e) {
   // Splits Website Description into intro text, ordinary sections and the two special sections.
-  const out = { intro: [], other: [], included: null, bring: null };
+  const out = { intro: [], other: [], included: null };
   let cur = null;
   for (const raw of String(e.description || '').split('\n')) {
     const l = raw.trim();
     if (l.startsWith('## ')) {
       const h = l.slice(3).trim();
       cur = { h, lines: [] };
-      if (INCLUDED_RE.test(h)) out.included = cur; else if (BRING_RE.test(h)) out.bring = cur; else out.other.push(cur);
+      if (INCLUDED_RE.test(h)) out.included = cur; else if (!PRIVATE_RE.test(h)) out.other.push(cur);
       continue;
     }
     (cur ? cur.lines : out.intro).push(raw);
@@ -584,13 +585,12 @@ function experiencePage(data, e) {
 <p class="lead">${esc(e.summary || firstLine(e))}</p>
 ${ph.length ? `<div class="exp-hero${ph.length === 1 ? ' one' : ''}"><img class="main" src="${esc(ph[0].url)}" alt="${esc(e.title)}" fetchpriority="high">${ph.length > 1 ? `<div class="side">${ph.slice(1, 5).map((p) => `<img src="${esc(p.thumb)}" alt="${esc(e.title)}" loading="lazy">`).join('')}</div>` : ''}</div>` : ''}
 <div class="facts">${fact(ICON.people, 'Who is it for', fmtAge(e.age))}${fact(ICON.pin, 'Where', fmtPlace(e.location))}${fact(ICON.clock, 'When', e.timing || 'On request', nextLbl)}${fact(ICON.tag, 'Price', fmtPrice(e), priceOnRequest(e) ? '' : (priceInfo(e).group ? 'per group' : 'per person'))}</div>
-<nav class="toc"><a href="#about">About</a><a href="#included">Included</a><a href="#plan">Itinerary</a><a href="#pricing">Price</a><a href="#bring">What to bring</a><a href="#faqs">FAQs</a><a href="#how">How to book</a></nav>
+<nav class="toc"><a href="#about">About</a><a href="#included">Included</a><a href="#plan">Itinerary</a><a href="#pricing">Price</a><a href="#faqs">FAQs</a><a href="#how">How to book</a></nav>
 <div class="exp-layout"><div class="content">
 ${block('about', 'What is it?', aboutHtml || fallback('Message us and we will tell you all about it.'))}
 ${block('included', "What's included", sec.included ? md(sec.included.lines.join('\n')) : fallback('We share the full list of inclusions when you enquire.'))}
 ${block('plan', 'Itinerary', e.itinerary ? itineraryHtml(e.itinerary) : fallback('The detailed plan is shared when you book.'))}
 ${block('pricing', 'Price', priceOnRequest(e) ? fallback('Price depends on your group size and date. Message us for a quote.') + pricesHtml(String(e.prices || '').split('\n').filter((l) => !/price on request/i.test(l)).join('\n')) : pricesHtml(e.prices))}
-${block('bring', sec.bring ? esc(sec.bring.h) : 'What to bring', sec.bring ? md(sec.bring.lines.join('\n')) : fallback('We share a packing list when you book.'))}
 ${block('faqs', 'FAQs', e.faqs ? faqsHtml(e.faqs) : fallback('Have a question? WhatsApp us and a real person will answer.'))}
 ${block('how', 'How to book', `<ol class="steps">${steps.map((t) => `<li>${t}</li>`).join('')}</ol><div class="row"><a class="btn btn-wa" href="${ask('')}">${ICON.wa}Book on WhatsApp</a><a class="btn btn-ghost" href="tel:${SITE.tel}">${ICON.phone}Call ${SITE.phone}</a></div>`)}
 </div>

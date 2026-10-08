@@ -17,7 +17,7 @@ const metas = list.split('class="meta3"').length - 1;
 console.log('cards', cards, 'meta blocks', metas);
 for (const e of snap.experiences) {
   const h = await (await get('/experiences/' + e.slug)).text();
-  const need = ['id="about"', 'id="included"', 'id="plan"', 'id="pricing"', 'id="bring"', 'id="faqs"', 'id="how"'];
+  const need = ['id="about"', 'id="included"', 'id="plan"', 'id="pricing"', 'id="faqs"', 'id="how"'];
   const missing = need.filter((n) => !h.includes(n));
   const fallbacks = (h.match(/<p class="muted">[^<]*<\/p>/g) || []).filter((x) => !/Upcoming dates/.test(x));
   const from = (h.match(/<div class="from">(.*?)<\/div>/) || [])[1];
