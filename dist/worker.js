@@ -387,13 +387,14 @@ section{padding:64px 0}section.tight{padding:48px 0}section.first{padding-top:44
 .page-head .lead{margin-top:10px}
 .exp-hero{display:grid;grid-template-columns:1.25fr 1fr;gap:12px;margin-top:6px;height:min(520px,46vw)}
 .exp-hero.one{grid-template-columns:1fr}
-.exp-hero img{width:100%;height:100%;object-fit:cover;border-radius:var(--r);background:#d8d0c3;min-height:0}
+.exp-hero .tile{position:relative;display:block;border-radius:var(--r);overflow:hidden;background:#d8d0c3;min-height:0;cursor:zoom-in}.exp-hero .tile img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}.exp-hero .tile:hover img{transform:scale(1.03)}.exp-hero .more{position:absolute;inset:0;display:grid;place-items:center;background:rgba(12,16,22,.5);color:#fff;font:800 clamp(30px,3.4vw,44px)/1 "Big Shoulders Display","Arial Narrow",sans-serif;letter-spacing:.02em}
+.lb{position:fixed;inset:0;z-index:100;background:rgba(10,12,16,.97);display:flex;align-items:center;justify-content:center}.lb[hidden]{display:none}.lb figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:12px;max-width:min(92vw,1400px)}.lb img{max-width:100%;max-height:82vh;object-fit:contain;border-radius:8px}.lb figcaption{color:#cfc8bd;font-size:14px;letter-spacing:.08em}.lb button{background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:999px;cursor:pointer;display:grid;place-items:center}.lb button:hover{background:rgba(255,255,255,.25)}.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:52px;height:52px;font-size:34px;line-height:1}.lb-prev{left:18px}.lb-next{right:18px}.lb-x{position:absolute;top:16px;right:16px;width:44px;height:44px;font-size:28px}.lb button[hidden]{display:none}
 .exp-hero .side{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;min-height:0}
-.exp-hero .side img:only-child{grid-column:span 2;grid-row:span 2}
-.exp-hero .side img:first-child:nth-last-child(2),.exp-hero .side img:first-child:nth-last-child(2)~img{grid-column:span 2}
-.exp-hero .side img:first-child:nth-last-child(3){grid-column:span 2}
+.exp-hero .side .tile:only-child{grid-column:span 2;grid-row:span 2}
+.exp-hero .side .tile:first-child:nth-last-child(2),.exp-hero .side .tile:first-child:nth-last-child(2)~.tile{grid-column:span 2}
+.exp-hero .side .tile:first-child:nth-last-child(3){grid-column:span 2}
 @media (max-width:820px){.exp-hero{height:auto;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;margin:0 -20px;padding:0 20px}
-.exp-hero .main,.exp-hero .side img{flex:0 0 86%;scroll-snap-align:center;aspect-ratio:4/3;height:auto}.exp-hero.one .main{flex-basis:100%}.exp-hero .side{display:contents}}
+.exp-hero .main,.exp-hero .side .tile{flex:0 0 86%;scroll-snap-align:center;aspect-ratio:4/3;height:auto}.lb-nav{width:42px;height:42px;font-size:28px}.lb-prev{left:8px}.lb-next{right:8px}.exp-hero.one .main{flex-basis:100%}.exp-hero .side{display:contents}}
 .exp-layout{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:56px;align-items:start;margin-top:40px}
 @media (max-width:960px){.exp-layout{grid-template-columns:1fr;gap:28px}}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
@@ -532,6 +533,29 @@ const certBadges = (list) => `<ul class="certs">${list.map((c) => `<li>${ICON.sh
 const sorted = (data) => [...data.experiences].sort((a, b) => a.order - b.order);
 const bySlug = (data, s) => data.experiences.find((e) => e.slug === s);
 
+// ---------- photo gallery ----------
+// Shows up to 5 photos; the 5th tile carries "+N" when there are more. Any tile opens a slideshow of all photos.
+function galleryHtml(e, ph) {
+  if (!ph.length) return '';
+  const SHOW = 5;
+  const extra = ph.length - SHOW;
+  const tile = (p, i, cls, big) => `<a class="tile${cls}" href="${esc(p.url)}" data-i="${i}" aria-label="Open photo ${i + 1} of ${ph.length}"><img src="${esc(big ? p.url : p.thumb)}" alt="${esc(e.title)}"${i ? ' loading="lazy"' : ' fetchpriority="high"'}>${i === SHOW - 1 && extra > 0 ? `<span class="more">+${extra}</span>` : ''}</a>`;
+  const side = ph.slice(1, SHOW).map((p, k) => tile(p, k + 1, '', false)).join('');
+  const urls = JSON.stringify(ph.map((p) => p.url)).replace(/</g, '\\u003c');
+  return `<div class="exp-hero${ph.length === 1 ? ' one' : ''}" id="gallery">${tile(ph[0], 0, ' main', true)}${ph.length > 1 ? `<div class="side">${side}</div>` : ''}</div>
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Photos"><button class="lb-x" type="button" aria-label="Close">&times;</button><button class="lb-nav lb-prev" type="button" aria-label="Previous photo">&#8249;</button><figure><img alt="${esc(e.title)}"><figcaption></figcaption></figure><button class="lb-nav lb-next" type="button" aria-label="Next photo">&#8250;</button></div>
+<script>(function(){var U=${urls},lb=document.getElementById('lb'),im=lb.querySelector('img'),cap=lb.querySelector('figcaption'),i=0,x0=null;
+function show(n){i=(n+U.length)%U.length;im.src=U[i];cap.textContent=(i+1)+' / '+U.length;[i+1,i-1].forEach(function(k){var p=new Image();p.src=U[(k+U.length)%U.length]})}
+function open(n){show(n);lb.hidden=false;document.body.style.overflow='hidden';lb.querySelector('.lb-next').focus()}
+function close(){lb.hidden=true;document.body.style.overflow=''}
+document.querySelectorAll('#gallery .tile').forEach(function(a){a.addEventListener('click',function(ev){ev.preventDefault();open(+a.dataset.i)})});
+lb.querySelector('.lb-prev').onclick=function(){show(i-1)};lb.querySelector('.lb-next').onclick=function(){show(i+1)};lb.querySelector('.lb-x').onclick=close;
+lb.addEventListener('click',function(ev){if(ev.target===lb||ev.target.tagName==='FIGURE')close()});
+document.addEventListener('keydown',function(ev){if(lb.hidden)return;if(ev.key==='Escape')close();if(ev.key==='ArrowRight')show(i+1);if(ev.key==='ArrowLeft')show(i-1)});
+lb.addEventListener('touchstart',function(ev){x0=ev.touches[0].clientX},{passive:true});lb.addEventListener('touchend',function(ev){if(x0===null)return;var d=ev.changedTouches[0].clientX-x0;if(Math.abs(d)>40)show(d<0?i+1:i-1);x0=null});
+if(U.length<2)lb.querySelectorAll('.lb-nav').forEach(function(b){b.hidden=true})})();</script>`;
+}
+
 // ---------- pages ----------
 function home(data) {
   const exps = sorted(data);
@@ -605,7 +629,7 @@ function experiencePage(data, e) {
   const body = `<section class="page-head xhead"><div class="wrap">
 <p class="eyebrow"><a href="/experiences" style="text-decoration:none">Experiences</a> · ${esc(e.categories.join(' · '))}</p><h1>${esc(e.title)}</h1>
 <p class="lead">${esc(e.summary || firstLine(e))}</p>
-${ph.length ? `<div class="exp-hero${ph.length === 1 ? ' one' : ''}"><img class="main" src="${esc(ph[0].url)}" alt="${esc(e.title)}" fetchpriority="high">${ph.length > 1 ? `<div class="side">${ph.slice(1, 5).map((p) => `<img src="${esc(p.thumb)}" alt="${esc(e.title)}" loading="lazy">`).join('')}</div>` : ''}</div>` : ''}
+${galleryHtml(e, ph)}
 <div class="facts">${fact(ICON.people, 'Who is it for', fmtAge(e.age))}${fact(ICON.pin, 'Where', fmtPlace(e.location))}${fact(ICON.clock, 'When', e.timing || 'On request', nextLbl)}${fact(ICON.tag, 'Price', fmtPrice(e), priceOnRequest(e) ? '' : (priceInfo(e).group ? 'per group' : 'per person'))}</div>
 <nav class="toc"><a href="#about">About</a><a href="#included">Included</a><a href="#plan">Itinerary</a><a href="#pricing">Price</a><a href="#faqs">FAQs</a><a href="#how">How to book</a></nav>
 <div class="exp-layout"><div class="content">
