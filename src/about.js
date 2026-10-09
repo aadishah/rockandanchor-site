@@ -13,10 +13,6 @@ const ABOUT_BELIEFS = [
   'Nature is not a backdrop.',
   'Villages are not destinations.',
   'Local people should benefit from tourism.',
-  'Experiences should leave something behind.',
-  'Learning does not have to happen inside a classroom.',
-  'Sustainability is not an add-on.',
-  'We do not have an Earth 2.0.',
 ];
 
 function aboutPage(data) {
@@ -91,18 +87,6 @@ function aboutPage(data) {
   const gi = (g) => { const i = TEAM_GROUPS.indexOf(g); return i < 0 ? 99 : i; };
   const team = (data.team || []).slice().sort((a, b) => gi(a.group) - gi(b.group) || a.order - b.order);
   const workWith = waLink('Hi Rock & Anchor, I would like to work with you (school, company or partnership).');
-
-  // Signature graphic: Touch > Experience > Move, Inspire above, Understand > Care > Act below, grounded in People, Community, Nature.
-  const sig = `<svg class="ab-sig" viewBox="0 0 720 560" role="img" aria-labelledby="sigT"><title id="sigT">Touch, experience, move and inspire lead to understanding, care and action, grounded in people, community and nature.</title>
-<g class="ln"><path d="M150 150H275"/><path d="M445 150H570"/><path d="M360 110V58"/><path d="M360 190V262"/><path d="M360 312V352"/><path d="M360 402V442"/></g>
-<g class="nd"><rect x="40" y="125" width="110" height="50" rx="25"/><text x="95" y="157">TOUCH</text>
-<rect class="core" x="275" y="110" width="170" height="80" rx="40"/><text class="core" x="360" y="158">EXPERIENCE</text>
-<rect x="570" y="125" width="110" height="50" rx="25"/><text x="625" y="157">MOVE</text>
-<rect x="295" y="10" width="130" height="48" rx="24"/><text x="360" y="41">INSPIRE</text>
-<rect x="270" y="262" width="180" height="50" rx="25"/><text x="360" y="294">UNDERSTAND</text>
-<rect x="305" y="352" width="110" height="50" rx="25"/><text x="360" y="384">CARE</text>
-<rect x="305" y="442" width="110" height="50" rx="25"/><text x="360" y="474">ACT</text></g>
-<text class="base" x="360" y="540">PEOPLE · COMMUNITY · NATURE</text></svg>`;
 
   // Circular "everyone gains" diagram.
   const R = 170, cx = 220, cy = 220;
@@ -201,12 +185,6 @@ ${ringNodes.map((n) => `<g class="rn"><circle cx="${n.x.toFixed(1)}" cy="${n.y.t
   <div class="ab-ambitions">${[['More local leaders', 'People who can create and lead experiences themselves.'], ['More opportunities', 'More meaningful livelihoods close to home.'], ['More people connected to nature', 'Especially children and young people.']].map(([h, t]) => `<div class="rv"><h3>${h}</h3><p>${t}</p></div>`).join('')}</div>
 </div></section>
 
-<section class="ab-sigsec" id="philosophy"><div class="wrap ab-sig-grid">
-  <div><p class="ab-kicker rv">The philosophy in one picture</p><h2 class="ab-h rv">From a moment outside to a lifetime of care.</h2>
-  <p class="ab-p rv">It begins with a touch: a place, a person, a story. An experience moves you and inspires you. Understanding follows, then care, and care turns into action, for people, for communities and for nature.</p></div>
-  <div class="ab-sig-wrap" data-sig>${sig}</div>
-</div></section>
-
 <section class="ab-proof" id="proof"><div class="wrap">
   <p class="ab-kicker rv">Proof</p><h2 class="ab-h rv">What we have done so far.</h2>
   <div class="ab-facts">${ABOUT_FACTS.map(([v, l]) => `<div class="rv"><b data-count="${esc(v)}">${esc(v)}</b><span>${l}</span></div>`).join('')}</div>
@@ -219,9 +197,6 @@ ${ringNodes.map((n) => `<g class="rn"><circle cx="${n.x.toFixed(1)}" cy="${n.y.t
 </div></section>
 
 <section class="ab-end" id="come"><img class="ab-end-img" src="${esc(ph('ridge-and-lake', 2, true))}" alt="" loading="lazy"><div class="wrap">
-  <p class="ab-end-a rv">Maybe you came looking for a trek.</p>
-  <p class="ab-end-b rv">You might leave with something else.</p>
-  <ul class="ab-end-list">${['A connection.', 'A story.', 'A new skill.', 'A different way of seeing a village.', 'A little more curiosity about the natural world.'].map((l) => `<li class="rv">${l}</li>`).join('')}</ul>
   <h2 class="ab-end-h rv">Get outside. Come back changed.</h2>
   <div class="ab-end-cta rv"><a class="btn btn-clay" href="/experiences">Explore experiences</a><a class="btn btn-ghost" href="${workWith}">${ICON.wa}Work with us</a></div>
 </div></section>
@@ -263,8 +238,7 @@ function closeG(){md.hidden=true;d.body.style.overflow='';if(last)last.focus()}
 d.querySelectorAll('.ab-tile').forEach(function(t){t.addEventListener('click',function(){last=t;openG(t.dataset.g)})});
 md.querySelector('.ab-x').addEventListener('click',closeG);md.addEventListener('click',function(e){if(e.target===md)closeG()});
 d.addEventListener('keydown',function(e){if(e.key==='Escape'&&!md.hidden)closeG()});
-/* signature graphic draws in, numbers count up */
-var sg=d.querySelector('[data-sig]');if(sg&&io&&!rm){var sgo=new IntersectionObserver(function(es){if(es[0].isIntersecting){sg.classList.add('draw');sgo.disconnect()}},{threshold:.35});sgo.observe(sg)}else if(sg)sg.classList.add('draw');
+/* numbers count up */
 if(!rm&&io){var co=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;co.unobserve(e.target);var el=e.target,raw=el.dataset.count,m=raw.match(/^([\\d,]+)(.*)$/);if(!m)return;var end=+m[1].replace(/,/g,''),suf=m[2],t0=null;function st(ts){if(!t0)t0=ts;var p=Math.min(1,(ts-t0)/1200),v=Math.round(end*(1-Math.pow(1-p,3)));el.textContent=v.toLocaleString('en-IN')+suf;if(p<1)requestAnimationFrame(st)}requestAnimationFrame(st)})},{threshold:.6});d.querySelectorAll('[data-count]').forEach(function(el){co.observe(el)})}
 })();`;
 
@@ -416,17 +390,6 @@ const ABOUT_CSS = `
 .ab-ambitions{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px}
 .ab-ambitions div{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px}
 .ab-ambitions h3{font-size:30px;margin:0 0 .3em}.ab-ambitions p{margin:0;color:var(--ink2)}
-/* 11 signature */
-.ab-sigsec{background:#efe7da}
-.ab-sig-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:48px;align-items:center}
-.ab-sig{width:100%}
-.ab-sig .ln path{fill:none;stroke:var(--clay);stroke-width:2.5;stroke-dasharray:160;stroke-dashoffset:160;transition:stroke-dashoffset 1.2s ease}
-.ab-sig-wrap.draw .ln path{stroke-dashoffset:0}
-.ab-sig .nd rect{fill:var(--card);stroke:var(--ink);stroke-width:1.5}
-.ab-sig .nd rect.core{fill:var(--forest);stroke:var(--forest)}
-.ab-sig text{font:800 19px "Big Shoulders Display","Arial Narrow",sans-serif;letter-spacing:.08em;text-anchor:middle;fill:var(--ink)}
-.ab-sig text.core{fill:#fff;font-size:21px}
-.ab-sig .base{font-size:17px;fill:var(--clay);letter-spacing:.2em}
 /* 12 proof */
 .ab-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:34px 28px;margin-top:30px}
 .ab-facts b{display:block;font:800 clamp(56px,7vw,96px)/1 "Big Shoulders Display","Arial Narrow",sans-serif;color:var(--forest)}
@@ -445,16 +408,12 @@ const ABOUT_CSS = `
 .ab-end{position:relative;color:#fff;overflow:hidden;background:var(--night)}
 .ab-end-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.42}
 .ab-end .wrap{position:relative;z-index:2}
-.ab-end-a{font-size:clamp(20px,2.2vw,26px);margin:0;color:#f2ede6}
-.ab-end-b{font:800 clamp(34px,5vw,64px)/1.05 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;margin:.2em 0 .6em}
-.ab-end-list{list-style:none;padding:0;margin:0 0 40px}
-.ab-end-list li{font-size:clamp(19px,2vw,24px);padding:4px 0;color:#f2ede6}
 .ab-end-h{font-size:clamp(46px,8vw,112px);color:#f3c9a6;margin:0 0 .4em;max-width:12ch}
 .ab-end-cta{display:flex;gap:14px;flex-wrap:wrap}
 .ab-end .btn-ghost{color:#fff}
 @media(max-width:900px){
 .ab-probs,.ab-roles,.ab-ambitions{grid-template-columns:1fr 1fr}
-.ab-inter-grid,.ab-gain-grid,.ab-origin-grid,.ab-sig-grid{grid-template-columns:1fr;gap:34px}
+.ab-inter-grid,.ab-gain-grid,.ab-origin-grid{grid-template-columns:1fr;gap:34px}
 .ab-cards{grid-template-columns:1fr}.ab-arrow{padding:0;justify-self:center;transform:rotate(90deg)}
 .ab-tmi{grid-template-columns:1fr;gap:0}.ab-tmi-media{position:sticky;top:64px;aspect-ratio:16/10;order:-1;z-index:2;margin-bottom:10px}
 .ab-tmi-step{min-height:auto;padding:26px 0 26px 18px}
