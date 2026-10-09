@@ -650,17 +650,7 @@ ${revs.length ? `<section><div class="wrap"><h2>What people say</h2>${reviewsBlo
   return layout({ title: e.title, desc: e.summary, path: `/experiences/${e.slug}`, body, image: cover(e, true), data });
 }
 
-function aboutPage(data) {
-  const img = cover(bySlug(data, 'winter-trekking'), true) || cover(sorted(data)[0], true);
-  const body = `<section class="page-head"><div class="wrap"><h1>Rock &amp; Anchor</h1>
-<p class="lead">Rock & Anchor began on a trek in September 2021, when Aaditya and Mansi met on the trail and decided to build the kind of outdoor experiences they wished existed: small, safe, deeply local, and good for the villages that host them.</p></div></section>
-<section style="padding-top:20px"><div class="wrap split"><div>${img ? `<img src="${esc(img)}" alt="A Rock & Anchor group in the Sahyadris" loading="lazy">` : ''}</div>
-<div class="prose"><h2 style="margin-top:0">What we do</h2><p>We design outdoor experiences in the Sahyadris for families, schools, companies and curious adults: waterfall treks, stargazing nights, village stays, wildlife walks and survival skills.</p>
-<p>Outdoor learning builds confidence, curiosity and care for the natural world. Every experience is planned so that people come back with more than photos: a skill, a story and a new way of seeing the place they live in.</p>
-<h3>Our two pillars</h3><ul class="ticks"><li><b>Educate.</b> Our programmes teach nature, survival and life skills, and we reinvest in village schools with infrastructure, books and stationery.</li><li><b>Employ.</b> We hire and train villagers to lead and host, so families can earn a dignified living without leaving home.</li></ul></div></div></section>
-${ctaBlock()}`;
-  return layout({ title: 'About Us', desc: 'Rock & Anchor was founded by Aaditya Shah and Mansi Nayyar to create safe, local, meaningful outdoor experiences in the Sahyadris.', path: '/about', body, image: img, data });
-}
+__ABOUT__
 
 function impactPage(data) {
   const img = cover(bySlug(data, 'be-a-villager'), true);
@@ -734,6 +724,17 @@ const html = (s, status = 200, src = '') => new Response(s.replace(/<a ([^>]*?)h
 
 export default {
   async fetch(request, env, ctx) {
+    const res = await handle(request, env, ctx);
+    // Preview and staging copies on workers.dev should never show up in search results.
+    if (!new URL(request.url).hostname.endsWith('.workers.dev')) return res;
+    const out = new Response(res.body, res);
+    out.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    return out;
+  },
+};
+
+async function handle(request, env, ctx) {
+  {
     const url = new URL(request.url);
     if (url.hostname.startsWith('www.')) { url.hostname = url.hostname.slice(4); return Response.redirect(url.toString(), 301); }
     let path = url.pathname.replace(/\/+$/, '') || '/';
@@ -766,5 +767,5 @@ export default {
     if (path === '/contact') return html(contactPage(data));
     if (POLICIES[path.slice(1)]) return html(policyPage(path.slice(1), data));
     return html(notFound(data), 404);
-  },
-};
+  }
+}

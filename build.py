@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.join(here, 'src'))
 import policies
 p = lambda *a: os.path.join(here, *a)
 src = open(p('src', 'template.js')).read()
+src = src.replace('__ABOUT__', open(p('src', 'about.js')).read())
 src = src.replace('__SNAPSHOT__', open(p('src', 'snapshot.json')).read())
 src = src.replace('__LOGO__', base64.b64encode(open(p('assets', 'logo.png'), 'rb').read()).decode())
 src = src.replace('__FAVICON__', base64.b64encode(open(p('assets', 'favicon.png'), 'rb').read()).decode())
