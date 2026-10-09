@@ -7,7 +7,7 @@ const ABOUT_FACTS = [
   ['2,000+', 'Customers'],
   ['19', 'People on the team'],
   ['16', 'From local communities'],
-  ['25%', 'Of every experience supports village schools'],
+  ['25%', 'Of Net Profit supports village schools'],
 ];
 const ABOUT_BELIEFS = [
   'Nature is not a backdrop.',
@@ -44,7 +44,7 @@ function aboutPage(data) {
   ];
   const model = [
     ['Educate', 'We use the outdoors as a classroom.', ph('young-explorers-winter-school', 2), 'A child learning with a facilitator',
-      `<p>Participants learn about:</p><ul class="ab-list"><li>Nature</li><li>Local ecosystems</li><li>Survival and life skills</li><li>Sustainability</li><li>Local culture</li></ul><p>And we support learning in the communities around us. 25% of every experience funds schools in the mountain villages we work in.</p>`],
+      `<p>Participants learn about:</p><ul class="ab-list"><li>Nature</li><li>Local ecosystems</li><li>Survival and life skills</li><li>Sustainability</li><li>Local culture</li></ul><p>And we support learning in the communities around us. 25% of Net Profit funds schools in the mountain villages we work in.</p>`],
     ['Employ', 'We create meaningful opportunities for people from the villages where we operate.', ph('hidden-kingdom', 2), 'A shared meal served on leaves',
       `<p>Not simply as labour. As:</p><ul class="ab-list"><li>Guides</li><li>Facilitators</li><li>Hosts</li><li>Cooks</li><li>Leaders</li><li>Specialists</li></ul><p>16 of our 19 team members come from the villages we work in.</p>`],
     ['Empower', 'Skills become confidence. Confidence becomes leadership. Leadership creates possibilities for others.', ph('be-a-villager', 1), 'A facilitator sitting in a circle with village children',
@@ -60,7 +60,7 @@ function aboutPage(data) {
   ];
   const ground = [
     ['Village schools', 'Education and infrastructure support.', ph('be-a-villager', 3), 'Village school children',
-      '25% of every experience funds schools in the mountain villages we work in. The money goes into school infrastructure, books and stationery.',
+      '25% of Net Profit funds schools in the mountain villages we work in. The money goes into school infrastructure, books and stationery.',
       'Painted and equipped 3 schools with water coolers, fans, textbooks and stationery. Installed lights, fans, solar panels and inverters in 2 schools and 2 anganwadis.'],
     ['Local guides', 'Training and employment.', ph('young-explorers-winter-school', 1), 'A local guide leading a group',
       'Villagers know these mountains better than anyone. We train them to lead trips using our safety procedures, with skills in leadership, communication, first aid and outdoor management.',

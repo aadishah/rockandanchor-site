@@ -687,7 +687,7 @@ const ABOUT_FACTS = [
   ['2,000+', 'Customers'],
   ['19', 'People on the team'],
   ['16', 'From local communities'],
-  ['25%', 'Of every experience supports village schools'],
+  ['25%', 'Of Net Profit supports village schools'],
 ];
 const ABOUT_BELIEFS = [
   'Nature is not a backdrop.',
@@ -724,7 +724,7 @@ function aboutPage(data) {
   ];
   const model = [
     ['Educate', 'We use the outdoors as a classroom.', ph('young-explorers-winter-school', 2), 'A child learning with a facilitator',
-      `<p>Participants learn about:</p><ul class="ab-list"><li>Nature</li><li>Local ecosystems</li><li>Survival and life skills</li><li>Sustainability</li><li>Local culture</li></ul><p>And we support learning in the communities around us. 25% of every experience funds schools in the mountain villages we work in.</p>`],
+      `<p>Participants learn about:</p><ul class="ab-list"><li>Nature</li><li>Local ecosystems</li><li>Survival and life skills</li><li>Sustainability</li><li>Local culture</li></ul><p>And we support learning in the communities around us. 25% of Net Profit funds schools in the mountain villages we work in.</p>`],
     ['Employ', 'We create meaningful opportunities for people from the villages where we operate.', ph('hidden-kingdom', 2), 'A shared meal served on leaves',
       `<p>Not simply as labour. As:</p><ul class="ab-list"><li>Guides</li><li>Facilitators</li><li>Hosts</li><li>Cooks</li><li>Leaders</li><li>Specialists</li></ul><p>16 of our 19 team members come from the villages we work in.</p>`],
     ['Empower', 'Skills become confidence. Confidence becomes leadership. Leadership creates possibilities for others.', ph('be-a-villager', 1), 'A facilitator sitting in a circle with village children',
@@ -740,7 +740,7 @@ function aboutPage(data) {
   ];
   const ground = [
     ['Village schools', 'Education and infrastructure support.', ph('be-a-villager', 3), 'Village school children',
-      '25% of every experience funds schools in the mountain villages we work in. The money goes into school infrastructure, books and stationery.',
+      '25% of Net Profit funds schools in the mountain villages we work in. The money goes into school infrastructure, books and stationery.',
       'Painted and equipped 3 schools with water coolers, fans, textbooks and stationery. Installed lights, fans, solar panels and inverters in 2 schools and 2 anganwadis.'],
     ['Local guides', 'Training and employment.', ph('young-explorers-winter-school', 1), 'A local guide leading a group',
       'Villagers know these mountains better than anyone. We train them to lead trips using our safety procedures, with skills in leadership, communication, first aid and outdoor management.',
@@ -1130,7 +1130,7 @@ function impactPage(data, opts = {}) {
   const has = { Stories: stories.length, Projects: projects.length, Money: money.length, Places: places.length };
   const nums = (data.impact || []).map((m, i) => ({ ...m, i, link: has[m.opens] ? m.opens : '' }));
   const numCard = (m) => `<${m.link ? 'button type="button"' : 'div'} class="im-num${m.link ? ' im-click' : ''}"${m.link ? ` data-open="${m.link}"` : ''}><b>${esc(m.value)}</b><span>${esc(m.metric)}</span>${m.link ? `<em>See the evidence →</em>` : ''}</${m.link ? 'button' : 'div'}>`;
-  const schoolsCard = `<button type="button" class="im-num im-click im-accent" data-open="${projects.some((x) => x.category === 'Education') ? 'Education' : 'Money'}"><b>25%</b><span>Of every experience goes to village schools</span><em>See what it funded →</em></button>`;
+  const schoolsCard = `<button type="button" class="im-num im-click im-accent" data-open="${projects.some((x) => x.category === 'Education') ? 'Education' : 'Money'}"><b>25%</b><span>Of Net Profit goes to village schools</span><em>See what it funded →</em></button>`;
 
   // 3. Follow the money.
   const steps = [
@@ -1138,7 +1138,7 @@ function impactPage(data, opts = {}) {
     ['Experience delivery', ''],
     ['Local people are paid', 'Local people are paid'],
     ['Village businesses participate', 'Village businesses participate'],
-    ['25% supports village schools', 'Village schools'],
+    ['25% of Net Profit supports village schools', 'Village schools'],
     ['Skills, infrastructure and opportunity', 'Skills, infrastructure and opportunity'],
   ];
   const moneyFor = (k) => money.filter((m) => k && m.step === k);
@@ -1183,9 +1183,6 @@ function impactPage(data, opts = {}) {
       ${[['School initiatives', pl.schools], ['Training', pl.training], ['Environmental work', pl.env], ['Stories', pl.stories]].filter(([, v]) => v).map(([k, v]) => `<div><dt>${k}</dt><dd>${p(v)}</dd></div>`).join('')}
     </dl></div>`;
 
-  // 8. Impact by category.
-  const cats = ['Education', 'Livelihoods', 'Place', 'Experiences'].map((c) => ({ c, nums: nums.filter((m) => m.category === c), projs: projects.filter((x) => x.category === c) })).filter((x) => x.nums.length || x.projs.length);
-
   // 11. Archive by year.
   const years = {};
   const addY = (y, kind, label, live) => { if (!y) return; (years[y] = years[y] || []).push({ kind, label, live }); };
@@ -1199,8 +1196,8 @@ function impactPage(data, opts = {}) {
   const modals = [
     stories.length ? modal('Stories', 'The people behind the number', `<ul class="im-mlist">${stories.map((x) => `<li><b>${esc(x.name)}</b>${x.now ? ` <span>${esc(x.now)}</span>` : ''}${x.today ? `<p>${esc(x.today)}</p>` : ''}${draft(x)}</li>`).join('')}</ul><a class="im-link" href="#people" data-close>Read their stories →</a>`) : '',
     projects.length ? modal('Projects', 'The work behind the number', `<ul class="im-mlist">${projects.map((x) => `<li><b>${esc(x.title)}</b>${x.did ? `<p>${esc(x.did)}</p>` : ''}${draft(x)}</li>`).join('')}</ul><a class="im-link" href="#projects" data-close>See all projects →</a>`) : '',
-    projects.some((x) => x.category === 'Education') ? modal('Education', 'What 25% has funded', `<ul class="im-mlist">${projects.filter((x) => x.category === 'Education').map((x) => `<li><b>${esc(x.title)}</b>${x.did ? `<p>${esc(x.did)}</p>` : ''}${draft(x)}</li>`).join('')}</ul><a class="im-link" href="#projects" data-close>See all projects →</a>`) : '',
-    money.length ? modal('Money', 'Where the money went', `<ul class="im-mlist">${money.map(fig).join('')}</ul><a class="im-link" href="#money" data-close>Follow the money →</a>`) : modal('Money', 'Where the money goes', `<p>25% of every experience funds schools in the mountain villages we work in.</p><a class="im-link" href="#money" data-close>Follow the money →</a>`),
+    projects.some((x) => x.category === 'Education') ? modal('Education', 'What 25% of Net Profit has funded', `<ul class="im-mlist">${projects.filter((x) => x.category === 'Education').map((x) => `<li><b>${esc(x.title)}</b>${x.did ? `<p>${esc(x.did)}</p>` : ''}${draft(x)}</li>`).join('')}</ul><a class="im-link" href="#projects" data-close>See all projects →</a>`) : '',
+    money.length ? modal('Money', 'Where the money went', `<ul class="im-mlist">${money.map(fig).join('')}</ul><a class="im-link" href="#money" data-close>Follow the money →</a>`) : modal('Money', 'Where the money goes', `<p>25% of Net Profit funds schools in the mountain villages we work in.</p><a class="im-link" href="#money" data-close>Follow the money →</a>`),
     places.length ? modal('Places', 'Where it happened', `<ul class="im-mlist">${placeData.map((pl) => `<li><b>${esc(pl.area)}</b>${pl.exps.length ? ` <span>${pl.exps.length} experience${pl.exps.length > 1 ? 's' : ''}</span>` : ''}${draft(pl)}</li>`).join('')}</ul><a class="im-link" href="#places" data-close>Open the map →</a>`) : '',
   ].join('');
 
@@ -1244,12 +1241,6 @@ ${places.length ? `<section class="im-places" id="places"><div class="wrap">
   <p class="im-kicker rv">The places</p><h2 class="im-h rv">Places we work are not anonymous backdrops.</h2>
   <p class="im-p rv">We do not share village names or exact locations. It protects the people who live there and the places themselves from overcrowding. The map shows the general areas we work in.</p>
   <div class="im-map-grid"><div class="im-map-wrap rv">${mapSvg}</div><div class="im-place-panel" aria-live="polite">${placeData.map(placePanel).join('')}</div></div>
-</div></section>` : ''}
-
-${cats.length ? `<section class="im-cats" id="categories"><div class="wrap">
-  <p class="im-kicker rv">Impact by category</p><h2 class="im-h rv">The work, sorted.</h2>
-  <div class="im-tabs" role="tablist">${cats.map((x, i) => `<button type="button" role="tab" class="im-tab${i ? '' : ' on'}" data-cat="${x.c}" aria-selected="${i ? 'false' : 'true'}">${x.c}</button>`).join('')}</div>
-  ${cats.map((x, i) => `<div class="im-cat" data-cat="${x.c}"${i ? ' hidden' : ''}>${x.nums.length ? `<div class="im-cat-nums">${x.nums.map((m) => `<div><b>${esc(m.value)}</b><span>${esc(m.metric)}</span></div>`).join('')}</div>` : ''}${x.projs.length ? `<ul class="im-cat-projs">${x.projs.map((pr) => `<li><b>${esc(pr.title)}</b>${pr.did ? ` <span>${esc(pr.did)}</span>` : ''}${draft(pr)}</li>`).join('')}</ul>` : ''}</div>`).join('')}
 </div></section>` : ''}
 
 <section class="im-measure" id="measuring"><div class="wrap">
@@ -1300,8 +1291,6 @@ var pins=d.querySelectorAll('.im-map .pin'),panels=d.querySelectorAll('.im-place
 function pick(i){pins.forEach(function(p){p.classList.toggle('on',p.dataset.place===i)});panels.forEach(function(p){p.hidden=p.dataset.place!==i})}
 pins.forEach(function(p){p.addEventListener('click',function(){pick(p.dataset.place)});p.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(p.dataset.place)}})});
 if(pins.length)pick(pins[0].dataset.place);
-var tabs=d.querySelectorAll('.im-tab'),cats=d.querySelectorAll('.im-cat');
-tabs.forEach(function(t){t.addEventListener('click',function(){tabs.forEach(function(x){var on=x===t;x.classList.toggle('on',on);x.setAttribute('aria-selected',on)});cats.forEach(function(c){c.hidden=c.dataset.cat!==t.dataset.cat})})});
 })();`;
 
 const IMPACT_CSS = `
@@ -1386,15 +1375,6 @@ const IMPACT_CSS = `
 .im-place{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px}
 .im-place h3{font-size:40px;margin:0 0 8px}
 .im-place ul{margin:0;padding-left:18px}.im-place a{color:var(--clay);font-weight:700;text-decoration:none}
-/* categories */
-.im-cats{background:var(--card);border-top:1px solid var(--line)}
-.im-tabs{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 22px}
-.im-tab{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:10px 18px;font:700 15px "DM Sans",sans-serif;color:var(--ink);cursor:pointer}
-.im-tab.on{background:var(--forest);border-color:var(--forest);color:#fff}
-.im-cat-nums{display:flex;flex-wrap:wrap;gap:16px 40px;margin-bottom:18px}
-.im-cat-nums b{display:block;font:800 clamp(44px,5vw,64px)/1 "Big Shoulders Display","Arial Narrow",sans-serif;color:var(--forest)}
-.im-cat-nums span{color:var(--ink2)}
-.im-cat-projs{list-style:none;padding:0;margin:0}.im-cat-projs li{padding:12px 0;border-top:1px solid var(--line)}.im-cat-projs span{color:var(--ink2)}
 /* measuring */
 .im-measure-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}
 .im-measure-grid>div{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px}
