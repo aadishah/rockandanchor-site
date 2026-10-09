@@ -652,18 +652,12 @@ ${revs.length ? `<section><div class="wrap"><h2>What people say</h2>${reviewsBlo
 
 function aboutPage(data) {
   const img = cover(bySlug(data, 'winter-trekking'), true) || cover(sorted(data)[0], true);
-  const body = `<section class="page-head"><div class="wrap"><p class="eyebrow">About us</p><h1>The Rock and the Anchor</h1>
+  const body = `<section class="page-head"><div class="wrap"><h1>Rock &amp; Anchor</h1>
 <p class="lead">Rock & Anchor began on a trek in September 2021, when Aaditya and Mansi met on the trail and decided to build the kind of outdoor experiences they wished existed: small, safe, deeply local, and good for the villages that host them.</p></div></section>
 <section style="padding-top:20px"><div class="wrap split"><div>${img ? `<img src="${esc(img)}" alt="A Rock & Anchor group in the Sahyadris" loading="lazy">` : ''}</div>
 <div class="prose"><h2 style="margin-top:0">What we do</h2><p>We design outdoor experiences in the Sahyadris for families, schools, companies and curious adults: waterfall treks, stargazing nights, village stays, wildlife walks and survival skills.</p>
 <p>Outdoor learning builds confidence, curiosity and care for the natural world. Every experience is planned so that people come back with more than photos: a skill, a story and a new way of seeing the place they live in.</p>
 <h3>Our two pillars</h3><ul class="ticks"><li><b>Educate.</b> Our programmes teach nature, survival and life skills, and we reinvest in village schools with infrastructure, books and stationery.</li><li><b>Employ.</b> We hire and train villagers to lead and host, so families can earn a dignified living without leaving home.</li></ul></div></div></section>
-<section><div class="wrap"><p class="eyebrow">The founders</p><h2>Who you will be outside with</h2><div class="people">
-<div class="person"><span class="role">The Rock · Co-founder &amp; Outdoor Educator</span><h3>Aaditya Shah</h3><p>A former software engineer turned mountaineer and outdoor education leader. Thirteen years of exploring and leading hundreds of experiences in the US and India for people of all ages.</p>
-${certBadges(['Wilderness First Responder (USA)', 'Glacier Travel & Crevasse Rescue', 'AIARE Avalanche Rescue', 'Basic Mountaineering (NIM)', 'Diploma in Mountaineering (topped the course)', 'Advanced First Aid, CPR & AED', 'Sahyadri Search & Rescue'])}</div>
-<div class="person"><span class="role">The Anchor · Co-founder &amp; Outdoor Educator</span><h3>Mansi Nayyar</h3><p>A creative supervisor and trekker who has spent ten years leading offbeat treks across the Sahyadris, with treks led in Vietnam, Bhutan and Nepal and 450+ travel experiences curated.</p>
-${certBadges(['Wilderness First Aid', 'Basic Rock Climbing', 'Basic Mountain Biking', 'Paragliding Level 1', 'Cannes Lions Silver & Bronze 2025'])}</div>
-</div><p class="lead" style="margin-top:34px">Our team today includes villagers from the communities we work in, trained in leadership, first aid and our safety procedures.</p></div></section>
 ${ctaBlock()}`;
   return layout({ title: 'About Us', desc: 'Rock & Anchor was founded by Aaditya Shah and Mansi Nayyar to create safe, local, meaningful outdoor experiences in the Sahyadris.', path: '/about', body, image: img, data });
 }
