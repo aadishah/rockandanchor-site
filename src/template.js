@@ -13,7 +13,8 @@ const EF = {
 };
 const VF = { start: 'fldWr96uilLEjfI24', end: 'fldLWXxoeM3Xr7Qkd', exp: 'fldTwb0rZY39trwD4', status: 'fldEueCyQC6zJEEux', hide: 'fldYwt0HrpvixX8gg' };
 const RF = { name: 'fldIgYRm1oIN51m2Z', text: 'fldoiPyv0cAhFNMtJ', exp: 'fldCKUcXdn2vivo5h', show: 'fldwAqYVwcDDwqxLf', photo: 'fldsq62JdBgiw4j8A' };
-const TF = { name: 'fldOCEREnRFIAh8zc', role: 'fldgPjOaXv7pTdwmD', group: 'fldfnCycPmtEiabk9', bio: 'fldKNHwt0dVNiP8td', photo: 'fldx0IblfxhE0GYqL', order: 'fldH11Xe1zRMSZjm6', show: 'fldEH77VIUX1fdM6c' };
+const TF = { name: 'fldOCEREnRFIAh8zc', role: 'fldgPjOaXv7pTdwmD', group: 'fldfnCycPmtEiabk9', bio: 'fldKNHwt0dVNiP8td', photo: 'fldx0IblfxhE0GYqL', order: 'fldH11Xe1zRMSZjm6', show: 'fldEH77VIUX1fdM6c',
+  kind: 'fldze5mhPxMT8evgs', area: 'fld92I8Rdv22owYBt', joined: 'fld4STp2AroKaSvaQ', knows: 'fldOqWKa4wuXaYTdU', leads: 'fldlL6muSbNdqKFO2', learned: 'fld4BlKDhsKL2zAbt', creates: 'fld1KHz2UfFM7Mtmo', building: 'fldR905xb7rpp0vyz', ask: 'fldIB7Xx70u31yph6', quote: 'flduQ64BhAZnaIFa8', quoteOk: 'fld6l7HsshhSbLJpS', from: 'fldN74fuymMhezvYj' };
 const TEAM_GROUPS = ['Founders', 'Experience Leaders', 'Business Development', 'Social Media'];
 const IF = { metric: 'fldX1aQLHwAWY4A0C', value: 'fldcFhyLkZhdUiyF2', order: 'fldWCIzvRPTsj0hQW', show: 'fldMKHdAIyLWJJsKQ', category: 'fldoPU4x6KqBKNdrY', opens: 'fldkAcX2ofFwe8OgO' };
 // Impact Created evidence tables. Rows only appear publicly when Show on Website is ticked (stories also need Consent Given).
@@ -139,8 +140,10 @@ async function loadLive(env) {
     .map((r) => {
       const f = r.fields, g = f[TF.group];
       const p = (f[TF.photo] || [])[0];
-      return { name: f[TF.name], role: f[TF.role] || '', group: (g && g.name) || g || '', bio: f[TF.bio] || '', order: f[TF.order] ?? 99,
-        photo: p ? (p.thumbnails && p.thumbnails.large && p.thumbnails.large.url) || p.url : '' };
+      return { id: r.id, name: f[TF.name], role: f[TF.role] || '', group: (g && g.name) || g || '', bio: f[TF.bio] || '', order: f[TF.order] ?? 99,
+        photo: p ? (p.thumbnails && p.thumbnails.large && p.thumbnails.large.url) || p.url : '',
+        kind: selName(f[TF.kind]), area: f[TF.area] || '', joined: f[TF.joined] || null, knows: f[TF.knows] || '', leads: f[TF.leads] || '', learned: f[TF.learned] || '',
+        creates: f[TF.creates] || '', building: f[TF.building] || '', ask: f[TF.ask] || '', quote: f[TF.quote] || '', quoteOk: !!f[TF.quoteOk], from: f[TF.from] || [] };
     });
   return { experiences, events, reviews, impact, team, evidence: ev, source: 'live' };
 }
@@ -679,18 +682,7 @@ __ABOUT__
 
 __IMPACT__
 
-function teamPage(data) {
-  const team = data.team || [];
-  const initials = (n) => n.split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
-  const groups = TEAM_GROUPS.concat([...new Set(team.map((t) => t.group))].filter((g) => g && !TEAM_GROUPS.includes(g)))
-    .map((g) => ({ g, people: team.filter((t) => t.group === g).sort((a, b) => a.order - b.order) })).filter((x) => x.people.length)
-    .reduce((acc, x) => { const last = acc[acc.length - 1]; if (x.people.length === 1 && x.g !== 'Founders' && last && last.solo) { last.people.push(...x.people); last.g = 'Behind the scenes'; } else acc.push({ ...x, solo: x.people.length === 1 && x.g !== 'Founders' }); return acc; }, []);
-  const body = `<section class="page-head"><div class="wrap"><p class="eyebrow">Team</p><h1>The people behind your day outdoors</h1>
-<p class="lead">A small team of outdoor educators, experience leaders and village hosts who plan every detail, lead every group and look after you from the first message to the walk back.</p></div></section>
-${groups.map(({ g, people }) => `<section class="tight" style="padding-top:10px"><div class="wrap"><h2>${esc(g)}</h2><div class="team">${people.map((p) => `<div class="member">${p.photo ? `<img src="${esc(p.photo)}" alt="${esc(p.name)}" loading="lazy">` : `<div class="avatar">${esc(initials(p.name))}</div>`}<div><span class="role">${esc(p.role)}</span><h3>${esc(p.name)}</h3><p>${esc(p.bio)}</p></div></div>`).join('')}</div></div></section>`).join('')}
-${ctaBlock()}`;
-  return layout({ title: 'Team', desc: 'Meet the Rock & Anchor team: founders, experience leaders, business development and social media.', path: '/team', body, data });
-}
+__TEAM__
 
 function contactPage(data) {
   const body = `<section class="page-head"><div class="wrap"><p class="eyebrow">Contact</p><h1>Let's plan your day outdoors</h1>
@@ -774,7 +766,7 @@ async function handle(request, env, ctx) {
       return html(notFound(data), 404);
     }
     if (path === '/about') return html(aboutPage(data));
-    if (path === '/team') return html(teamPage(data), 200, data.source);
+    if (path === '/team') return html(teamPage(data, { drafts: url.hostname.startsWith('staging-') }), 200, data.source);
     if (path === '/impact') return html(impactPage(data, { drafts: url.hostname.startsWith('staging-') }), 200, data.source);
     if (path === '/contact') return html(contactPage(data));
     if (POLICIES[path.slice(1)]) return html(policyPage(path.slice(1), data));
