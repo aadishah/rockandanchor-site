@@ -356,7 +356,7 @@ const ABOUT_CSS = `
 .ab-tile-body b{display:block;font:800 26px "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase}
 .ab-tile-body span{display:block;color:var(--ink2);font-size:15px;margin:2px 0 10px}
 .ab-tile-body em{font-style:normal;font-weight:700;color:var(--clay);font-size:14px}
-.ab-modal{position:fixed;inset:0;z-index:200;background:rgba(12,16,22,.7);display:grid;place-items:center;padding:20px}
+.ab-modal{position:fixed;inset:0;z-index:1000;background:rgba(12,16,22,.7);display:grid;place-items:center;padding:20px}
 .ab-modal[hidden]{display:none}
 .ab-modal-card{position:relative;background:var(--card);border-radius:18px;max-width:880px;width:100%;max-height:90vh;overflow:auto}
 .ab-g{display:grid;grid-template-columns:1fr 1fr}

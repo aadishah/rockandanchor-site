@@ -15,7 +15,14 @@ const VF = { start: 'fldWr96uilLEjfI24', end: 'fldLWXxoeM3Xr7Qkd', exp: 'fldTwb0
 const RF = { name: 'fldIgYRm1oIN51m2Z', text: 'fldoiPyv0cAhFNMtJ', exp: 'fldCKUcXdn2vivo5h', show: 'fldwAqYVwcDDwqxLf', photo: 'fldsq62JdBgiw4j8A' };
 const TF = { name: 'fldOCEREnRFIAh8zc', role: 'fldgPjOaXv7pTdwmD', group: 'fldfnCycPmtEiabk9', bio: 'fldKNHwt0dVNiP8td', photo: 'fldx0IblfxhE0GYqL', order: 'fldH11Xe1zRMSZjm6', show: 'fldEH77VIUX1fdM6c' };
 const TEAM_GROUPS = ['Founders', 'Experience Leaders', 'Business Development', 'Social Media'];
-const IF = { metric: 'fldX1aQLHwAWY4A0C', value: 'fldcFhyLkZhdUiyF2', order: 'fldWCIzvRPTsj0hQW', show: 'fldMKHdAIyLWJJsKQ' };
+const IF = { metric: 'fldX1aQLHwAWY4A0C', value: 'fldcFhyLkZhdUiyF2', order: 'fldWCIzvRPTsj0hQW', show: 'fldMKHdAIyLWJJsKQ', category: 'fldoPU4x6KqBKNdrY', opens: 'fldkAcX2ofFwe8OgO' };
+// Impact Created evidence tables. Rows only appear publicly when Show on Website is ticked (stories also need Consent Given).
+const IT = { proj: 'tblO5fhefTEiwPCrL', story: 'tbl0qmZJYSqfbJPUj', learn: 'tblNiUX5KTmF7D1CM', money: 'tblpE6SiN0rR5PKuq', place: 'tblTlUsc0d0JYOR6P' };
+const PJ = { title: 'fldTSF31PRLJ2VDeM', show: 'fldHwPFRFC0ei7dsQ', order: 'fld5u5mysc1bnMX6K', category: 'fld5UnNMP9SNHFLJ3', year: 'fldGlQfsKw3M6ZuXI', area: 'fldA8qAyT2ixMo8Io', saw: 'fldx1ED4Oddqyvx9h', did: 'fldy7AxYXMBasLAan', who: 'fldmDFfJ8fYM51NgE', changed: 'fldZKJATOSDzZOjDN', next: 'fldc3WXuspgOcij8y', status: 'fldpKDvyuT7aO26YN', photo: 'fldW56CKYufKiFFhA' };
+const SF = { name: 'fldVcU4eB8TqKPiaO', show: 'fldVQzuRbZSF6H6cs', consent: 'fldnZfxv83ykIjY1a', order: 'fldQY0jW37UyJqSQh', then: 'fldH8cFHumuHuIzjP', now: 'fldKaffXv65WAWCUg', started: 'fldlcLjE7kNu4TGCo', learned: 'fldzdoWIVzDwNsXQ2', today: 'fldMzdH3RBe1sWXyq', next: 'fldmm2M9C8ZjQEjyV', year: 'fld3k824zqqmAAQlI', photo: 'fldIc3PUOTLYVo06E' };
+const LF = { title: 'fldGjJZumW4W0OKVE', show: 'fldGAmjvMowzEaMmz', order: 'fld42U9WiAX6hzK6P', year: 'fldmCe3hLHpHgbwzH', tried: 'fldvqHI1Rc6An6XBw', happened: 'fldbDSD1So0q3W1t6', learned: 'fld8EqBtdIB11ZeV8', changed: 'fldilg6anHBcWdhe0' };
+const MF = { label: 'fldyOm06vfgUjJLjk', show: 'fldhXmpFSwlKjwO4u', order: 'fldTCSD4CBGtHqS5B', step: 'fldvek276UVHNdmPT', amount: 'fldtBn2DWYxpFhkQ8', count: 'fldQ7xl2LK0n3niOq', period: 'fld7Xk6GxMTEwgMzT', note: 'fldfab4l9TAVOBZrT' };
+const PF = { area: 'fldMKXm0cOPMmxS4o', show: 'fldc7wAz0K6cHezsf', order: 'fld2c2Ksv3uScyAq2', lat: 'fldUo21hlsmghGass', lng: 'fldOIWCHP3Tt5bvoi', summary: 'fldh2IoMFc76i9zu3', hosts: 'fldZ0EgBYWWzJzcpZ', schools: 'fldkYkg0RC1b2pd53', training: 'fldkMVQg7ebvQ4nQY', env: 'fldld8V4SatweATYJ', stories: 'fld20XuWae734vxp1', match: 'fldlnrIe1SXnI1kXH' };
 const LIVE_STATUSES = ['Approved', 'Ready', 'Future'];
 const CACHE_SECONDS = 300;
 
@@ -60,6 +67,23 @@ async function atList(env, table, fields, formula) {
   return out;
 }
 
+const selName = (v) => (v && typeof v === 'object' ? v.name : v) || '';
+const attUrl = (a, big) => { const p = (a || [])[0]; if (!p) return ''; const t = p.thumbnails || {}; return (big ? t.full && t.full.url : t.large && t.large.url) || p.url; };
+// Loads the Impact Created evidence. Every row keeps its publish flags so drafts can be previewed on staging only.
+async function loadEvidence(env) {
+  const get = (t, f) => atList(env, t, Object.values(f)).catch(() => []);
+  const [pj, st, ln, mo, pl] = await Promise.all([get(IT.proj, PJ), get(IT.story, SF), get(IT.learn, LF), get(IT.money, MF), get(IT.place, PF)]);
+  const o = (v) => (typeof v === 'number' ? v : 999);
+  const by = (a, b) => a.order - b.order;
+  return {
+    projects: pj.filter((r) => r.fields[PJ.title]).map((r) => { const f = r.fields; return { title: f[PJ.title], live: !!f[PJ.show], order: o(f[PJ.order]), category: selName(f[PJ.category]), year: f[PJ.year] || null, area: f[PJ.area] || '', saw: f[PJ.saw] || '', did: f[PJ.did] || '', who: f[PJ.who] || '', changed: f[PJ.changed] || '', next: f[PJ.next] || '', status: selName(f[PJ.status]), photo: attUrl(f[PJ.photo], true) }; }).sort(by),
+    stories: st.filter((r) => r.fields[SF.name]).map((r) => { const f = r.fields; return { name: f[SF.name], live: !!(f[SF.show] && f[SF.consent]), order: o(f[SF.order]), then: f[SF.then] || '', now: f[SF.now] || '', started: f[SF.started] || '', learned: f[SF.learned] || '', today: f[SF.today] || '', next: f[SF.next] || '', year: f[SF.year] || null, photo: attUrl(f[SF.photo]) }; }).sort(by),
+    learnings: ln.filter((r) => r.fields[LF.title]).map((r) => { const f = r.fields; return { title: f[LF.title], live: !!f[LF.show], order: o(f[LF.order]), year: f[LF.year] || null, tried: f[LF.tried] || '', happened: f[LF.happened] || '', learned: f[LF.learned] || '', changed: f[LF.changed] || '' }; }).sort(by),
+    money: mo.filter((r) => r.fields[MF.label]).map((r) => { const f = r.fields; return { label: f[MF.label], live: !!f[MF.show], order: o(f[MF.order]), step: selName(f[MF.step]), amount: f[MF.amount] ?? null, count: f[MF.count] ?? null, period: f[MF.period] || '', note: f[MF.note] || '' }; }).sort(by),
+    places: pl.filter((r) => r.fields[PF.area]).map((r) => { const f = r.fields; return { area: f[PF.area], live: !!f[PF.show], order: o(f[PF.order]), lat: f[PF.lat] ?? null, lng: f[PF.lng] ?? null, summary: f[PF.summary] || '', hosts: f[PF.hosts] ?? null, schools: f[PF.schools] || '', training: f[PF.training] || '', env: f[PF.env] || '', stories: f[PF.stories] || '', match: String(f[PF.match] || f[PF.area]).split(',').map((x) => x.trim().toLowerCase()).filter(Boolean) }; }).sort(by),
+  };
+}
+
 async function loadLive(env) {
   const [exps, evs, revs, imps, tms] = await Promise.all([
     atList(env, T.exp, Object.values(EF)),
@@ -68,6 +92,7 @@ async function loadLive(env) {
     atList(env, T.imp, Object.values(IF)).catch(() => null),
     atList(env, T.team, Object.values(TF)).catch(() => []),
   ]);
+  const ev = await loadEvidence(env);
   const experiences = exps
     .filter((r) => r.fields[EF.show] && String(r.fields[EF.slug] || '').trim() && (r.fields[EF.title] || r.fields[EF.name]))
     .map((r) => {
@@ -107,7 +132,7 @@ async function loadLive(env) {
     .map((r) => ({ name: r.fields[RF.name] || '', text: r.fields[RF.text], exp: r.fields[RF.exp] || [], photo: att(r.fields[RF.photo]) }));
   const impact = imps === null ? (MEMO && MEMO.d.impact) || SNAPSHOT.impact : imps
     .filter((r) => r.fields[IF.show] && r.fields[IF.metric])
-    .map((r) => ({ metric: r.fields[IF.metric], value: r.fields[IF.value] || '', order: r.fields[IF.order] ?? 99 }))
+    .map((r) => ({ metric: r.fields[IF.metric], value: r.fields[IF.value] || '', order: r.fields[IF.order] ?? 99, category: selName(r.fields[IF.category]), opens: selName(r.fields[IF.opens]) }))
     .sort((a, b) => a.order - b.order);
   const team = !tms.length && SNAPSHOT.team ? SNAPSHOT.team : tms
     .filter((r) => r.fields[TF.show] && r.fields[TF.name])
@@ -117,7 +142,7 @@ async function loadLive(env) {
       return { name: f[TF.name], role: f[TF.role] || '', group: (g && g.name) || g || '', bio: f[TF.bio] || '', order: f[TF.order] ?? 99,
         photo: p ? (p.thumbnails && p.thumbnails.large && p.thumbnails.large.url) || p.url : '' };
     });
-  return { experiences, events, reviews, impact, team, source: 'live' };
+  return { experiences, events, reviews, impact, team, evidence: ev, source: 'live' };
 }
 
 let MEMO = null;
@@ -126,7 +151,7 @@ async function getData(env, ctx) {
   const now = Date.now();
   if (MEMO && now - MEMO.t < CACHE_SECONDS * 1000) return MEMO.d;
   const cache = caches.default;
-  const key = new Request('https://data.cache/rock-anchor-v1');
+  const key = new Request('https://data.cache/rock-anchor-v2');
   const hit = await cache.match(key);
   if (hit) {
     const d = await hit.json();
@@ -652,20 +677,7 @@ ${revs.length ? `<section><div class="wrap"><h2>What people say</h2>${reviewsBlo
 
 __ABOUT__
 
-function impactPage(data) {
-  const img = cover(bySlug(data, 'be-a-villager'), true);
-  const img2 = cover(bySlug(data, 'little-feet-sunset-safari'), true);
-  const body = `<section class="page-head"><div class="wrap"><p class="eyebrow">Impact created</p><h1>Good for people. Good for the villages.</h1>
-<p class="lead">25% of every experience funds schools in the mountain villages we work in. And every trip is hosted and guided by people who live there.</p></div></section>
-${data.impact.length ? `<section class="band tight"><div class="wrap"><div class="stats" style="margin-top:0">${data.impact.map((i) => `<div class="stat"><b>${esc(i.value)}</b><span>${esc(i.metric)}</span></div>`).join('')}</div></div></section>` : ''}
-<section><div class="wrap split"><div class="prose"><p class="eyebrow">Educate</p><h2 style="margin-top:0">Schools in the hills</h2><p>Profits from our experiences go back into village schools. So far we have painted and equipped schools with water coolers, fans, textbooks and stationery, and installed lights, fans, solar panels and inverters in schools and anganwadis.</p><p>Guests often spend time teaching and playing with village children, and our programmes for city children build a love for nature, survival skills and an understanding of sustainability.</p></div>
-<div>${img ? `<img src="${esc(img)}" alt="Children at a Rock & Anchor village experience" loading="lazy">` : ''}</div></div></section>
-<section style="padding-top:0"><div class="wrap split"><div>${img2 ? `<img src="${esc(img2)}" alt="Families with village hosts" loading="lazy">` : ''}</div>
-<div class="prose"><p class="eyebrow">Employ</p><h2 style="margin-top:0">Livelihoods close to home</h2><p>Villagers know these mountains better than anyone, which makes our experiences safer and more authentic. We train local hosts and guides to lead trips using our procedures, with skills in leadership, communication, first aid and outdoor management.</p><p>Jobs in the village mean families can stay together instead of migrating to the city for work.</p>
-<h3>Search and rescue</h3><p>Our team volunteers with Sahyadri search and rescue, with 48 live rescues to date.</p></div></div></section>
-${ctaBlock()}`;
-  return layout({ title: 'Impact Created', desc: '25% of every Rock & Anchor experience funds village schools, and our trips employ local guides and hosts in the Sahyadris.', path: '/impact', body, image: img, data });
-}
+__IMPACT__
 
 function teamPage(data) {
   const team = data.team || [];
@@ -763,7 +775,7 @@ async function handle(request, env, ctx) {
     }
     if (path === '/about') return html(aboutPage(data));
     if (path === '/team') return html(teamPage(data), 200, data.source);
-    if (path === '/impact') return html(impactPage(data));
+    if (path === '/impact') return html(impactPage(data, { drafts: url.hostname.startsWith('staging-') }), 200, data.source);
     if (path === '/contact') return html(contactPage(data));
     if (POLICIES[path.slice(1)]) return html(policyPage(path.slice(1), data));
     return html(notFound(data), 404);
