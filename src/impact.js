@@ -1,4 +1,6 @@
 // ---------- Impact Created: the open impact books ----------
+// Impact speaks as evidence: what happened, what changed, where the money went. No philosophy, no team directory,
+// no selling. A person appears here only as evidence of change (Stories), never simply because they are on the team.
 // About Us explains the system. Impact Created opens it up: numbers, money flow, projects, people,
 // places, outcomes, what we measure, what did not work and a year-by-year archive.
 // Evidence sections read from the Website Impact tables in Airtable and stay hidden until rows are published.
@@ -66,7 +68,7 @@ function impactPage(data, opts = {}) {
   </svg>`;
   const placePanel = (pl) => `<div class="im-place" data-place="${pl.i}"${pl.i ? ' hidden' : ''}>${draft(pl)}<h3>${esc(pl.area)}</h3>${p(pl.summary)}
     <dl>
-      ${pl.exps.length ? `<div><dt>Experiences here</dt><dd><ul>${pl.exps.map((e) => `<li><a href="/experiences/${esc(e.slug)}">${esc(e.title)}</a></li>`).join('')}</ul></dd></div>` : ''}
+      ${pl.exps.length ? `<div><dt>Experiences run here</dt><dd><ul>${pl.exps.map((e) => `<li><a href="/experiences/${esc(e.slug)}">${esc(e.title)}</a></li>`).join('')}</ul></dd></div>` : ''}
       ${pl.hosts != null ? `<div><dt>Local hosts</dt><dd>${esc(pl.hosts)}</dd></div>` : ''}
       ${[['School initiatives', pl.schools], ['Training', pl.training], ['Environmental work', pl.env], ['Stories', pl.stories]].filter(([, v]) => v).map(([k, v]) => `<div><dt>${k}</dt><dd>${p(v)}</dd></div>`).join('')}
     </dl></div>`;
@@ -154,7 +156,7 @@ ${yearList.length ? `<section class="im-archive" id="archive"><div class="wrap">
 <section class="im-end" id="you"><div class="wrap">
   <h2>You helped make this happen.</h2>
   <p>Every time you choose to experience a place with us, you become part of the work happening there.</p>
-  <div class="im-end-cta"><a class="btn btn-clay" href="/experiences">See the experiences</a><a class="btn btn-ghost" href="#${projects.length ? 'projects' : 'numbers'}">See the work</a><a class="btn btn-ghost" href="${workWith}">${ICON.wa}Work with us</a></div>
+  <div class="im-end-cta"><a class="btn btn-clay" href="#${projects.length ? 'projects' : 'numbers'}">See the work</a><a class="btn btn-ghost" href="/team">Meet the people who make it happen</a><a class="btn btn-ghost" href="${workWith}">${ICON.wa}Work with us</a></div>
 </div></section>
 
 <div class="im-modal" id="imModal" hidden role="dialog" aria-modal="true"><div class="im-modal-card"><button type="button" class="im-x" aria-label="Close">×</button>${modals}</div></div>

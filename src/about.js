@@ -1,14 +1,7 @@
 // ---------- About page: an interactive manifesto ----------
 // Story order: why we exist > problem > intersection > experiences > model > shared value >
-// on the ground > people > origin > future > signature graphic > proof > beliefs > invitation.
-const ABOUT_FACTS = [
-  ['20+', 'Outdoor experiences'],
-  ['400+', 'Trips curated'],
-  ['2,000+', 'Customers'],
-  ['19', 'People on the team'],
-  ['16', 'From local communities'],
-  ['25%', 'Of Net Profit supports village schools'],
-];
+// this is why > people > origin > future > see the evidence > beliefs > invitation.
+// About speaks as Rock & Anchor: it makes the argument. Evidence (numbers, projects, money) lives on Impact Created.
 const ABOUT_BELIEFS = [
   'Nature is not a backdrop.',
   'Villages are not destinations.',
@@ -24,8 +17,6 @@ function aboutPage(data) {
     return all.length ? (big ? all[(i * 7) % all.length].url : all[(i * 7) % all.length].thumb) : '';
   };
   const img = (src, alt, cls = '') => (src ? `<img class="${cls}" src="${esc(src)}" alt="${esc(alt)}" loading="lazy">` : `<div class="${cls} ab-noimg"></div>`);
-  const impactVal = (re) => { const m = (data.impact || []).find((i) => re.test(i.metric)); return m ? m.value : ''; };
-  const families = impactVal(/famil/i);
 
   const problems = [
     ['01', 'We are losing our connection with nature', 'Modern life has made it easier to be connected to everything except the natural world around us.', ph('night-sky-experience', 1), 'A guest looking out of a tent at sunrise over the Sahyadris', '<span>City</span><span>Phone</span><span>Screen</span><i></i><span>Forest</span><span>Mountains</span><span>Night sky</span>'],
@@ -46,7 +37,7 @@ function aboutPage(data) {
     ['Educate', 'We use the outdoors as a classroom.', ph('young-explorers-winter-school', 2), 'A child learning with a facilitator',
       `<p>Participants learn about:</p><ul class="ab-list"><li>Nature</li><li>Local ecosystems</li><li>Survival and life skills</li><li>Sustainability</li><li>Local culture</li></ul><p>And we support learning in the communities around us. 25% of Net Profit funds schools in the mountain villages we work in.</p>`],
     ['Employ', 'We create meaningful opportunities for people from the villages where we operate.', ph('hidden-kingdom', 2), 'A shared meal served on leaves',
-      `<p>Not simply as labour. As:</p><ul class="ab-list"><li>Guides</li><li>Facilitators</li><li>Hosts</li><li>Cooks</li><li>Leaders</li><li>Specialists</li></ul><p>16 of our 19 team members come from the villages we work in.</p>`],
+      `<p>Not simply as labour. As:</p><ul class="ab-list"><li>Guides</li><li>Facilitators</li><li>Hosts</li><li>Cooks</li><li>Leaders</li><li>Specialists</li></ul>`],
     ['Empower', 'Skills become confidence. Confidence becomes leadership. Leadership creates possibilities for others.', ph('be-a-villager', 1), 'A facilitator sitting in a circle with village children',
       `<ul class="ab-steps"><li><b>Create</b> their own projects and experiences</li><li><b>Bring others along</b> and build a team</li><li><b>Find their voice</b> and speak with confidence</li><li><b>Set goals</b> and work towards them</li><li><b>Lead</b> groups and make decisions</li><li><b>Hand over</b> to the next person they have trained</li></ul>`],
   ];
@@ -58,25 +49,13 @@ function aboutPage(data) {
     ['Nature', 'People who understand and care for it.'],
     ['Rock & Anchor', 'A sustainable business capable of doing more.'],
   ];
+  // "This is why": About makes the argument. The evidence lives on Impact Created.
   const ground = [
-    ['Village schools', 'Education and infrastructure support.', ph('be-a-villager', 3), 'Village school children',
-      '25% of Net Profit funds schools in the mountain villages we work in. The money goes into school infrastructure, books and stationery.',
-      'Painted and equipped 3 schools with water coolers, fans, textbooks and stationery. Installed lights, fans, solar panels and inverters in 2 schools and 2 anganwadis.'],
-    ['Local guides', 'Training and employment.', ph('young-explorers-winter-school', 1), 'A local guide leading a group',
-      'Villagers know these mountains better than anyone. We train them to lead trips using our safety procedures, with skills in leadership, communication, first aid and outdoor management.',
-      '16 of our 19 team members are from the villages we work in.'],
-    ['Experiences', 'Stargazing, trekking, camping, village experiences.', ph('rooftop-stargazing', 1), 'A stargazing session with a telescope',
-      'Every experience is designed to teach something, run safely and keep its value close to the place it happens in.',
-      '20+ outdoor experiences and 400+ trips curated since 2021.'],
-    ['Children', 'Outdoor learning and nature connection.', ph('little-feet-sensory', 2), 'Children playing in a stream',
-      'Children learn by touching, building, getting wet and asking questions. Our programmes give them time outdoors that a classroom or a screen cannot.',
-      'Programmes from Little Feet sensory days for ages 1 to 6 to the Young Explorers Winter School.'],
-    ['Schools', 'OutTeach and experiential education.', ph('young-explorers-winter-school', 3), 'Students on a school trek',
-      'The OutTeach programme takes school learning outdoors, building a love for nature, survival and life skills, and an understanding of sustainability.',
-      'Studies show that outdoor learning improves socio-emotional skills, performance and wellbeing in children and adults.'],
-    ['Villages', 'Local hosts, food, stories, culture and livelihoods.', ph('little-feet-sunset-safari', 2), 'Guests with their village hosts',
-      'Village families host our guests, cook for them and share farming, stories and their way of life. Guests leave seeing a village differently, and the income stays in the village.',
-      families ? `We work with ${families} village families who host and cook for our guests.` : 'Income from every village experience goes directly to the families who host it.'],
+    ['This is why we work with villages.', 'Villages hold knowledge, food, stories and ways of living that are quietly disappearing. When a village hosts an experience, the value stays in the village.', ph('little-feet-sunset-safari', 2), 'Guests with their village hosts'],
+    ['This is why we care about nature.', 'You cannot care for a place you have never felt. We bring people close to the natural world, and leave it as we found it.', ph('monsoon-village-1-day', 0), 'A monsoon waterfall in the Sahyadris'],
+    ['This is why we employ locally.', 'The people who live here know these mountains better than anyone. Meaningful work close to home means young people do not have to leave to find it.', ph('young-explorers-winter-school', 1), 'A local guide leading a group'],
+    ['This is why we support village schools.', 'A community that learns can build its own future. 25% of Net Profit goes to schools in the villages we work in.', ph('be-a-villager', 3), 'Village school children'],
+    ['This is why experiences matter.', 'People learn by touching, building, getting wet and asking questions. A day outside teaches what a classroom or a screen cannot.', ph('little-feet-sensory', 2), 'Children playing in a stream'],
   ];
   const roles = [
     ['Local guides', 'People who know every trail, river and season, trained to lead groups safely.'],
@@ -155,12 +134,9 @@ ${ringNodes.map((n) => `<g class="rn"><circle cx="${n.x.toFixed(1)}" cy="${n.y.t
 </div></section>
 
 <section class="ab-ground" id="ground"><div class="wrap">
-  <p class="ab-kicker rv">What this looks like on the ground</p><h2 class="ab-h rv">This is what the idea looks like in real life.</h2>
-  <p class="ab-p rv">Tap any of these to see the work behind it.</p></div>
-  <div class="ab-rail" tabindex="0" aria-label="Our work on the ground">${ground.map(([h, t, src, alt], i) => `<button type="button" class="ab-tile" data-g="${i}">${img(src, alt, 'ab-tile-img')}<span class="ab-tile-body"><b>${h}</b><span>${t}</span><em>See the work →</em></span></button>`).join('')}</div>
-  <div class="ab-modal" id="abModal" hidden role="dialog" aria-modal="true" aria-labelledby="abModalH"><div class="ab-modal-card"><button type="button" class="ab-x" aria-label="Close">×</button>
-    ${ground.map(([h, , src, alt, text, outcome], i) => `<div class="ab-g" data-g="${i}" hidden>${img(src, alt, 'ab-g-img')}<div class="ab-g-body"><h3${i ? '' : ' id="abModalH"'}>${h}</h3><p>${text}</p><p class="ab-outcome"><span>Outcome</span>${outcome}</p></div></div>`).join('')}
-  </div></div>
+  <p class="ab-kicker rv">Why we work the way we do</p><h2 class="ab-h rv">Every choice comes back to what we believe.</h2></div>
+  <div class="ab-rail" tabindex="0" aria-label="Why we work the way we do">${ground.map(([h, t, src, alt]) => `<div class="ab-tile">${img(src, alt, 'ab-tile-img')}<span class="ab-tile-body"><b>${h}</b><span>${t}</span></span></div>`).join('')}</div>
+  <div class="wrap"><a class="ab-link ab-bridge rv" href="/impact">See what that looks like: Impact Created →</a></div>
 </section>
 
 <section class="ab-people" id="people"><div class="wrap">
@@ -186,9 +162,9 @@ ${ringNodes.map((n) => `<g class="rn"><circle cx="${n.x.toFixed(1)}" cy="${n.y.t
 </div></section>
 
 <section class="ab-proof" id="proof"><div class="wrap">
-  <p class="ab-kicker rv">Proof</p><h2 class="ab-h rv">What we have done so far.</h2>
-  <div class="ab-facts">${ABOUT_FACTS.map(([v, l]) => `<div class="rv"><b data-count="${esc(v)}">${esc(v)}</b><span>${l}</span></div>`).join('')}</div>
-  <div class="ab-see"><span>See the work</span><a href="/impact">Village initiatives →</a><a href="/experiences#Family%20%26%20Kids">School and children’s programmes →</a><a href="/experiences">Experiences →</a></div>
+  <p class="ab-kicker rv">The evidence</p><h2 class="ab-h rv">See what that looks like.</h2>
+  <p class="ab-p rv">This page is what we believe. What actually happens because of it, the projects, the money, the people and the places, is on its own page.</p>
+  <div class="ab-see"><a href="/impact">Impact Created →</a><a href="/team">The people who make it happen →</a></div>
 </div></section>
 
 <section class="ab-believe" id="believe"><div class="wrap">
@@ -232,12 +208,12 @@ steps.forEach(function(s){s.addEventListener('click',function(){act(+s.dataset.i
 /* model cards */
 d.querySelectorAll('.ab-more').forEach(function(b){b.addEventListener('click',function(){var m=d.getElementById(b.getAttribute('aria-controls')),o=b.getAttribute('aria-expanded')==='true';b.setAttribute('aria-expanded',!o);m.hidden=o;b.closest('.ab-card').toggleAttribute('data-open',!o)})});
 /* on the ground modal */
-var md=d.getElementById('abModal'),last=null;
+var md=d.getElementById('abModal'),last=null;if(md){
 function openG(i){d.querySelectorAll('.ab-g').forEach(function(g){g.hidden=g.dataset.g!==String(i)});md.hidden=false;d.body.style.overflow='hidden';md.querySelector('.ab-x').focus()}
 function closeG(){md.hidden=true;d.body.style.overflow='';if(last)last.focus()}
 d.querySelectorAll('.ab-tile').forEach(function(t){t.addEventListener('click',function(){last=t;openG(t.dataset.g)})});
 md.querySelector('.ab-x').addEventListener('click',closeG);md.addEventListener('click',function(e){if(e.target===md)closeG()});
-d.addEventListener('keydown',function(e){if(e.key==='Escape'&&!md.hidden)closeG()});
+d.addEventListener('keydown',function(e){if(e.key==='Escape'&&!md.hidden)closeG()});}
 /* numbers count up */
 if(!rm&&io){var co=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;co.unobserve(e.target);var el=e.target,raw=el.dataset.count,m=raw.match(/^([\\d,]+)(.*)$/);if(!m)return;var end=+m[1].replace(/,/g,''),suf=m[2],t0=null;function st(ts){if(!t0)t0=ts;var p=Math.min(1,(ts-t0)/1200),v=Math.round(end*(1-Math.pow(1-p,3)));el.textContent=v.toLocaleString('en-IN')+suf;if(p<1)requestAnimationFrame(st)}requestAnimationFrame(st)})},{threshold:.6});d.querySelectorAll('[data-count]').forEach(function(el){co.observe(el)})}
 })();`;
@@ -349,8 +325,8 @@ const ABOUT_CSS = `
 .ab-gains dd{margin:4px 0 0;color:#e6ede7}
 /* 7 ground */
 .ab-rail{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-left:max(20px,calc((100vw - var(--max))/2 + 20px));padding:18px max(20px,calc((100vw - var(--max))/2 + 20px)) 22px;scrollbar-width:thin}
-.ab-tile{flex:0 0 clamp(250px,28vw,330px);scroll-snap-align:start;border:0;padding:0;background:var(--card);border-radius:var(--r);overflow:hidden;text-align:left;cursor:pointer;font:inherit;color:var(--ink);box-shadow:0 1px 0 var(--line);transition:transform .25s,box-shadow .25s}
-.ab-tile:hover{transform:translateY(-4px);box-shadow:0 18px 34px -22px rgba(34,29,25,.5)}
+.ab-tile{flex:0 0 clamp(250px,28vw,330px);scroll-snap-align:start;border:0;padding:0;background:var(--card);border-radius:var(--r);overflow:hidden;text-align:left;font:inherit;color:var(--ink);box-shadow:0 1px 0 var(--line)}
+.ab-bridge{display:inline-block;margin-top:28px;font-size:19px}
 .ab-tile-img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
 .ab-tile-body{display:block;padding:16px 18px 20px}
 .ab-tile-body b{display:block;font:800 26px "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase}

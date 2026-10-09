@@ -680,15 +680,8 @@ ${revs.length ? `<section><div class="wrap"><h2>What people say</h2>${reviewsBlo
 
 // ---------- About page: an interactive manifesto ----------
 // Story order: why we exist > problem > intersection > experiences > model > shared value >
-// on the ground > people > origin > future > signature graphic > proof > beliefs > invitation.
-const ABOUT_FACTS = [
-  ['20+', 'Outdoor experiences'],
-  ['400+', 'Trips curated'],
-  ['2,000+', 'Customers'],
-  ['19', 'People on the team'],
-  ['16', 'From local communities'],
-  ['25%', 'Of Net Profit supports village schools'],
-];
+// this is why > people > origin > future > see the evidence > beliefs > invitation.
+// About speaks as Rock & Anchor: it makes the argument. Evidence (numbers, projects, money) lives on Impact Created.
 const ABOUT_BELIEFS = [
   'Nature is not a backdrop.',
   'Villages are not destinations.',
@@ -704,8 +697,6 @@ function aboutPage(data) {
     return all.length ? (big ? all[(i * 7) % all.length].url : all[(i * 7) % all.length].thumb) : '';
   };
   const img = (src, alt, cls = '') => (src ? `<img class="${cls}" src="${esc(src)}" alt="${esc(alt)}" loading="lazy">` : `<div class="${cls} ab-noimg"></div>`);
-  const impactVal = (re) => { const m = (data.impact || []).find((i) => re.test(i.metric)); return m ? m.value : ''; };
-  const families = impactVal(/famil/i);
 
   const problems = [
     ['01', 'We are losing our connection with nature', 'Modern life has made it easier to be connected to everything except the natural world around us.', ph('night-sky-experience', 1), 'A guest looking out of a tent at sunrise over the Sahyadris', '<span>City</span><span>Phone</span><span>Screen</span><i></i><span>Forest</span><span>Mountains</span><span>Night sky</span>'],
@@ -726,7 +717,7 @@ function aboutPage(data) {
     ['Educate', 'We use the outdoors as a classroom.', ph('young-explorers-winter-school', 2), 'A child learning with a facilitator',
       `<p>Participants learn about:</p><ul class="ab-list"><li>Nature</li><li>Local ecosystems</li><li>Survival and life skills</li><li>Sustainability</li><li>Local culture</li></ul><p>And we support learning in the communities around us. 25% of Net Profit funds schools in the mountain villages we work in.</p>`],
     ['Employ', 'We create meaningful opportunities for people from the villages where we operate.', ph('hidden-kingdom', 2), 'A shared meal served on leaves',
-      `<p>Not simply as labour. As:</p><ul class="ab-list"><li>Guides</li><li>Facilitators</li><li>Hosts</li><li>Cooks</li><li>Leaders</li><li>Specialists</li></ul><p>16 of our 19 team members come from the villages we work in.</p>`],
+      `<p>Not simply as labour. As:</p><ul class="ab-list"><li>Guides</li><li>Facilitators</li><li>Hosts</li><li>Cooks</li><li>Leaders</li><li>Specialists</li></ul>`],
     ['Empower', 'Skills become confidence. Confidence becomes leadership. Leadership creates possibilities for others.', ph('be-a-villager', 1), 'A facilitator sitting in a circle with village children',
       `<ul class="ab-steps"><li><b>Create</b> their own projects and experiences</li><li><b>Bring others along</b> and build a team</li><li><b>Find their voice</b> and speak with confidence</li><li><b>Set goals</b> and work towards them</li><li><b>Lead</b> groups and make decisions</li><li><b>Hand over</b> to the next person they have trained</li></ul>`],
   ];
@@ -738,25 +729,13 @@ function aboutPage(data) {
     ['Nature', 'People who understand and care for it.'],
     ['Rock & Anchor', 'A sustainable business capable of doing more.'],
   ];
+  // "This is why": About makes the argument. The evidence lives on Impact Created.
   const ground = [
-    ['Village schools', 'Education and infrastructure support.', ph('be-a-villager', 3), 'Village school children',
-      '25% of Net Profit funds schools in the mountain villages we work in. The money goes into school infrastructure, books and stationery.',
-      'Painted and equipped 3 schools with water coolers, fans, textbooks and stationery. Installed lights, fans, solar panels and inverters in 2 schools and 2 anganwadis.'],
-    ['Local guides', 'Training and employment.', ph('young-explorers-winter-school', 1), 'A local guide leading a group',
-      'Villagers know these mountains better than anyone. We train them to lead trips using our safety procedures, with skills in leadership, communication, first aid and outdoor management.',
-      '16 of our 19 team members are from the villages we work in.'],
-    ['Experiences', 'Stargazing, trekking, camping, village experiences.', ph('rooftop-stargazing', 1), 'A stargazing session with a telescope',
-      'Every experience is designed to teach something, run safely and keep its value close to the place it happens in.',
-      '20+ outdoor experiences and 400+ trips curated since 2021.'],
-    ['Children', 'Outdoor learning and nature connection.', ph('little-feet-sensory', 2), 'Children playing in a stream',
-      'Children learn by touching, building, getting wet and asking questions. Our programmes give them time outdoors that a classroom or a screen cannot.',
-      'Programmes from Little Feet sensory days for ages 1 to 6 to the Young Explorers Winter School.'],
-    ['Schools', 'OutTeach and experiential education.', ph('young-explorers-winter-school', 3), 'Students on a school trek',
-      'The OutTeach programme takes school learning outdoors, building a love for nature, survival and life skills, and an understanding of sustainability.',
-      'Studies show that outdoor learning improves socio-emotional skills, performance and wellbeing in children and adults.'],
-    ['Villages', 'Local hosts, food, stories, culture and livelihoods.', ph('little-feet-sunset-safari', 2), 'Guests with their village hosts',
-      'Village families host our guests, cook for them and share farming, stories and their way of life. Guests leave seeing a village differently, and the income stays in the village.',
-      families ? `We work with ${families} village families who host and cook for our guests.` : 'Income from every village experience goes directly to the families who host it.'],
+    ['This is why we work with villages.', 'Villages hold knowledge, food, stories and ways of living that are quietly disappearing. When a village hosts an experience, the value stays in the village.', ph('little-feet-sunset-safari', 2), 'Guests with their village hosts'],
+    ['This is why we care about nature.', 'You cannot care for a place you have never felt. We bring people close to the natural world, and leave it as we found it.', ph('monsoon-village-1-day', 0), 'A monsoon waterfall in the Sahyadris'],
+    ['This is why we employ locally.', 'The people who live here know these mountains better than anyone. Meaningful work close to home means young people do not have to leave to find it.', ph('young-explorers-winter-school', 1), 'A local guide leading a group'],
+    ['This is why we support village schools.', 'A community that learns can build its own future. 25% of Net Profit goes to schools in the villages we work in.', ph('be-a-villager', 3), 'Village school children'],
+    ['This is why experiences matter.', 'People learn by touching, building, getting wet and asking questions. A day outside teaches what a classroom or a screen cannot.', ph('little-feet-sensory', 2), 'Children playing in a stream'],
   ];
   const roles = [
     ['Local guides', 'People who know every trail, river and season, trained to lead groups safely.'],
@@ -835,12 +814,9 @@ ${ringNodes.map((n) => `<g class="rn"><circle cx="${n.x.toFixed(1)}" cy="${n.y.t
 </div></section>
 
 <section class="ab-ground" id="ground"><div class="wrap">
-  <p class="ab-kicker rv">What this looks like on the ground</p><h2 class="ab-h rv">This is what the idea looks like in real life.</h2>
-  <p class="ab-p rv">Tap any of these to see the work behind it.</p></div>
-  <div class="ab-rail" tabindex="0" aria-label="Our work on the ground">${ground.map(([h, t, src, alt], i) => `<button type="button" class="ab-tile" data-g="${i}">${img(src, alt, 'ab-tile-img')}<span class="ab-tile-body"><b>${h}</b><span>${t}</span><em>See the work →</em></span></button>`).join('')}</div>
-  <div class="ab-modal" id="abModal" hidden role="dialog" aria-modal="true" aria-labelledby="abModalH"><div class="ab-modal-card"><button type="button" class="ab-x" aria-label="Close">×</button>
-    ${ground.map(([h, , src, alt, text, outcome], i) => `<div class="ab-g" data-g="${i}" hidden>${img(src, alt, 'ab-g-img')}<div class="ab-g-body"><h3${i ? '' : ' id="abModalH"'}>${h}</h3><p>${text}</p><p class="ab-outcome"><span>Outcome</span>${outcome}</p></div></div>`).join('')}
-  </div></div>
+  <p class="ab-kicker rv">Why we work the way we do</p><h2 class="ab-h rv">Every choice comes back to what we believe.</h2></div>
+  <div class="ab-rail" tabindex="0" aria-label="Why we work the way we do">${ground.map(([h, t, src, alt]) => `<div class="ab-tile">${img(src, alt, 'ab-tile-img')}<span class="ab-tile-body"><b>${h}</b><span>${t}</span></span></div>`).join('')}</div>
+  <div class="wrap"><a class="ab-link ab-bridge rv" href="/impact">See what that looks like: Impact Created →</a></div>
 </section>
 
 <section class="ab-people" id="people"><div class="wrap">
@@ -866,9 +842,9 @@ ${ringNodes.map((n) => `<g class="rn"><circle cx="${n.x.toFixed(1)}" cy="${n.y.t
 </div></section>
 
 <section class="ab-proof" id="proof"><div class="wrap">
-  <p class="ab-kicker rv">Proof</p><h2 class="ab-h rv">What we have done so far.</h2>
-  <div class="ab-facts">${ABOUT_FACTS.map(([v, l]) => `<div class="rv"><b data-count="${esc(v)}">${esc(v)}</b><span>${l}</span></div>`).join('')}</div>
-  <div class="ab-see"><span>See the work</span><a href="/impact">Village initiatives →</a><a href="/experiences#Family%20%26%20Kids">School and children’s programmes →</a><a href="/experiences">Experiences →</a></div>
+  <p class="ab-kicker rv">The evidence</p><h2 class="ab-h rv">See what that looks like.</h2>
+  <p class="ab-p rv">This page is what we believe. What actually happens because of it, the projects, the money, the people and the places, is on its own page.</p>
+  <div class="ab-see"><a href="/impact">Impact Created →</a><a href="/team">The people who make it happen →</a></div>
 </div></section>
 
 <section class="ab-believe" id="believe"><div class="wrap">
@@ -912,12 +888,12 @@ steps.forEach(function(s){s.addEventListener('click',function(){act(+s.dataset.i
 /* model cards */
 d.querySelectorAll('.ab-more').forEach(function(b){b.addEventListener('click',function(){var m=d.getElementById(b.getAttribute('aria-controls')),o=b.getAttribute('aria-expanded')==='true';b.setAttribute('aria-expanded',!o);m.hidden=o;b.closest('.ab-card').toggleAttribute('data-open',!o)})});
 /* on the ground modal */
-var md=d.getElementById('abModal'),last=null;
+var md=d.getElementById('abModal'),last=null;if(md){
 function openG(i){d.querySelectorAll('.ab-g').forEach(function(g){g.hidden=g.dataset.g!==String(i)});md.hidden=false;d.body.style.overflow='hidden';md.querySelector('.ab-x').focus()}
 function closeG(){md.hidden=true;d.body.style.overflow='';if(last)last.focus()}
 d.querySelectorAll('.ab-tile').forEach(function(t){t.addEventListener('click',function(){last=t;openG(t.dataset.g)})});
 md.querySelector('.ab-x').addEventListener('click',closeG);md.addEventListener('click',function(e){if(e.target===md)closeG()});
-d.addEventListener('keydown',function(e){if(e.key==='Escape'&&!md.hidden)closeG()});
+d.addEventListener('keydown',function(e){if(e.key==='Escape'&&!md.hidden)closeG()});}
 /* numbers count up */
 if(!rm&&io){var co=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;co.unobserve(e.target);var el=e.target,raw=el.dataset.count,m=raw.match(/^([\\d,]+)(.*)$/);if(!m)return;var end=+m[1].replace(/,/g,''),suf=m[2],t0=null;function st(ts){if(!t0)t0=ts;var p=Math.min(1,(ts-t0)/1200),v=Math.round(end*(1-Math.pow(1-p,3)));el.textContent=v.toLocaleString('en-IN')+suf;if(p<1)requestAnimationFrame(st)}requestAnimationFrame(st)})},{threshold:.6});d.querySelectorAll('[data-count]').forEach(function(el){co.observe(el)})}
 })();`;
@@ -1029,8 +1005,8 @@ const ABOUT_CSS = `
 .ab-gains dd{margin:4px 0 0;color:#e6ede7}
 /* 7 ground */
 .ab-rail{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-left:max(20px,calc((100vw - var(--max))/2 + 20px));padding:18px max(20px,calc((100vw - var(--max))/2 + 20px)) 22px;scrollbar-width:thin}
-.ab-tile{flex:0 0 clamp(250px,28vw,330px);scroll-snap-align:start;border:0;padding:0;background:var(--card);border-radius:var(--r);overflow:hidden;text-align:left;cursor:pointer;font:inherit;color:var(--ink);box-shadow:0 1px 0 var(--line);transition:transform .25s,box-shadow .25s}
-.ab-tile:hover{transform:translateY(-4px);box-shadow:0 18px 34px -22px rgba(34,29,25,.5)}
+.ab-tile{flex:0 0 clamp(250px,28vw,330px);scroll-snap-align:start;border:0;padding:0;background:var(--card);border-radius:var(--r);overflow:hidden;text-align:left;font:inherit;color:var(--ink);box-shadow:0 1px 0 var(--line)}
+.ab-bridge{display:inline-block;margin-top:28px;font-size:19px}
 .ab-tile-img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
 .ab-tile-body{display:block;padding:16px 18px 20px}
 .ab-tile-body b{display:block;font:800 26px "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase}
@@ -1111,6 +1087,8 @@ const ABOUT_CSS = `
 
 
 // ---------- Impact Created: the open impact books ----------
+// Impact speaks as evidence: what happened, what changed, where the money went. No philosophy, no team directory,
+// no selling. A person appears here only as evidence of change (Stories), never simply because they are on the team.
 // About Us explains the system. Impact Created opens it up: numbers, money flow, projects, people,
 // places, outcomes, what we measure, what did not work and a year-by-year archive.
 // Evidence sections read from the Website Impact tables in Airtable and stay hidden until rows are published.
@@ -1178,7 +1156,7 @@ function impactPage(data, opts = {}) {
   </svg>`;
   const placePanel = (pl) => `<div class="im-place" data-place="${pl.i}"${pl.i ? ' hidden' : ''}>${draft(pl)}<h3>${esc(pl.area)}</h3>${p(pl.summary)}
     <dl>
-      ${pl.exps.length ? `<div><dt>Experiences here</dt><dd><ul>${pl.exps.map((e) => `<li><a href="/experiences/${esc(e.slug)}">${esc(e.title)}</a></li>`).join('')}</ul></dd></div>` : ''}
+      ${pl.exps.length ? `<div><dt>Experiences run here</dt><dd><ul>${pl.exps.map((e) => `<li><a href="/experiences/${esc(e.slug)}">${esc(e.title)}</a></li>`).join('')}</ul></dd></div>` : ''}
       ${pl.hosts != null ? `<div><dt>Local hosts</dt><dd>${esc(pl.hosts)}</dd></div>` : ''}
       ${[['School initiatives', pl.schools], ['Training', pl.training], ['Environmental work', pl.env], ['Stories', pl.stories]].filter(([, v]) => v).map(([k, v]) => `<div><dt>${k}</dt><dd>${p(v)}</dd></div>`).join('')}
     </dl></div>`;
@@ -1266,7 +1244,7 @@ ${yearList.length ? `<section class="im-archive" id="archive"><div class="wrap">
 <section class="im-end" id="you"><div class="wrap">
   <h2>You helped make this happen.</h2>
   <p>Every time you choose to experience a place with us, you become part of the work happening there.</p>
-  <div class="im-end-cta"><a class="btn btn-clay" href="/experiences">See the experiences</a><a class="btn btn-ghost" href="#${projects.length ? 'projects' : 'numbers'}">See the work</a><a class="btn btn-ghost" href="${workWith}">${ICON.wa}Work with us</a></div>
+  <div class="im-end-cta"><a class="btn btn-clay" href="#${projects.length ? 'projects' : 'numbers'}">See the work</a><a class="btn btn-ghost" href="/team">Meet the people who make it happen</a><a class="btn btn-ghost" href="${workWith}">${ICON.wa}Work with us</a></div>
 </div></section>
 
 <div class="im-modal" id="imModal" hidden role="dialog" aria-modal="true"><div class="im-modal-card"><button type="button" class="im-x" aria-label="Close">×</button>${modals}</div></div>
@@ -1421,10 +1399,12 @@ const IMPACT_CSS = `
 `;
 
 
-// ---------- Team: the people making it happen ----------
-// About says what we believe. Impact shows what happened. Team introduces the people.
+// ---------- Team: who makes this real ----------
+// Four voices: About speaks as Rock & Anchor (what we believe). Impact speaks as evidence (what happened).
+// Team speaks through people (who we are, present tense). Curate speaks to the customer.
+// So this page avoids the About manifesto, the Educate > Employ > Empower model, impact numbers and project case studies.
 // Profiles read from the Website Team table. Every rich field (Knows, Leads, Has Learned, Creates,
-// Building Towards, Ask Me About, Quote) is hidden until it is filled in. Quotes also need Quote Approved.
+// Building Towards, Ask Me About, Quote) is hidden until filled in. Quotes also need Quote Approved.
 // On the staging address, unapproved quotes are shown with a "Draft" badge and empty profiles show a hint.
 function teamPage(data, opts = {}) {
   const drafts = !!opts.drafts;
@@ -1434,10 +1414,10 @@ function teamPage(data, opts = {}) {
   const initials = (n) => n.split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
   const draft = '<span class="tm-draft">Draft, not public</span>';
   const KINDS = [
-    ['Knows the place', 'The people who know the place', 'Local guides, hosts, cooks and villagers. The knowledge every experience stands on.'],
-    ['Creates the experience', 'The people who create the experience', 'Experience leaders, outdoor educators and facilitators. They turn a place into a day you remember.'],
-    ['Makes the system work', 'The people who make the system work', 'Operations, business development, administration and content. The work you never see, and always feel.'],
-    ['Learning to lead', 'The people who are learning to lead', 'Interns, trainees and emerging local leaders. Tomorrow\'s experience leaders, learning on the ground.'],
+    ['Knows the place', 'The people who know the place', 'Local guides, hosts, cooks and villagers.'],
+    ['Creates the experience', 'The people who create the experience', 'Experience leaders, outdoor educators and facilitators.'],
+    ['Makes the system work', 'The people who make the system work', 'Operations, business development, administration and content.'],
+    ['Learning to lead', 'The people who are learning to lead', 'Interns, trainees and emerging local leaders.'],
   ];
   const kindOf = (m) => m.kind || (m.group === 'Founders' ? 'Founder' : m.group === 'Experience Leaders' ? 'Creates the experience' : 'Makes the system work');
   const gi = (g) => { const i = TEAM_GROUPS.indexOf(g); return i < 0 ? 99 : i; };
@@ -1450,56 +1430,47 @@ function teamPage(data, opts = {}) {
   const asks = (m) => String(m.ask || '').split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
   const quotes = all.filter((m) => m.quote && (m.quoteOk || drafts));
   const knowers = all.filter((m) => m.knows);
+  // A journey needs at least two real steps, so it never reads as filler.
+  const journeys = all.filter((m) => [m.joined, m.learned, m.leads, m.building, teachers(m).length, students(m).length].filter(Boolean).length >= 2);
   const areas = {};
   all.filter((m) => m.area).forEach((m) => (areas[m.area] = areas[m.area] || []).push(m));
   const areaList = Object.keys(areas).sort();
-  const chains = all.filter((m) => teachers(m).length);
   const workWith = waLink('Hi Rock & Anchor, I would like to work with you or join the team.');
 
   const avatar = (m, cls = 'tm-av') => (m.photo ? `<img class="${cls}" src="${esc(m.photo)}" alt="${esc(m.name)}" loading="lazy">` : `<span class="${cls} tm-ini">${esc(initials(m.name))}</span>`);
+  // Profile: present tense. Who they are, what they know, what they lead, what to ask them.
   const profile = (m) => {
-    const rows = [['Knows', m.knows], ['Leads', m.leads], ['Has learned', m.learned], ['Creates', m.creates], ['Is building towards', m.building]].filter(([, v]) => v);
-    const t = teachers(m), s = students(m), a = asks(m);
-    const more = rows.length || t.length || s.length;
+    const f = first(m.name), a = asks(m);
+    const rows = [[`What ${f} knows`, m.knows], [`What ${f} leads`, m.leads], [`What ${f} creates`, m.creates]].filter(([, v]) => v);
     return `<article class="tm-card rv" data-kind="${esc(m.k)}">
     <div class="tm-card-top">${avatar(m)}<div><span class="tm-role">${esc(m.role)}</span><h3>${esc(m.name)}</h3>${m.joined ? `<small class="tm-since">With us since ${esc(m.joined)}</small>` : ''}</div></div>
     ${m.bio ? `<div class="tm-bio">${p(m.bio)}</div>` : ''}
-    ${a.length ? `<div class="tm-ask"><b>Ask ${esc(first(m.name))} about</b><ul>${a.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
-    ${more ? `<details class="tm-more"><summary>More about ${esc(first(m.name))}</summary><dl>${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${p(v)}</dd></div>`).join('')}
-      ${t.length ? `<div><dt>Learned from</dt><dd>${t.map((x) => esc(x.name)).join(', ')}</dd></div>` : ''}
-      ${s.length ? `<div><dt>Now passing it on to</dt><dd>${s.map((x) => esc(x.name)).join(', ')}</dd></div>` : ''}</dl></details>`
-      : drafts ? `<p class="tm-hint">Staging only: add Knows, Leads, Has Learned, Creates, Building Towards and Ask Me About in Airtable (Website Team) to fill this profile.</p>` : ''}
+    ${rows.length ? `<dl>${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${p(v)}</dd></div>`).join('')}</dl>` : ''}
+    ${a.length ? `<div class="tm-ask"><b>Ask ${esc(f)} about</b><ul>${a.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+    ${!rows.length && !a.length && drafts ? `<p class="tm-hint">Staging only: add Knows, Leads, Creates and Ask Me About in Airtable (Website Team) to fill this profile.</p>` : ''}
   </article>`;
   };
-
-  const circle = [
-    ['Local guide', 'Place knowledge', 'Training, income and opportunity'],
-    ['Outdoor educator', 'Learning', 'Local knowledge and experience'],
-    ['Founder', 'Direction', 'Ideas and leadership from the team'],
-    ['Guest', 'Participation and revenue', 'Experience and connection'],
-  ];
-  const ladder = [
-    ['Learn', 'Come along. Watch how a day outdoors is put together, from the first message to the walk back.'],
-    ['Participate', 'Help on the ground. Carry the kit, walk at the back, look after a small group.'],
-    ['Take responsibility', 'Own a part of the day: the safety brief, the route, the meal, the stories.'],
-    ['Lead', 'Lead the group. Make the calls, keep everyone safe, make the day mean something.'],
-    ['Create', 'Design something new: a trail, an experience, a way of seeing the place.'],
-    ['Teach someone else', 'Pass it on. Someone learns from you, and the ladder starts again.'],
-  ];
-  const cx = 260, cy = 260, R = 170;
-  const circleSvg = `<svg class="tm-ring" viewBox="0 0 520 520" role="img" aria-label="Four kinds of people around a circle, each bringing something and receiving something">
-    <circle cx="${cx}" cy="${cy}" r="${R}" class="ring"/>
-    <circle cx="${cx}" cy="${cy}" r="78" class="core"/><text x="${cx}" y="${cy - 6}" class="core-t">Rock &amp;</text><text x="${cx}" y="${cy + 22}" class="core-t">Anchor</text>
-    ${circle.map(([who], i) => { const ang = -Math.PI / 2 + (i * Math.PI) / 2; const x = cx + R * Math.cos(ang), y = cy + R * Math.sin(ang); return `<g class="node${i ? '' : ' on'}" data-i="${i}" tabindex="0" role="button" aria-label="${who}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="54"/><text x="${x.toFixed(1)}" y="${(y + 6).toFixed(1)}">${who.split(' ').map((w, j, arr) => `<tspan x="${x.toFixed(1)}" dy="${j ? 19 : arr.length > 1 ? -9 : 0}">${w}</tspan>`).join('')}</text></g>`; }).join('')}
-  </svg>`;
+  // Journey: who did this person become? Joined us > developed a skill > now leads > next.
+  const journey = (m) => {
+    const t = teachers(m), s = students(m);
+    const steps = [
+      m.joined || t.length ? ['Joined us', [m.joined ? `In ${esc(m.joined)}.` : '', t.length ? `Learned from ${t.map((x) => esc(x.name)).join(' and ')}.` : ''].filter(Boolean).join(' ')] : null,
+      m.learned ? ['Developed', esc(String(m.learned).split(/\n+/)[0])] : null,
+      m.leads ? ['Now leads', esc(String(m.leads).split(/\n+/)[0])] : null,
+      s.length ? ['Now teaching', s.map((x) => esc(x.name)).join(', ')] : null,
+      m.building ? ['Next', esc(String(m.building).split(/\n+/)[0])] : null,
+    ].filter(Boolean);
+    return `<article class="tm-journey rv">${avatar(m, 'tm-face')}<div><h3>${esc(m.name)}</h3><span class="tm-role">${esc(m.role)}</span>
+      <ol>${steps.map(([k, v]) => `<li><b>${k}</b><span>${v}</span></li>`).join('')}</ol></div></article>`;
+  };
 
   const body = `<style>${TEAM_CSS}</style>
 <div class="tm">
 ${drafts ? '<div class="tm-staging">Staging preview: profile hints and unapproved quotes are only visible here. The live site shows nothing until it is filled in and approved in Airtable.</div>' : ''}
 <section class="tm-hero"><img src="${esc(photo('winter-trekking', 1))}" alt="A Rock &amp; Anchor leader pointing out the valley on a Sahyadri ridge" fetchpriority="high"><div class="wrap">
   <p class="tm-kicker">Team</p><h1>People make the experience.</h1>
-  <p class="tm-sub">Rock &amp; Anchor is built by people who know these mountains, care about the places we work in, and believe that good experiences can create something beyond themselves.</p>
-  <a class="tm-scroll" href="#kinds">Meet them ↓</a>
+  <p class="tm-sub">These are the people you will walk with, eat with, learn from and trust on the mountain. Some of them know these places better than any map.</p>
+  <a class="tm-scroll" href="#people">Meet them ↓</a>
 </div></section>
 
 <section class="tm-kinds" id="kinds"><div class="wrap">
@@ -1508,10 +1479,9 @@ ${drafts ? '<div class="tm-staging">Staging preview: profile hints and unapprove
 </div></section>
 
 <section class="tm-people" id="people"><div class="wrap">
-  <p class="tm-kicker rv">A team is more than a job title</p>
-  <h2 class="tm-h rv">What you do is only the beginning.</h2>
-  <ol class="tm-prog rv">${['Started', 'Learned', 'Took responsibility', 'Led', 'Passed it on'].map((s, i) => `<li><span>${i + 1}</span>${s}</li>`).join('')}</ol>
-  <p class="tm-lead rv">Leadership should multiply. Someone learned from someone. Now someone learns from them.</p>
+  <p class="tm-kicker rv">The people</p>
+  <h2 class="tm-h rv">Who might lead your experience.</h2>
+  <p class="tm-lead rv">What they know, what they lead, and what you can ask them when you meet.</p>
   ${people.length ? `<div class="tm-filter rv" role="group" aria-label="Show people"><button type="button" class="on" data-filter="all">Everyone</button>${KINDS.filter(([k]) => people.some((m) => m.k === k)).map(([k, t]) => `<button type="button" data-filter="${k}">${t.replace('The people who ', '').replace(/^./, (c) => c.toUpperCase())}</button>`).join('')}</div>
   <div class="tm-cards">${people.map(profile).join('')}</div>` : ''}
 </div></section>
@@ -1522,71 +1492,31 @@ ${quotes.length ? `<section class="tm-voices" id="voices"><div class="wrap">
 </div></section>` : drafts ? `<section class="tm-voices"><div class="wrap"><p class="tm-kicker">In their own words</p><p class="tm-hint">Staging only: this section appears when a team member has a Quote with Quote Approved ticked in Airtable. Use their real words, not ours.</p></div></section>` : ''}
 
 <section class="tm-know" id="knowledge"><div class="wrap">
-  <div class="tm-know-head"><div><p class="tm-kicker rv">What we know because we live here</p><h2 class="tm-h rv">Some knowledge cannot be Googled.</h2></div>
+  <div class="tm-know-head"><div><p class="tm-kicker rv">Why it matters who your guide is</p><h2 class="tm-h rv">Some knowledge cannot be Googled.</h2>
+  <p class="tm-lead rv">Certification tells you someone knows how to manage risk. It does not tell you where the best trail starts after the rain.</p></div>
   <img class="rv" src="${esc(photo('hidden-kingdom', 2))}" alt="A shared meal on leaves after dark" loading="lazy"></div>
-  <div class="tm-know-grid">
-    ${knowers.map((m) => `<div class="tm-kcard rv"><b>${esc(first(m.name))} knows…</b><p>${esc(String(m.knows).split(/\n+/)[0])}</p></div>`).join('')}
-    <div class="tm-kcard rv"><b>A village host knows…</b><p>How a particular meal is traditionally prepared.</p></div>
-    <div class="tm-kcard rv"><b>An educator knows…</b><p>How to get a group of children to stop and actually look.</p></div>
+  <div class="tm-kinds2">
+    <div class="rv"><h3>Learned knowledge</h3><p>What our team trains for.</p><ul>${['Mountaineering', 'First aid', 'Outdoor safety', 'Astronomy', 'Leadership'].map((x) => `<li>${x}</li>`).join('')}</ul></div>
+    <div class="rv tm-lived"><h3>Lived knowledge</h3><p>What our team grew up with.</p><ul>${['These mountains', 'These villages', 'The weather', 'Farming', 'Local stories', 'Seasonal changes', 'Places that do not appear on Google Maps'].map((x) => `<li>${x}</li>`).join('')}</ul></div>
   </div>
-  <p class="tm-p rv">Rock &amp; Anchor is stronger because knowledge is shared between people who live here and people who have chosen to work here. People, places, animals, ecosystems and knowledge all have value in themselves. Nobody here is a resource.</p>
+  ${knowers.length ? `<div class="tm-know-grid">${knowers.map((m) => `<div class="tm-kcard rv"><b>${esc(first(m.name))} knows…</b><p>${esc(String(m.knows).split(/\n+/)[0])}</p></div>`).join('')}</div>` : drafts ? '<p class="tm-hint">Staging only: the first line of each person\'s Knows field appears here as "Sujit knows…" cards.</p>' : ''}
 </div></section>
 
-<section class="tm-circle" id="circle"><div class="wrap tm-circle-grid">
-  <div><p class="tm-kicker rv">A circle, not a hierarchy</p><h2 class="tm-h rv">Everyone brings something. Everyone receives something.</h2>
-  <div class="tm-give" aria-live="polite">${circle.map(([who, brings, gets], i) => `<div class="tm-give-card" data-i="${i}"${i ? ' hidden' : ''}><h3>${who}</h3><div><span>Brings</span><b>${brings}</b></div><div><span>Receives</span><b>${gets}</b></div></div>`).join('')}</div>
-  <p class="tm-tip">Tap a circle to see what each person brings and receives.</p></div>
-  <div class="rv">${circleSvg}</div>
-</div></section>
-
-<section class="tm-learn" id="learning"><div class="wrap">
-  <p class="tm-kicker rv">What we learn from each other</p><h2 class="tm-h rv">Nobody arrives knowing everything.</h2>
-  <div class="tm-two">
-    <div class="rv"><h3>We teach</h3><ul>${['Safety', 'Outdoor leadership', 'First aid', 'Experience design', 'Communication', 'Facilitation'].map((x) => `<li>${x}</li>`).join('')}</ul></div>
-    <span class="tm-swap" aria-hidden="true">⇄</span>
-    <div class="rv"><h3>We learn</h3><ul>${['Local knowledge', 'Farming', 'Stories', 'Seasons', 'Culture', 'Ways of living with the landscape'].map((x) => `<li>${x}</li>`).join('')}</ul></div>
-  </div>
-  <p class="tm-quote rv">The best teams are not built around one person knowing everything. They are built around people being willing to learn from one another.</p>
-</div></section>
-
-<section class="tm-ladder" id="leadership"><div class="wrap tm-ladder-grid">
-  <div><p class="tm-kicker rv">From participant to leader</p><h2 class="tm-h rv">What leadership looks like here.</h2>
-  <p class="tm-p rv">Not everyone follows the same path, or at the same pace. But this is the direction we are always moving people in.</p>
-  <div class="tm-step-text" aria-live="polite">${ladder.map(([s, d], i) => `<div data-i="${i}"${i ? ' hidden' : ''}><b>${s}</b><p>${d}</p></div>`).join('')}</div></div>
-  <ol class="tm-rungs rv">${ladder.map(([s], i) => `<li><button type="button" data-i="${i}" class="${i ? '' : 'on'}" style="--i:${i}"><span>${String(i + 1).padStart(2, '0')}</span>${s}<small>${ladder[i][1]}</small></button></li>`).join('')}</ol>
-</div></section>
-
-<section class="tm-own" id="capable"><div class="wrap">
-  <h2 class="tm-big rv">We do not want people to work for Rock &amp; Anchor forever.</h2>
-  <p class="tm-lead rv">We want people to leave us more capable than when they arrived.</p>
-  <ul class="tm-capable">${['leading', 'creating', 'expressing an idea', 'bringing others along', 'building something of their own'].map((x) => `<li class="rv">Capable of <b>${x}.</b></li>`).join('')}</ul>
-</div></section>
-
-<section class="tm-hand" id="handover"><div class="wrap">
-  <p class="tm-kicker rv">Handover</p><h2 class="tm-h rv">The goal is not to be needed forever.</h2>
-  <ol class="tm-chain">${['Aaditya teaches someone', 'That person leads', 'They teach someone else', 'That person leads', 'The capability stays in the community'].map((s, i, a) => `<li class="rv${i === a.length - 1 ? ' last' : ''}">${s}</li>`).join('')}</ol>
-  <div class="tm-not rv"><p><s>“We created a great guide.”</s></p><p><b>“We created someone who can create another great guide.”</b></p></div>
-  ${chains.length ? `<div class="tm-real rv"><h3>It is already happening</h3><ul>${chains.map((m) => `<li>${teachers(m).map((t) => `<b>${esc(t.name)}</b>`).join(' and ')} <i>→</i> <b>${esc(m.name)}</b>${students(m).length ? ` <i>→</i> ${students(m).map((s) => `<b>${esc(s.name)}</b>`).join(', ')}` : ''}</li>`).join('')}</ul></div>` : ''}
-</div></section>
+${journeys.length ? `<section class="tm-journeys" id="journeys"><div class="wrap">
+  <p class="tm-kicker rv">From participant to leader</p><h2 class="tm-h rv">Who they have become.</h2>
+  <div class="tm-journey-list">${journeys.map(journey).join('')}</div>
+</div></section>` : drafts ? `<section class="tm-journeys" id="journeys"><div class="wrap"><p class="tm-kicker">From participant to leader</p><p class="tm-hint">Staging only: this section appears for people with at least two of Joined, Has Learned, Leads, Building Towards or Learned From filled in. It tells their journey in their own steps, not as a framework.</p></div></section>` : ''}
 
 <section class="tm-places" id="places"><div class="wrap">
-  <p class="tm-kicker rv">People behind the places</p><h2 class="tm-h rv">These are not abstract “local communities”. These are actual people.</h2>
-  <p class="tm-p rv">Wherever we work, a day outdoors depends on a small circle of people. We do not name the villages we work in, to protect the people who live there and the places themselves. But we can tell you who you will meet.</p>
-  <ul class="tm-roles rv">${['Guide', 'Host', 'Cook', 'School contact', 'Facilitator'].map((r) => `<li>${r}</li>`).join('')}</ul>
-  ${areaList.length ? `<div class="tm-areas">${areaList.map((a) => `<div class="tm-area rv"><h3>${esc(a)}</h3><ul>${areas[a].map((m) => `<li>${avatar(m, 'tm-face')}<span><b>${esc(m.name)}</b>${esc(m.role)}</span></li>`).join('')}</ul></div>`).join('')}</div>` : drafts ? '<p class="tm-hint">Staging only: add a general Area (for example Karjat or Shahapur, never a village) to team members in Airtable to group them here.</p>' : ''}
+  <p class="tm-kicker rv">People behind the places</p><h2 class="tm-h rv">Who knows this place?</h2>
+  <p class="tm-p rv">Wherever we go, a day outdoors depends on a small circle of people: a guide, a host, a cook, a school contact, a facilitator. We do not name the villages, to protect the people who live there and the places themselves.</p>
+  ${areaList.length ? `<div class="tm-areas">${areaList.map((a) => `<div class="tm-area rv"><h3>${esc(a)}</h3><ul>${areas[a].map((m) => `<li>${avatar(m, 'tm-face')}<span><b>${esc(m.name)}</b>${esc(m.role)}</span></li>`).join('')}</ul></div>`).join('')}</div>` : `<ul class="tm-roles rv">${['Guide', 'Host', 'Cook', 'School contact', 'Facilitator'].map((r) => `<li>${r}</li>`).join('')}</ul>${drafts ? '<p class="tm-hint">Staging only: add a general Area (for example Karjat or Shahapur, never a village) to team members in Airtable to group them here.</p>' : ''}`}
 </div></section>
 
 ${founders.length ? `<section class="tm-founders" id="founders"><div class="wrap">
   <p class="tm-kicker rv">The founders</p><h2 class="tm-h rv">Started it. Still learning how to build it.</h2>
   <div class="tm-cards tm-cards-2">${founders.map(profile).join('')}</div>
-  <a class="tm-link rv" href="/about#origin">How it started →</a>
 </div></section>` : ''}
-
-<section class="tm-place" id="practice"><div class="wrap tm-place-grid">
-  <div><p class="tm-kicker rv">How we work</p><h2 class="tm-h rv">A team that knows it is part of the place.</h2>
-  <p class="tm-p rv">You cannot care for a place you treat as separate from yourself. There is no Earth 2.0, so the team is trained not just to deliver experiences, but to understand the consequences of delivering them.</p></div>
-  <ul class="tm-practice">${['Leave No Trace', 'Group management', 'Safety', 'Local sourcing', 'Respect for village life', 'Responsible interaction with wildlife', 'Waste management', 'Resource use'].map((x) => `<li class="rv">${x}</li>`).join('')}</ul>
-</div></section>
 
 <section class="tm-end" id="meet"><img src="${esc(photo('little-feet-sunset-safari', 1))}" alt="" loading="lazy"><div class="wrap">
   <h2>Who will you meet?</h2>
@@ -1596,7 +1526,7 @@ ${founders.length ? `<section class="tm-founders" id="founders"><div class="wrap
 </div></section>
 </div>
 <script>${TEAM_JS}</script>`;
-  return layout({ title: 'Team', desc: 'The people who make Rock & Anchor: local guides, experience leaders, outdoor educators and the people learning to lead.', path: '/team', body, image: photo('winter-trekking', 1), data });
+  return layout({ title: 'Team', desc: 'The people behind Rock & Anchor experiences: local guides, experience leaders, outdoor educators and the people learning to lead.', path: '/team', body, image: photo('winter-trekking', 1), data });
 }
 
 const TEAM_JS = `(function(){
@@ -1608,12 +1538,6 @@ var fb=d.querySelectorAll('.tm-filter button'),cards=d.querySelectorAll('.tm-peo
 function filt(k){fb.forEach(function(b){b.classList.toggle('on',b.dataset.filter===k)});cards.forEach(function(c){c.hidden=!(k==='all'||c.dataset.kind===k);if(!c.hidden)c.classList.add('in')})}
 fb.forEach(function(b){b.addEventListener('click',function(){filt(b.dataset.filter)})});
 d.querySelectorAll('.tm-kind').forEach(function(b){b.addEventListener('click',function(){var k=b.dataset.filter,has=false;fb.forEach(function(x){if(x.dataset.filter===k)has=true});filt(has?k:'all');d.getElementById('people').scrollIntoView({behavior:rm?'auto':'smooth'})})});
-var nodes=d.querySelectorAll('.tm-ring .node'),gc=d.querySelectorAll('.tm-give-card');
-function pick(i){nodes.forEach(function(n){n.classList.toggle('on',n.dataset.i===i)});gc.forEach(function(c){c.hidden=c.dataset.i!==i})}
-nodes.forEach(function(n){n.addEventListener('click',function(){pick(n.dataset.i)});n.addEventListener('mouseenter',function(){pick(n.dataset.i)});n.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(n.dataset.i)}})});
-var rb=d.querySelectorAll('.tm-rungs button'),st=d.querySelectorAll('.tm-step-text>div');
-function step(i){rb.forEach(function(b){var n=+b.dataset.i;b.classList.toggle('on',n===+i);b.classList.toggle('past',n<+i)});st.forEach(function(s){s.hidden=s.dataset.i!==String(i)})}
-rb.forEach(function(b){b.addEventListener('click',function(){step(b.dataset.i)});b.addEventListener('mouseenter',function(){step(b.dataset.i)})});
 })();`;
 
 const TEAM_CSS = `
@@ -1651,12 +1575,7 @@ const TEAM_CSS = `
 .tm-ini{display:grid;place-items:center;background:var(--forest);color:#f3c9a6;font:800 15px/1 "Big Shoulders Display","Arial Narrow",sans-serif}
 /* people */
 .tm-people{background:#efe7da}
-.tm-prog{list-style:none;padding:0;margin:10px 0 18px;display:flex;flex-wrap:wrap;gap:0;counter-reset:x}
-.tm-prog li{display:flex;align-items:center;gap:10px;font-weight:700;font-size:clamp(15px,1.5vw,18px);color:var(--forest);padding:8px 0}
-.tm-prog li:not(:last-child):after{content:"";width:clamp(18px,3vw,44px);height:2px;background:repeating-linear-gradient(90deg,var(--clay) 0 6px,transparent 6px 10px);margin:0 12px}
-.tm-prog span{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--forest);color:#fff;font-size:13px}
-.tm-prog li:last-child span{background:var(--clay)}
-.tm-filter{display:flex;flex-wrap:wrap;gap:10px;margin:34px 0 22px}
+.tm-filter{display:flex;flex-wrap:wrap;gap:10px;margin:30px 0 22px}
 .tm-filter button{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:10px 18px;font:700 15px "DM Sans",sans-serif;color:var(--ink);cursor:pointer}
 .tm-filter button.on{background:var(--forest);border-color:var(--forest);color:#fff}
 .tm-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;align-items:start}
@@ -1673,11 +1592,7 @@ const TEAM_CSS = `
 .tm-ask b{display:block;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--forest);margin-bottom:8px}
 .tm-ask ul{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:6px}
 .tm-ask li{background:var(--moss);color:var(--forest);font-weight:600;font-size:14px;padding:5px 11px;border-radius:999px}
-.tm-more{border-top:1px solid var(--line);padding-top:10px;margin-top:auto}
-.tm-more summary{cursor:pointer;font-weight:700;color:var(--clay);list-style:none;padding:4px 0}
-.tm-more summary::-webkit-details-marker{display:none}
-.tm-more summary:after{content:" +";}.tm-more[open] summary:after{content:" \\2212"}
-.tm dl{margin:6px 0 0}.tm dl>div{padding:10px 0;border-top:1px solid var(--line)}
+.tm dl{margin:0}.tm dl>div{padding:10px 0;border-top:1px solid var(--line)}
 .tm dt{font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--clay);margin-bottom:4px}
 .tm dd{margin:0;color:var(--ink2)}.tm dd p{margin:0 0 6px}
 /* voices */
@@ -1691,65 +1606,29 @@ const TEAM_CSS = `
 /* knowledge */
 .tm-know-head{display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:end}
 .tm-know-head img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:18px}
-.tm-know-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin:30px 0 26px}
+.tm-kinds2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:34px}
+.tm-kinds2>div{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px}
+.tm-kinds2 h3{font-size:32px;margin:0}.tm-kinds2>div>p{margin:4px 0 14px;color:var(--muted)}
+.tm-kinds2 ul{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px}
+.tm-kinds2 li{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-weight:600}
+.tm-lived{background:var(--forest)!important;border-color:var(--forest)!important;color:#fff}.tm-lived>p{color:#cfe0d3!important}
+.tm-lived li{background:rgba(255,255,255,.1)!important;border-color:rgba(255,255,255,.2)!important;color:#fff}
+.tm-know-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin:24px 0 0}
 .tm-kcard{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--clay);border-radius:var(--r);padding:22px}
 .tm-kcard b{font:800 26px/1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;color:var(--forest)}
 .tm-kcard p{margin:10px 0 0;font-size:18px;color:var(--ink)}
-/* circle */
-.tm-circle{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.tm-circle-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
-.tm-ring{width:100%;max-width:520px;display:block;margin:0 auto}
-.tm-ring .ring{fill:none;stroke:var(--clay);stroke-width:2;stroke-dasharray:6 8}
-.tm-ring .core{fill:var(--forest)}
-.tm-ring .core-t{fill:#f3c9a6;font:800 26px "Big Shoulders Display","Arial Narrow",sans-serif;text-anchor:middle;text-transform:uppercase}
-.tm-ring .node{cursor:pointer;outline:none}
-.tm-ring .node circle{fill:var(--paper);stroke:var(--line);stroke-width:2;transition:fill .2s,stroke .2s}
-.tm-ring .node text{font:700 16px "DM Sans",sans-serif;fill:var(--ink);text-anchor:middle}
-.tm-ring .node.on circle,.tm-ring .node:focus circle{fill:var(--clay);stroke:var(--clay)}.tm-ring .node.on text{fill:#fff}
-.tm-give-card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:24px;margin-top:10px}
-.tm-give-card h3{font-size:34px;margin:0 0 10px}
-.tm-give-card div{display:grid;grid-template-columns:100px 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
-.tm-give-card span{font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--clay);padding-top:3px}
-.tm-give-card b{font-size:19px;font-weight:600}
-.tm-tip{color:var(--muted);font-size:14px;margin-top:12px}
-/* learn */
-.tm-two{display:grid;grid-template-columns:1fr auto 1fr;gap:24px;align-items:center;margin-top:24px}
-.tm-two>div{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px}
-.tm-two h3{font-size:32px;margin:0 0 10px}
-.tm-two ul{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px}
-.tm-two li{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-weight:600}
-.tm-two>div:last-child li{background:var(--moss);border-color:#cfdcc9;color:var(--forest)}
-.tm-swap{font-size:40px;color:var(--clay)}
-.tm-quote{font:800 clamp(26px,3.4vw,42px)/1.1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;color:var(--forest);max-width:30ch;margin:44px 0 0}
-/* ladder */
-.tm-ladder{background:var(--night);color:#fff}
-.tm-ladder .tm-kicker{color:#f3c9a6}.tm-ladder .tm-p{color:#cfd5dc}
-.tm-ladder-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
-.tm-step-text>div{border-left:3px solid var(--clay);padding:6px 0 6px 18px;margin-top:24px}
-.tm-step-text b{font:800 34px/1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;color:#f3c9a6}
-.tm-step-text p{margin:8px 0 0;font-size:18px;color:#e6e9ee;max-width:42ch}
-.tm-rungs{list-style:none;padding:0;margin:0;display:flex;flex-direction:column-reverse;gap:10px}
-.tm-rungs button{width:calc(52% + var(--i) * 9.6%);display:flex;align-items:center;gap:14px;text-align:left;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.04);color:#fff;border-radius:12px;padding:14px 16px;font:700 17px "DM Sans",sans-serif;cursor:pointer;transition:background .2s,border-color .2s}
-.tm-rungs button small{display:none}
-.tm-rungs button span{font:800 15px "Big Shoulders Display","Arial Narrow",sans-serif;color:#f3c9a6}
-.tm-rungs button.past{border-color:rgba(243,201,166,.45)}
-.tm-rungs button.on{background:var(--clay);border-color:var(--clay)}.tm-rungs button.on span{color:#fff}
-/* capable */
-.tm-own{text-align:center}
-.tm-big{font-size:clamp(40px,6.4vw,88px);max-width:16ch;margin:0 auto .35em}
-.tm-own .tm-lead{margin:0 auto 30px}
-.tm-capable{list-style:none;padding:0;margin:0 auto;max-width:640px}
-.tm-capable li{padding:12px 0;border-top:1px solid var(--line);font-size:clamp(19px,2vw,24px);color:var(--ink2)}
-.tm-capable b{color:var(--forest)}
-/* handover */
-.tm-hand{background:#efe7da}
-.tm-chain{list-style:none;padding:0;margin:30px 0;display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-.tm-chain li{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 16px;font-weight:700;font-size:17px;min-height:96px;display:flex;align-items:center}
-.tm-chain li:not(.last):after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:var(--clay);color:#fff;display:grid;place-items:center;font-size:13px;z-index:1}
-.tm-chain li.last{background:var(--forest);color:#fff;border-color:var(--forest)}
-.tm-not p{margin:6px 0;font-size:clamp(20px,2.4vw,28px)}.tm-not s{color:var(--muted)}.tm-not b{color:var(--forest)}
-.tm-real{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;margin-top:26px}
-.tm-real h3{font-size:26px;margin:0 0 8px}.tm-real ul{list-style:none;padding:0;margin:0}.tm-real li{padding:8px 0;border-top:1px solid var(--line)}.tm-real i{font-style:normal;color:var(--clay);margin:0 6px}
+/* journeys */
+.tm-journeys{background:#efe7da}
+.tm-journey-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;margin-top:24px}
+.tm-journey{display:grid;grid-template-columns:48px 1fr;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px}
+.tm-journey .tm-face{width:48px;height:48px}
+.tm-journey h3{font-size:30px;margin:0;line-height:1}
+.tm-journey ol{list-style:none;padding:0;margin:14px 0 0;border-left:2px dashed var(--clay)}
+.tm-journey li{position:relative;padding:0 0 12px 18px}
+.tm-journey li:before{content:"";position:absolute;left:-7px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--paper);border:2.5px solid var(--clay)}
+.tm-journey li:last-child:before{background:var(--clay)}
+.tm-journey li b{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--clay)}
+.tm-journey li span{color:var(--ink2)}
 /* places */
 .tm-roles{list-style:none;padding:0;margin:24px 0 0;display:flex;flex-wrap:wrap;gap:12px}
 .tm-roles li{font:800 clamp(22px,2.4vw,30px)/1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:14px 24px;color:var(--forest)}
@@ -1759,12 +1638,6 @@ const TEAM_CSS = `
 .tm-area li{display:flex;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}.tm-area li span{display:flex;flex-direction:column;font-size:14px;color:var(--muted)}.tm-area li b{color:var(--ink);font-size:16px}
 /* founders */
 .tm-founders{background:var(--card);border-top:1px solid var(--line)}
-.tm-link{display:inline-block;margin-top:22px;font-weight:700;color:var(--clay);text-decoration:none}
-/* practice */
-.tm-place-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
-.tm-practice{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.tm-practice li{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px 14px 42px;position:relative;font-weight:600}
-.tm-practice li:before{content:"";position:absolute;left:16px;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:var(--forest2)}
 /* end */
 .tm-end{position:relative;color:#fff;text-align:center;overflow:hidden;background:var(--night)}
 .tm-end img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.45}
@@ -1774,10 +1647,9 @@ const TEAM_CSS = `
 .tm-say{font-weight:700;color:#f3c9a6!important;margin-bottom:32px!important}
 .tm-end-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 .tm-end .btn-ghost{color:#fff;border-color:rgba(255,255,255,.6)}
-@media(max-width:980px){.tm-kind-grid{grid-template-columns:1fr 1fr}.tm-chain{grid-template-columns:1fr}.tm-chain li{min-height:0}.tm-chain li:not(.last):after{content:"↓";right:auto;left:24px;top:auto;bottom:-14px;transform:none}}
-@media(max-width:900px){.tm-circle-grid,.tm-ladder-grid,.tm-place-grid,.tm-know-head{grid-template-columns:1fr;gap:28px}.tm-two{grid-template-columns:1fr}.tm-swap{text-align:center;transform:rotate(90deg)}}
-@media(max-width:900px){.tm-step-text{display:none}.tm-rungs{flex-direction:column}.tm-rungs button{flex-wrap:wrap}.tm-rungs button.on small{display:block;flex-basis:100%;font:400 15px/1.45 "DM Sans",sans-serif;color:#fff}}
-@media(max-width:600px){.tm-kind-grid{grid-template-columns:1fr}.tm-practice{grid-template-columns:1fr}.tm-rungs button{width:100%}.tm-cards{grid-template-columns:1fr}.tm-prog li:not(:last-child):after{width:14px;margin:0 6px}}
+@media(max-width:980px){.tm-kind-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.tm-know-head,.tm-kinds2{grid-template-columns:1fr;gap:20px}}
+@media(max-width:600px){.tm-kind-grid{grid-template-columns:1fr}.tm-cards,.tm-journey-list{grid-template-columns:1fr}}
 `;
 
 
