@@ -14,7 +14,7 @@ const EF = {
 const VF = { start: 'fldWr96uilLEjfI24', end: 'fldLWXxoeM3Xr7Qkd', exp: 'fldTwb0rZY39trwD4', status: 'fldEueCyQC6zJEEux', hide: 'fldYwt0HrpvixX8gg' };
 const RF = { name: 'fldIgYRm1oIN51m2Z', text: 'fldoiPyv0cAhFNMtJ', exp: 'fldCKUcXdn2vivo5h', show: 'fldwAqYVwcDDwqxLf', photo: 'fldsq62JdBgiw4j8A' };
 const TF = { name: 'fldOCEREnRFIAh8zc', role: 'fldgPjOaXv7pTdwmD', group: 'fldfnCycPmtEiabk9', bio: 'fldKNHwt0dVNiP8td', photo: 'fldx0IblfxhE0GYqL', order: 'fldH11Xe1zRMSZjm6', show: 'fldEH77VIUX1fdM6c',
-  kind: 'fldze5mhPxMT8evgs', area: 'fld92I8Rdv22owYBt', joined: 'fld4STp2AroKaSvaQ', knows: 'fldOqWKa4wuXaYTdU', leads: 'fldlL6muSbNdqKFO2', learned: 'fld4BlKDhsKL2zAbt', creates: 'fld1KHz2UfFM7Mtmo', building: 'fldR905xb7rpp0vyz', ask: 'fldIB7Xx70u31yph6', quote: 'flduQ64BhAZnaIFa8', quoteOk: 'fld6l7HsshhSbLJpS', from: 'fldN74fuymMhezvYj' };
+  kind: 'fldze5mhPxMT8evgs', area: 'fld92I8Rdv22owYBt', joined: 'fld4STp2AroKaSvaQ', knows: 'fldOqWKa4wuXaYTdU', leads: 'fldlL6muSbNdqKFO2', learned: 'fld4BlKDhsKL2zAbt', creates: 'fld1KHz2UfFM7Mtmo', building: 'fldR905xb7rpp0vyz', ask: 'fldIB7Xx70u31yph6', quote: 'flduQ64BhAZnaIFa8', quoteOk: 'fld6l7HsshhSbLJpS', from: 'fldN74fuymMhezvYj', kinds: 'fldj9E9s2cXNzQ0zq' };
 const TEAM_GROUPS = ['Founders', 'Experience Leaders', 'Business Development', 'Social Media'];
 const IF = { metric: 'fldX1aQLHwAWY4A0C', value: 'fldcFhyLkZhdUiyF2', order: 'fldWCIzvRPTsj0hQW', show: 'fldMKHdAIyLWJJsKQ', category: 'fldoPU4x6KqBKNdrY', opens: 'fldkAcX2ofFwe8OgO' };
 // Impact Created evidence tables. Rows only appear publicly when Show on Website is ticked (stories also need Consent Given).
@@ -143,7 +143,7 @@ async function loadLive(env) {
       return { id: r.id, name: f[TF.name], role: f[TF.role] || '', group: (g && g.name) || g || '', bio: f[TF.bio] || '', order: f[TF.order] ?? 99,
         photo: p ? (p.thumbnails && p.thumbnails.large && p.thumbnails.large.url) || p.url : '',
         kind: selName(f[TF.kind]), area: f[TF.area] || '', joined: f[TF.joined] || null, knows: f[TF.knows] || '', leads: f[TF.leads] || '', learned: f[TF.learned] || '',
-        creates: f[TF.creates] || '', building: f[TF.building] || '', ask: f[TF.ask] || '', quote: f[TF.quote] || '', quoteOk: !!f[TF.quoteOk], from: f[TF.from] || [] };
+        creates: f[TF.creates] || '', building: f[TF.building] || '', ask: f[TF.ask] || '', quote: f[TF.quote] || '', quoteOk: !!f[TF.quoteOk], from: f[TF.from] || [], kinds: (f[TF.kinds] || []).map(selName) };
     });
   return { experiences, events, reviews, impact, team, evidence: ev, source: 'live' };
 }

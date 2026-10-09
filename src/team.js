@@ -3,15 +3,13 @@
 // Team speaks through people (who we are, present tense). Curate speaks to the customer.
 // So this page avoids the About manifesto, the Educate > Employ > Empower model, impact numbers and project case studies.
 // Profiles read from the Website Team table. Every rich field (Knows, Leads, Has Learned, Creates,
-// Building Towards, Ask Me About, Quote) is hidden until filled in. Quotes also need Quote Approved.
-// On the staging address, unapproved quotes are shown with a "Draft" badge and empty profiles show a hint.
+// Building Towards, Ask Me About) is hidden until filled in. On the staging address, empty profiles show a hint.
 function teamPage(data, opts = {}) {
   const drafts = !!opts.drafts;
   const photo = (slug, i) => { const x = bySlug(data, slug); const ph = x && x.photos && (x.photos[i] || x.photos[0]); return ph ? ph.url : cover(sorted(data)[0], true); };
   const p = (t) => (t ? String(t).split(/\n+/).filter(Boolean).map((l) => `<p>${esc(l)}</p>`).join('') : '');
   const first = (n) => String(n).split(/\s+/)[0];
   const initials = (n) => n.split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
-  const draft = '<span class="tm-draft">Draft, not public</span>';
   const KINDS = [
     ['Knows the place', 'The people who know the place', 'Local guides, hosts, cooks and villagers.'],
     ['Creates the experience', 'The people who create the experience', 'Experience leaders, outdoor educators and facilitators.'],
@@ -20,20 +18,17 @@ function teamPage(data, opts = {}) {
   ];
   const kindOf = (m) => m.kind || (m.group === 'Founders' ? 'Founder' : m.group === 'Experience Leaders' ? 'Creates the experience' : 'Makes the system work');
   const gi = (g) => { const i = TEAM_GROUPS.indexOf(g); return i < 0 ? 99 : i; };
-  const all = (data.team || []).map((m) => ({ ...m, k: kindOf(m) })).sort((a, b) => gi(a.group) - gi(b.group) || a.order - b.order);
+  // Kinds on Website (multiple) decides the kind cards; a person can sit on more than one.
+  const kindsOf = (m) => (m.kinds && m.kinds.length ? m.kinds : [kindOf(m)].filter((k) => k !== 'Founder'));
+  const all = (data.team || []).map((m) => ({ ...m, k: kindOf(m), ks: kindsOf(m) })).sort((a, b) => gi(a.group) - gi(b.group) || a.order - b.order);
   const byId = Object.fromEntries(all.filter((m) => m.id).map((m) => [m.id, m]));
   const founders = all.filter((m) => m.k === 'Founder');
   const people = all.filter((m) => m.k !== 'Founder');
   const teachers = (m) => (m.from || []).map((id) => byId[id]).filter(Boolean);
   const students = (m) => all.filter((x) => (x.from || []).includes(m.id));
   const asks = (m) => String(m.ask || '').split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
-  const quotes = all.filter((m) => m.quote && (m.quoteOk || drafts));
-  const knowers = all.filter((m) => m.knows);
   // A journey needs at least two real steps, so it never reads as filler.
   const journeys = all.filter((m) => [m.joined, m.learned, m.leads, m.building, teachers(m).length, students(m).length].filter(Boolean).length >= 2);
-  const areas = {};
-  all.filter((m) => m.area).forEach((m) => (areas[m.area] = areas[m.area] || []).push(m));
-  const areaList = Object.keys(areas).sort();
   const workWith = waLink('Hi Rock & Anchor, I would like to work with you or join the team.');
 
   const avatar = (m, cls = 'tm-av') => (m.photo ? `<img class="${cls}" src="${esc(m.photo)}" alt="${esc(m.name)}" loading="lazy">` : `<span class="${cls} tm-ini">${esc(initials(m.name))}</span>`);
@@ -41,7 +36,7 @@ function teamPage(data, opts = {}) {
   const profile = (m) => {
     const f = first(m.name), a = asks(m);
     const rows = [[`What ${f} knows`, m.knows], [`What ${f} leads`, m.leads], [`What ${f} creates`, m.creates]].filter(([, v]) => v);
-    return `<article class="tm-card rv" data-kind="${esc(m.k)}">
+    return `<article class="tm-card rv" data-kind="${esc(m.ks.join('|'))}">
     <div class="tm-card-top">${avatar(m)}<div><span class="tm-role">${esc(m.role)}</span><h3>${esc(m.name)}</h3>${m.joined ? `<small class="tm-since">With us since ${esc(m.joined)}</small>` : ''}</div></div>
     ${m.bio ? `<div class="tm-bio">${p(m.bio)}</div>` : ''}
     ${rows.length ? `<dl>${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${p(v)}</dd></div>`).join('')}</dl>` : ''}
@@ -65,7 +60,7 @@ function teamPage(data, opts = {}) {
 
   const body = `<style>${TEAM_CSS}</style>
 <div class="tm">
-${drafts ? '<div class="tm-staging">Staging preview: profile hints and unapproved quotes are only visible here. The live site shows nothing until it is filled in and approved in Airtable.</div>' : ''}
+${drafts ? '<div class="tm-staging">Staging preview: the yellow hints are only visible here. The live site shows nothing until it is filled in Airtable.</div>' : ''}
 <section class="tm-hero"><img src="${esc(photo('winter-trekking', 1))}" alt="A Rock &amp; Anchor leader pointing out the valley on a Sahyadri ridge" fetchpriority="high"><div class="wrap">
   <p class="tm-kicker">Team</p><h1>People make the experience.</h1>
   <p class="tm-sub">These are the people you will walk with, eat with, learn from and trust on the mountain. Some of them know these places better than any map.</p>
@@ -74,21 +69,16 @@ ${drafts ? '<div class="tm-staging">Staging preview: profile hints and unapprove
 
 <section class="tm-kinds" id="kinds"><div class="wrap">
   <h2 class="tm-h rv">There is no single kind of person at Rock &amp; Anchor.</h2>
-  <div class="tm-kind-grid">${KINDS.map(([k, t, d], i) => { const ms = people.filter((m) => m.k === k); return `<button type="button" class="tm-kind rv" data-filter="${k}"><span class="tm-num">0${i + 1}</span><h3>${t}</h3><p>${d}</p>${ms.length ? `<span class="tm-faces">${ms.slice(0, 5).map((m) => avatar(m, 'tm-face')).join('')}<em>${ms.length === 1 ? esc(first(ms[0].name)) : `${ms.length} people`}</em></span>` : ''}</button>`; }).join('')}</div>
+  <div class="tm-kind-grid">${KINDS.map(([k, t, d], i) => { const ms = all.filter((m) => m.ks.includes(k)); return `<button type="button" class="tm-kind rv" data-filter="${k}"><span class="tm-num">0${i + 1}</span><h3>${t}</h3><p>${d}</p>${ms.length ? `<span class="tm-faces">${ms.slice(0, 5).map((m) => avatar(m, 'tm-face')).join('')}<em>${ms.length === 1 ? esc(first(ms[0].name)) : `${ms.length} people`}</em></span>` : ''}</button>`; }).join('')}</div>
 </div></section>
 
 <section class="tm-people" id="people"><div class="wrap">
   <p class="tm-kicker rv">The people</p>
   <h2 class="tm-h rv">Who might lead your experience.</h2>
   <p class="tm-lead rv">What they know, what they lead, and what you can ask them when you meet.</p>
-  ${people.length ? `<div class="tm-filter rv" role="group" aria-label="Show people"><button type="button" class="on" data-filter="all">Everyone</button>${KINDS.filter(([k]) => people.some((m) => m.k === k)).map(([k, t]) => `<button type="button" data-filter="${k}">${t.replace('The people who ', '').replace(/^./, (c) => c.toUpperCase())}</button>`).join('')}</div>
+  ${people.length ? `<div class="tm-filter rv" role="group" aria-label="Show people"><button type="button" class="on" data-filter="all">Everyone</button>${KINDS.filter(([k]) => people.some((m) => m.ks.includes(k))).map(([k, t]) => `<button type="button" data-filter="${k}">${t.replace('The people who ', '').replace(/^./, (c) => c.toUpperCase())}</button>`).join('')}</div>
   <div class="tm-cards">${people.map(profile).join('')}</div>` : ''}
 </div></section>
-
-${quotes.length ? `<section class="tm-voices" id="voices"><div class="wrap">
-  <p class="tm-kicker rv">In their own words</p><h2 class="tm-h rv">Not what we say about them. What they say.</h2>
-  <div class="tm-quotes">${quotes.map((m) => `<figure class="rv">${m.quoteOk ? '' : draft}<blockquote>${esc(m.quote)}</blockquote><figcaption>${avatar(m, 'tm-face')}<span><b>${esc(m.name)}</b>${esc(m.role)}</span></figcaption></figure>`).join('')}</div>
-</div></section>` : drafts ? `<section class="tm-voices"><div class="wrap"><p class="tm-kicker">In their own words</p><p class="tm-hint">Staging only: this section appears when a team member has a Quote with Quote Approved ticked in Airtable. Use their real words, not ours.</p></div></section>` : ''}
 
 <section class="tm-know" id="knowledge"><div class="wrap">
   <div class="tm-know-head"><div><p class="tm-kicker rv">Why it matters who your guide is</p><h2 class="tm-h rv">Some knowledge cannot be Googled.</h2>
@@ -98,19 +88,12 @@ ${quotes.length ? `<section class="tm-voices" id="voices"><div class="wrap">
     <div class="rv"><h3>Learned knowledge</h3><p>What our team trains for.</p><ul>${['Mountaineering', 'First aid', 'Outdoor safety', 'Astronomy', 'Leadership'].map((x) => `<li>${x}</li>`).join('')}</ul></div>
     <div class="rv tm-lived"><h3>Lived knowledge</h3><p>What our team grew up with.</p><ul>${['These mountains', 'These villages', 'The weather', 'Farming', 'Local stories', 'Seasonal changes', 'Places that do not appear on Google Maps'].map((x) => `<li>${x}</li>`).join('')}</ul></div>
   </div>
-  ${knowers.length ? `<div class="tm-know-grid">${knowers.map((m) => `<div class="tm-kcard rv"><b>${esc(first(m.name))} knows…</b><p>${esc(String(m.knows).split(/\n+/)[0])}</p></div>`).join('')}</div>` : drafts ? '<p class="tm-hint">Staging only: the first line of each person\'s Knows field appears here as "Sujit knows…" cards.</p>' : ''}
 </div></section>
 
 ${journeys.length ? `<section class="tm-journeys" id="journeys"><div class="wrap">
   <p class="tm-kicker rv">From participant to leader</p><h2 class="tm-h rv">Who they have become.</h2>
   <div class="tm-journey-list">${journeys.map(journey).join('')}</div>
 </div></section>` : drafts ? `<section class="tm-journeys" id="journeys"><div class="wrap"><p class="tm-kicker">From participant to leader</p><p class="tm-hint">Staging only: this section appears for people with at least two of Joined, Has Learned, Leads, Building Towards or Learned From filled in. It tells their journey in their own steps, not as a framework.</p></div></section>` : ''}
-
-<section class="tm-places" id="places"><div class="wrap">
-  <p class="tm-kicker rv">People behind the places</p><h2 class="tm-h rv">Who knows this place?</h2>
-  <p class="tm-p rv">Wherever we go, a day outdoors depends on a small circle of people: a guide, a host, a cook, a school contact, a facilitator. We do not name the villages, to protect the people who live there and the places themselves.</p>
-  ${areaList.length ? `<div class="tm-areas">${areaList.map((a) => `<div class="tm-area rv"><h3>${esc(a)}</h3><ul>${areas[a].map((m) => `<li>${avatar(m, 'tm-face')}<span><b>${esc(m.name)}</b>${esc(m.role)}</span></li>`).join('')}</ul></div>`).join('')}</div>` : `<ul class="tm-roles rv">${['Guide', 'Host', 'Cook', 'School contact', 'Facilitator'].map((r) => `<li>${r}</li>`).join('')}</ul>${drafts ? '<p class="tm-hint">Staging only: add a general Area (for example Karjat or Shahapur, never a village) to team members in Airtable to group them here.</p>' : ''}`}
-</div></section>
 
 ${founders.length ? `<section class="tm-founders" id="founders"><div class="wrap">
   <p class="tm-kicker rv">The founders</p><h2 class="tm-h rv">Started it. Still learning how to build it.</h2>
@@ -134,9 +117,9 @@ d.documentElement.classList.add('tmjs');
 var io=('IntersectionObserver' in w)?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{rootMargin:'0px 0px -8% 0px'}):null;
 d.querySelectorAll('.tm .rv').forEach(function(el){if(io&&!rm)io.observe(el);else el.classList.add('in')});
 var fb=d.querySelectorAll('.tm-filter button'),cards=d.querySelectorAll('.tm-people .tm-card');
-function filt(k){fb.forEach(function(b){b.classList.toggle('on',b.dataset.filter===k)});cards.forEach(function(c){c.hidden=!(k==='all'||c.dataset.kind===k);if(!c.hidden)c.classList.add('in')})}
+function filt(k){fb.forEach(function(b){b.classList.toggle('on',b.dataset.filter===k)});cards.forEach(function(c){c.hidden=!(k==='all'||c.dataset.kind.split('|').indexOf(k)>-1);if(!c.hidden)c.classList.add('in')})}
 fb.forEach(function(b){b.addEventListener('click',function(){filt(b.dataset.filter)})});
-d.querySelectorAll('.tm-kind').forEach(function(b){b.addEventListener('click',function(){var k=b.dataset.filter,has=false;fb.forEach(function(x){if(x.dataset.filter===k)has=true});filt(has?k:'all');d.getElementById('people').scrollIntoView({behavior:rm?'auto':'smooth'})})});
+d.querySelectorAll('.tm-kind').forEach(function(b){b.addEventListener('click',function(){var k=b.dataset.filter,has=false;fb.forEach(function(x){if(x.dataset.filter===k)has=true});var to='people';if(has)filt(k);else{filt('all');if(d.getElementById('founders'))to='founders'}d.getElementById(to).scrollIntoView({behavior:rm?'auto':'smooth'})})});
 })();`;
 
 const TEAM_CSS = `
@@ -194,14 +177,6 @@ const TEAM_CSS = `
 .tm dl{margin:0}.tm dl>div{padding:10px 0;border-top:1px solid var(--line)}
 .tm dt{font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--clay);margin-bottom:4px}
 .tm dd{margin:0;color:var(--ink2)}.tm dd p{margin:0 0 6px}
-/* voices */
-.tm-voices{background:var(--forest);color:#fff}
-.tm-voices .tm-kicker{color:#f3c9a6}.tm-voices .tm-hint{background:rgba(255,255,255,.08);color:#f2ede6;border-color:rgba(255,255,255,.3)}
-.tm-quotes{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px;margin-top:24px}
-.tm-quotes figure{margin:0;border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:26px}
-.tm-quotes blockquote{margin:0 0 20px;font:800 clamp(24px,2.4vw,32px)/1.15 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase}
-.tm-quotes blockquote:before{content:"\\201C";display:block;font-size:64px;line-height:.6;color:#f3c9a6;margin-bottom:8px}
-.tm-quotes figcaption{display:flex;gap:12px;align-items:center}.tm-quotes figcaption span{display:flex;flex-direction:column;font-size:14px;color:#d8e2da}.tm-quotes figcaption b{color:#fff;font-size:16px}
 /* knowledge */
 .tm-know-head{display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:end}
 .tm-know-head img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:18px}
@@ -212,10 +187,6 @@ const TEAM_CSS = `
 .tm-kinds2 li{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-weight:600}
 .tm-lived{background:var(--forest)!important;border-color:var(--forest)!important;color:#fff}.tm-lived>p{color:#cfe0d3!important}
 .tm-lived li{background:rgba(255,255,255,.1)!important;border-color:rgba(255,255,255,.2)!important;color:#fff}
-.tm-know-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin:24px 0 0}
-.tm-kcard{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--clay);border-radius:var(--r);padding:22px}
-.tm-kcard b{font:800 26px/1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;color:var(--forest)}
-.tm-kcard p{margin:10px 0 0;font-size:18px;color:var(--ink)}
 /* journeys */
 .tm-journeys{background:#efe7da}
 .tm-journey-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;margin-top:24px}
@@ -228,13 +199,6 @@ const TEAM_CSS = `
 .tm-journey li:last-child:before{background:var(--clay)}
 .tm-journey li b{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--clay)}
 .tm-journey li span{color:var(--ink2)}
-/* places */
-.tm-roles{list-style:none;padding:0;margin:24px 0 0;display:flex;flex-wrap:wrap;gap:12px}
-.tm-roles li{font:800 clamp(22px,2.4vw,30px)/1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:14px 24px;color:var(--forest)}
-.tm-areas{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;margin-top:28px}
-.tm-area{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px}
-.tm-area h3{font-size:32px;margin:0 0 10px}.tm-area ul{list-style:none;padding:0;margin:0}
-.tm-area li{display:flex;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}.tm-area li span{display:flex;flex-direction:column;font-size:14px;color:var(--muted)}.tm-area li b{color:var(--ink);font-size:16px}
 /* founders */
 .tm-founders{background:var(--card);border-top:1px solid var(--line)}
 /* end */
