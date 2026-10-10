@@ -1429,29 +1429,28 @@ function teamPage(data, opts = {}) {
   const students = (m) => all.filter((x) => (x.from || []).includes(m.id));
   const asks = (m) => String(m.ask || '').split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
   // A journey needs at least two real steps, so it never reads as filler.
-  const journeys = all.filter((m) => [m.joined, m.learned, m.leads, m.building, teachers(m).length, students(m).length].filter(Boolean).length >= 2);
+  const journeys = all.filter((m) => [m.joined, m.learned, m.building, teachers(m).length, students(m).length].filter(Boolean).length >= 2);
   const workWith = waLink('Hi Rock & Anchor, I would like to work with you or join the team.');
 
   const avatar = (m, cls = 'tm-av') => (m.photo ? `<img class="${cls}" src="${esc(m.photo)}" alt="${esc(m.name)}" loading="lazy">` : `<span class="${cls} tm-ini">${esc(initials(m.name))}</span>`);
   // Profile: present tense. Who they are, what they know, what they lead, what to ask them.
   const profile = (m) => {
     const f = first(m.name), a = asks(m);
-    const rows = [[`What ${f} knows`, m.knows], [`What ${f} leads`, m.leads], [`What ${f} creates`, m.creates]].filter(([, v]) => v);
+    const rows = [['Has learned', m.learned]].filter(([, v]) => v);
     return `<article class="tm-card rv" data-kind="${esc(m.ks.join('|'))}">
     <div class="tm-card-top">${avatar(m)}<div><span class="tm-role">${esc(m.role)}</span><h3>${esc(m.name)}</h3>${m.joined ? `<small class="tm-since">With us since ${esc(m.joined)}</small>` : ''}</div></div>
     ${m.bio ? `<div class="tm-bio">${p(m.bio)}</div>` : ''}
     ${rows.length ? `<dl>${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${p(v)}</dd></div>`).join('')}</dl>` : ''}
     ${a.length ? `<div class="tm-ask"><b>Ask ${esc(f)} about</b><ul>${a.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
-    ${!rows.length && !a.length && drafts ? `<p class="tm-hint">Staging only: add Knows, Leads, Creates and Ask Me About in Airtable (Website Team) to fill this profile.</p>` : ''}
+    ${!rows.length && !a.length && drafts ? `<p class="tm-hint">Staging only: add Has Learned and Ask Me About in Airtable (Website Team) to fill this profile.</p>` : ''}
   </article>`;
   };
-  // Journey: who did this person become? Joined us > developed a skill > now leads > next.
+  // Journey: who did this person become? Joined us > developed a skill > now teaching > next.
   const journey = (m) => {
     const t = teachers(m), s = students(m);
     const steps = [
       m.joined || t.length ? ['Joined us', [m.joined ? `In ${esc(m.joined)}.` : '', t.length ? `Learned from ${t.map((x) => esc(x.name)).join(' and ')}.` : ''].filter(Boolean).join(' ')] : null,
       m.learned ? ['Developed', esc(String(m.learned).split(/\n+/)[0])] : null,
-      m.leads ? ['Now leads', esc(String(m.leads).split(/\n+/)[0])] : null,
       s.length ? ['Now teaching', s.map((x) => esc(x.name)).join(', ')] : null,
       m.building ? ['Next', esc(String(m.building).split(/\n+/)[0])] : null,
     ].filter(Boolean);
@@ -1476,7 +1475,7 @@ ${drafts ? '<div class="tm-staging">Staging preview: the yellow hints are only v
 <section class="tm-people" id="people"><div class="wrap">
   <p class="tm-kicker rv">The people</p>
   <h2 class="tm-h rv">Who might lead your experience.</h2>
-  <p class="tm-lead rv">What they know, what they lead, and what you can ask them when you meet.</p>
+  <p class="tm-lead rv">What they have learned, and what you can ask them when you meet.</p>
   ${people.length ? `<div class="tm-filter rv" role="group" aria-label="Show people"><button type="button" class="on" data-filter="all">Everyone</button>${KINDS.filter(([k]) => people.some((m) => m.ks.includes(k))).map(([k, t]) => `<button type="button" data-filter="${k}">${t.replace('The people who ', '').replace(/^./, (c) => c.toUpperCase())}</button>`).join('')}</div>
   <div class="tm-cards">${people.map(profile).join('')}</div>` : ''}
 </div></section>
@@ -1494,7 +1493,7 @@ ${drafts ? '<div class="tm-staging">Staging preview: the yellow hints are only v
 ${journeys.length ? `<section class="tm-journeys" id="journeys"><div class="wrap">
   <p class="tm-kicker rv">From participant to leader</p><h2 class="tm-h rv">Who they have become.</h2>
   <div class="tm-journey-list">${journeys.map(journey).join('')}</div>
-</div></section>` : drafts ? `<section class="tm-journeys" id="journeys"><div class="wrap"><p class="tm-kicker">From participant to leader</p><p class="tm-hint">Staging only: this section appears for people with at least two of Joined, Has Learned, Leads, Building Towards or Learned From filled in. It tells their journey in their own steps, not as a framework.</p></div></section>` : ''}
+</div></section>` : drafts ? `<section class="tm-journeys" id="journeys"><div class="wrap"><p class="tm-kicker">From participant to leader</p><p class="tm-hint">Staging only: this section appears for people with at least two of Joined, Has Learned, Building Towards or Learned From filled in. It tells their journey in their own steps, not as a framework.</p></div></section>` : ''}
 
 ${founders.length ? `<section class="tm-founders" id="founders"><div class="wrap">
   <p class="tm-kicker rv">The founders</p><h2 class="tm-h rv">Started it. Still learning how to build it.</h2>
