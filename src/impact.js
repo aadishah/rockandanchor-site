@@ -1,15 +1,15 @@
 // ---------- Impact Created: the open impact books ----------
 // Impact speaks as evidence: what happened, what changed, where the money went. No philosophy, no team directory,
-// no selling. A person appears here only as evidence of change (Stories), never simply because they are on the team.
-// About Us explains the system. Impact Created opens it up: numbers, money flow, projects, people,
-// places, outcomes, what we measure, what did not work and a year-by-year archive.
+// no selling, no people profiles (those live on Team).
+// About Us explains the system. Impact Created opens it up: numbers, money flow, projects,
+// what we measure, what did not work and a year-by-year archive.
 // Evidence sections read from the Website Impact tables in Airtable and stay hidden until rows are published.
 // On the staging address, unpublished rows are shown with a "Draft" badge so they can be reviewed.
 function impactPage(data, opts = {}) {
   const drafts = !!opts.drafts;
   const ev = data.evidence || { projects: [], stories: [], learnings: [], money: [], places: [] };
   const vis = (list) => (list || []).filter((x) => x.live || drafts);
-  const projects = vis(ev.projects), stories = vis(ev.stories), learnings = vis(ev.learnings), money = vis(ev.money), places = vis(ev.places);
+  const projects = vis(ev.projects), learnings = vis(ev.learnings), money = vis(ev.money);
   const draft = (x) => (x.live ? '' : '<span class="im-draft">Draft, not public</span>');
   const p = (t) => (t ? String(t).split(/\n+/).filter(Boolean).map((l) => `<p>${esc(l)}</p>`).join('') : '');
   const photo = (slug, i, big = true) => { const x = bySlug(data, slug); const ph = x && x.photos && (x.photos[i] || x.photos[0]); return ph ? (big ? ph.url : ph.thumb) : cover(sorted(data)[0], big); };
@@ -17,7 +17,7 @@ function impactPage(data, opts = {}) {
   const workWith = waLink('Hi Rock & Anchor, I would like to work with you (school, company or partnership).');
 
   // 2. Numbers: from the Website Impact table. "Click Opens" decides what each number reveals.
-  const has = { Stories: stories.length, Projects: projects.length, Money: money.length, Places: places.length };
+  const has = { Projects: projects.length, Money: money.length };
   const nums = (data.impact || []).map((m, i) => ({ ...m, i, link: has[m.opens] ? m.opens : '' }));
   const numCard = (m) => `<${m.link ? 'button type="button"' : 'div'} class="im-num${m.link ? ' im-click' : ''}"${m.link ? ` data-open="${m.link}"` : ''}><b>${esc(m.value)}</b><span>${esc(m.metric)}</span>${m.link ? `<em>See the evidence →</em>` : ''}</${m.link ? 'button' : 'div'}>`;
   const schoolsCard = `<button type="button" class="im-num im-click im-accent" data-open="${projects.some((x) => x.category === 'Education') ? 'Education' : 'Money'}"><b>25%</b><span>Of Net Profit goes to village schools</span><em>See what it funded →</em></button>`;
@@ -41,54 +41,19 @@ function impactPage(data, opts = {}) {
     <dl>${[['What we saw', x.saw], ['What we did', x.did], ['Who was involved', x.who], ['What changed', x.changed], ['What happens next', x.next]].filter(([, v]) => v).map(([k, v]) => `<div><dt>${k}</dt><dd>${p(v)}</dd></div>`).join('')}</dl>
   </div></article>`;
 
-  // 5. Stories.
-  const initials = (n) => n.split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
-  const storyCard = (x) => `<article class="im-story rv">${x.photo ? `<img src="${esc(x.photo)}" alt="${esc(x.name)}" loading="lazy">` : `<span class="im-av">${esc(initials(x.name))}</span>`}<div>${draft(x)}<h3>${esc(x.name)}</h3>
-    ${x.then || x.now ? `<p class="im-path">${x.then ? `<span>${esc(x.then)}</span>` : ''}${x.then && x.now ? '<i>→</i>' : ''}${x.now ? `<span class="now">${esc(x.now)}</span>` : ''}</p>` : ''}
-    <dl>${[['Started', x.started], ['Learned', x.learned], ['Today', x.today], ['Next', x.next]].filter(([, v]) => v).map(([k, v]) => `<div><dt>${k}</dt><dd>${p(v)}</dd></div>`).join('')}</dl>
-    ${drafts && !x.started && !x.learned && !x.today ? '<p class="im-muted">Add their story in Airtable: Website Impact Stories.</p>' : ''}</div></article>`;
-
-  // 6. Then and now, only where both sides are written down.
-  const thenNow = [
-    ...stories.filter((x) => x.then && x.now).map((x) => ['Person', x.name, x.then, x.now, x]),
-    ...projects.filter((x) => x.saw && x.changed).map((x) => [x.category === 'Education' ? 'School' : x.category || 'Project', x.title, x.saw, x.changed, x]),
-  ];
-
-  // 7. Places map. General areas only, never villages or exact positions.
-  const box = { n: 19.8, s: 18.6, w: 72.6, e: 73.8 }, W = 600, H = 600;
-  const px = (lng) => ((lng - box.w) / (box.e - box.w)) * W, py = (lat) => ((box.n - lat) / (box.n - box.s)) * H;
-  const expsIn = (pl) => sorted(data).filter((e) => { const loc = String(e.location || '').toLowerCase(); return pl.match.some((m) => loc.startsWith(m)); });
-  const placeData = places.map((pl, i) => ({ ...pl, i, exps: expsIn(pl) }));
-  const mapSvg = `<svg class="im-map" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="mapT"><title id="mapT">A schematic map of the areas around Mumbai where Rock &amp; Anchor works. Areas are approximate.</title>
-    <path class="sea" d="M0 0H${px(72.95).toFixed(0)}C${px(72.9).toFixed(0)} 120 ${px(72.85).toFixed(0)} 260 ${px(72.95).toFixed(0)} 360S${px(73.0).toFixed(0)} 520 ${px(72.98).toFixed(0)} ${H}H0Z"/>
-    <text class="sea-t" x="40" y="${H - 40}">Arabian Sea</text>
-    <path class="ridge" d="M${px(73.55).toFixed(0)} 20C${px(73.62).toFixed(0)} 160 ${px(73.5).toFixed(0)} 300 ${px(73.62).toFixed(0)} 440S${px(73.55).toFixed(0)} 560 ${px(73.6).toFixed(0)} ${H}"/>
-    <text class="ridge-t" x="${(px(73.62) + 12).toFixed(0)}" y="300" transform="rotate(90 ${(px(73.62) + 12).toFixed(0)} 300)">SAHYADRIS</text>
-    ${placeData.filter((pl) => pl.lat != null && pl.lng != null).map((pl) => `<g class="pin${pl.live ? '' : ' is-draft'}" data-place="${pl.i}" tabindex="0" role="button" aria-label="${esc(pl.area)}"><circle class="halo" cx="${px(pl.lng).toFixed(1)}" cy="${py(pl.lat).toFixed(1)}" r="34"/><circle class="dot" cx="${px(pl.lng).toFixed(1)}" cy="${py(pl.lat).toFixed(1)}" r="11"/><text x="${(px(pl.lng) + 20).toFixed(1)}" y="${(py(pl.lat) + 6).toFixed(1)}">${esc(pl.area)}</text></g>`).join('')}
-  </svg>`;
-  const placePanel = (pl) => `<div class="im-place" data-place="${pl.i}"${pl.i ? ' hidden' : ''}>${draft(pl)}<h3>${esc(pl.area)}</h3>${p(pl.summary)}
-    <dl>
-      ${pl.exps.length ? `<div><dt>Experiences run here</dt><dd><ul>${pl.exps.map((e) => `<li><a href="/experiences/${esc(e.slug)}">${esc(e.title)}</a></li>`).join('')}</ul></dd></div>` : ''}
-      ${pl.hosts != null ? `<div><dt>Local hosts</dt><dd>${esc(pl.hosts)}</dd></div>` : ''}
-      ${[['School initiatives', pl.schools], ['Training', pl.training], ['Environmental work', pl.env], ['Stories', pl.stories]].filter(([, v]) => v).map(([k, v]) => `<div><dt>${k}</dt><dd>${p(v)}</dd></div>`).join('')}
-    </dl></div>`;
-
   // 11. Archive by year.
   const years = {};
   const addY = (y, kind, label, live) => { if (!y) return; (years[y] = years[y] || []).push({ kind, label, live }); };
   projects.forEach((x) => addY(x.year, 'Project', x.title, x.live));
-  stories.forEach((x) => addY(x.year, 'Person', `${x.name}${x.now ? `, ${x.now}` : ''}`, x.live));
   learnings.forEach((x) => addY(x.year, 'Learning', x.title, x.live));
   const yearList = Object.keys(years).sort();
 
   // Modal content for clickable numbers.
   const modal = (key, title, inner) => `<div class="im-m" data-m="${key}" hidden><h3>${title}</h3>${inner}</div>`;
   const modals = [
-    stories.length ? modal('Stories', 'The people behind the number', `<ul class="im-mlist">${stories.map((x) => `<li><b>${esc(x.name)}</b>${x.now ? ` <span>${esc(x.now)}</span>` : ''}${x.today ? `<p>${esc(x.today)}</p>` : ''}${draft(x)}</li>`).join('')}</ul><a class="im-link" href="#people" data-close>Read their stories →</a>`) : '',
     projects.length ? modal('Projects', 'The work behind the number', `<ul class="im-mlist">${projects.map((x) => `<li><b>${esc(x.title)}</b>${x.did ? `<p>${esc(x.did)}</p>` : ''}${draft(x)}</li>`).join('')}</ul><a class="im-link" href="#projects" data-close>See all projects →</a>`) : '',
     projects.some((x) => x.category === 'Education') ? modal('Education', 'What 25% of Net Profit has funded', `<ul class="im-mlist">${projects.filter((x) => x.category === 'Education').map((x) => `<li><b>${esc(x.title)}</b>${x.did ? `<p>${esc(x.did)}</p>` : ''}${draft(x)}</li>`).join('')}</ul><a class="im-link" href="#projects" data-close>See all projects →</a>`) : '',
     money.length ? modal('Money', 'Where the money went', `<ul class="im-mlist">${money.map(fig).join('')}</ul><a class="im-link" href="#money" data-close>Follow the money →</a>`) : modal('Money', 'Where the money goes', `<p>25% of Net Profit funds schools in the mountain villages we work in.</p><a class="im-link" href="#money" data-close>Follow the money →</a>`),
-    places.length ? modal('Places', 'Where it happened', `<ul class="im-mlist">${placeData.map((pl) => `<li><b>${esc(pl.area)}</b>${pl.exps.length ? ` <span>${pl.exps.length} experience${pl.exps.length > 1 ? 's' : ''}</span>` : ''}${draft(pl)}</li>`).join('')}</ul><a class="im-link" href="#places" data-close>Open the map →</a>`) : '',
   ].join('');
 
   const body = `<style>${IMPACT_CSS}</style>
@@ -114,23 +79,6 @@ ${drafts ? '<div class="im-staging">Staging preview: rows marked <b>Draft, not p
 ${projects.length ? `<section class="im-projects" id="projects"><div class="wrap">
   <p class="im-kicker rv">The work behind the number</p><h2 class="im-h rv">Where the impact has happened.</h2>
   <div class="im-projs">${projects.map(projCard).join('')}</div>
-</div></section>` : ''}
-
-${stories.length ? `<section class="im-people" id="people"><div class="wrap">
-  <p class="im-kicker rv">People stories</p><h2 class="im-h rv">Impact has names.</h2>
-  <div class="im-stories">${stories.map(storyCard).join('')}</div>
-</div></section>` : ''}
-
-${thenNow.length ? `<section class="im-tn" id="then-now"><div class="wrap">
-  <p class="im-kicker rv">Then and now</p><h2 class="im-h rv">Someone started here. Something changed.</h2>
-  <div class="im-tn-table rv" role="table"><div class="im-tn-row im-tn-head" role="row"><span role="columnheader"></span><span role="columnheader">Then</span><span role="columnheader">Now</span></div>
-  ${thenNow.map(([k, name, a, b, x]) => `<div class="im-tn-row" role="row"><span role="cell"><small>${esc(k)}</small><b>${esc(name)}</b>${draft(x)}</span><span role="cell">${esc(a)}</span><span role="cell" class="now">${esc(b)}</span></div>`).join('')}</div>
-</div></section>` : ''}
-
-${places.length ? `<section class="im-places" id="places"><div class="wrap">
-  <p class="im-kicker rv">The places</p><h2 class="im-h rv">Places we work are not anonymous backdrops.</h2>
-  <p class="im-p rv">We do not share village names or exact locations. It protects the people who live there and the places themselves from overcrowding. The map shows the general areas we work in.</p>
-  <div class="im-map-grid"><div class="im-map-wrap rv">${mapSvg}</div><div class="im-place-panel" aria-live="polite">${placeData.map(placePanel).join('')}</div></div>
 </div></section>` : ''}
 
 <section class="im-measure" id="measuring"><div class="wrap">
@@ -162,7 +110,7 @@ ${yearList.length ? `<section class="im-archive" id="archive"><div class="wrap">
 <div class="im-modal" id="imModal" hidden role="dialog" aria-modal="true"><div class="im-modal-card"><button type="button" class="im-x" aria-label="Close">×</button>${modals}</div></div>
 </div>
 <script>${IMPACT_JS}</script>`;
-  return layout({ title: 'Impact Created', desc: 'What happens because you travel with Rock & Anchor: the numbers, where the money goes, the projects, the people and the places.', path: '/impact', body, image: photo('be-a-villager', 3), data });
+  return layout({ title: 'Impact Created', desc: 'What happens because you travel with Rock & Anchor: the numbers, where the money goes, the projects and what we have learned.', path: '/impact', body, image: photo('be-a-villager', 3), data });
 }
 
 const IMPACT_JS = `(function(){
@@ -177,10 +125,6 @@ d.querySelectorAll('[data-open]').forEach(function(b){b.addEventListener('click'
 md.querySelector('.im-x').addEventListener('click',close);md.addEventListener('click',function(e){if(e.target===md)close()});
 md.querySelectorAll('[data-close]').forEach(function(a){a.addEventListener('click',function(){md.hidden=true;d.body.style.overflow=''})});
 d.addEventListener('keydown',function(e){if(e.key==='Escape'&&!md.hidden)close()});
-var pins=d.querySelectorAll('.im-map .pin'),panels=d.querySelectorAll('.im-place');
-function pick(i){pins.forEach(function(p){p.classList.toggle('on',p.dataset.place===i)});panels.forEach(function(p){p.hidden=p.dataset.place!==i})}
-pins.forEach(function(p){p.addEventListener('click',function(){pick(p.dataset.place)});p.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(p.dataset.place)}})});
-if(pins.length)pick(pins[0].dataset.place);
 })();`;
 
 const IMPACT_CSS = `
@@ -235,36 +179,6 @@ const IMPACT_CSS = `
 .im dl{margin:0}.im dl>div{padding:10px 0;border-top:1px solid var(--line)}
 .im dt{font-weight:700;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--clay);margin-bottom:4px}
 .im dd{margin:0;color:var(--ink2)}.im dd p{margin:0 0 6px}
-/* stories */
-.im-people{background:#efe7da}
-.im-stories{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin-top:28px}
-.im-story{display:grid;grid-template-columns:72px 1fr;gap:16px;background:var(--card);border-radius:var(--r);padding:22px;border:1px solid var(--line)}
-.im-story img,.im-av{width:72px;height:72px;border-radius:50%;object-fit:cover}
-.im-av{display:grid;place-items:center;background:var(--forest);color:#fff;font:800 24px "Big Shoulders Display","Arial Narrow",sans-serif}
-.im-story h3{font-size:30px;margin:0}
-.im-path{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:6px 0 10px;font-weight:700;color:var(--muted)}
-.im-path i{font-style:normal;color:var(--clay)}.im-path .now{color:var(--forest)}
-/* then and now */
-.im-tn-table{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--card);margin-top:24px}
-.im-tn-row{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:18px;padding:16px 20px;border-top:1px solid var(--line)}
-.im-tn-head{background:var(--forest);color:#fff;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:13px;border:0}
-.im-tn-row small{display:block;color:var(--clay);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:11.5px}
-.im-tn-row .now{color:var(--forest);font-weight:600}
-/* places */
-.im-map-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:start;margin-top:28px}
-.im-map{width:100%;background:#efe7da;border-radius:var(--r)}
-.im-map .sea{fill:#d9e6ea}.im-map .sea-t{fill:#7b97a1;font:italic 16px "DM Sans",sans-serif}
-.im-map .ridge{fill:none;stroke:#c9b99c;stroke-width:26;stroke-linecap:round;opacity:.55}
-.im-map .ridge-t{fill:#a8957a;font:800 15px "Big Shoulders Display","Arial Narrow",sans-serif;letter-spacing:.4em}
-.im-map .pin{cursor:pointer;outline:none}
-.im-map .pin .halo{fill:var(--clay);opacity:.14;transition:opacity .2s}
-.im-map .pin .dot{fill:var(--clay);stroke:#fff;stroke-width:3}
-.im-map .pin text{font:800 22px "Big Shoulders Display","Arial Narrow",sans-serif;fill:var(--ink);letter-spacing:.04em;text-transform:uppercase}
-.im-map .pin.on .halo,.im-map .pin:focus .halo{opacity:.35}.im-map .pin.on .dot{fill:var(--forest)}
-.im-map .pin.is-draft .dot{fill:#c9a227}
-.im-place{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px}
-.im-place h3{font-size:40px;margin:0 0 8px}
-.im-place ul{margin:0;padding-left:18px}.im-place a{color:var(--clay);font-weight:700;text-decoration:none}
 /* measuring */
 .im-measure-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}
 .im-measure-grid>div{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px}
@@ -304,8 +218,7 @@ const IMPACT_CSS = `
 .im-link{font-weight:700;color:var(--clay);text-decoration:none}
 .im-x{position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:50%;border:0;background:#efe7da;font-size:26px;cursor:pointer}
 @media(max-width:900px){
-.im-money-grid,.im-map-grid,.im-measure-grid{grid-template-columns:1fr;gap:28px}
-.im-tn-row{grid-template-columns:1fr 1fr}.im-tn-row>span:first-child{grid-column:1/-1}.im-tn-head>span:first-child{display:none}
+.im-money-grid,.im-measure-grid{grid-template-columns:1fr;gap:28px}
 }
-@media(max-width:600px){.im-story{grid-template-columns:1fr}.im-nums{grid-template-columns:1fr 1fr}.im-num{padding:16px}}
+@media(max-width:600px){.im-nums{grid-template-columns:1fr 1fr}.im-num{padding:16px}}
 `;
