@@ -16,7 +16,7 @@ function teamPage(data, opts = {}) {
     ['Makes the system work', 'The people who make the system work', 'Operations, business development, administration and content.'],
     ['Learning to lead', 'The people who are learning to lead', 'Interns, trainees and emerging local leaders.'],
   ];
-  const kindOf = (m) => m.kind || (m.group === 'Founders' ? 'Founder' : m.group === 'Experience Leaders' ? 'Creates the experience' : 'Makes the system work');
+  const kindOf = (m) => (m.group === 'Founders' ? 'Founder' : m.group === 'Experience Leaders' ? 'Creates the experience' : 'Makes the system work');
   const gi = (g) => { const i = TEAM_GROUPS.indexOf(g); return i < 0 ? 99 : i; };
   // Kinds on Website (multiple) decides the kind cards; a person can sit on more than one.
   const kindsOf = (m) => (m.kinds && m.kinds.length ? m.kinds : [kindOf(m)].filter((k) => k !== 'Founder'));
