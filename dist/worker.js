@@ -1350,7 +1350,7 @@ ${drafts ? '<div class="tm-staging">Staging preview: the yellow hints are only v
 
 <section class="tm-people" id="people"><div class="wrap">
   <p class="tm-kicker rv">The people</p>
-  <h2 class="tm-h rv">There is no single kind of person at Rock &amp; Anchor.</h2>
+  <h2 class="tm-h rv">The people behind your experience.</h2>
   ${tabs.length ? `<div class="tm-filter rv" role="tablist" aria-label="Show people"><button type="button" role="tab" class="on" data-filter="all">Everyone</button>${tabs.map(([k, t]) => `<button type="button" role="tab" data-filter="${k}">${t.replace('The people who ', '').replace(/^./, (c) => c.toUpperCase())}</button>`).join('')}</div>
   <div class="tm-kind-desc" aria-live="polite"><p data-kind="all">Local guides, experience leaders, outdoor educators and the people behind the scenes. Here is who you might meet.</p>${tabs.map(([k, t, d]) => { const fs = founders.filter((m) => m.ks.includes(k)); return `<p data-kind="${k}" hidden><b>${t}.</b> ${d}${fs.length ? ` <a href="#founders">${fs.map((m) => esc(first(m.name))).join(' and ')} ${fs.length > 1 ? 'are' : 'is'} here too, with the founders ↓</a>` : ''}</p>`; }).join('')}</div>` : ''}
   <div class="tm-cards">${people.map(profile).join('')}</div>
