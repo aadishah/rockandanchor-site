@@ -3,7 +3,7 @@
 // Team speaks through people (who we are, present tense). Curate speaks to the customer.
 // So this page avoids the About manifesto, the Educate > Employ > Empower model, impact numbers and project case studies.
 // Profiles read from the Website Team table. Every rich field (Knows, Leads, Has Learned, Creates,
-// Building Towards, Ask Me About) is hidden until filled in. On the staging address, empty profiles show a hint.
+// Building Towards) is hidden until filled in. On the staging address, empty profiles show a hint.
 function teamPage(data, opts = {}) {
   const drafts = !!opts.drafts;
   const photo = (slug, i) => { const x = bySlug(data, slug); const ph = x && x.photos && (x.photos[i] || x.photos[0]); return ph ? ph.url : cover(sorted(data)[0], true); };
@@ -26,7 +26,6 @@ function teamPage(data, opts = {}) {
   const people = all.filter((m) => m.k !== 'Founder');
   const teachers = (m) => (m.from || []).map((id) => byId[id]).filter(Boolean);
   const students = (m) => all.filter((x) => (x.from || []).includes(m.id));
-  const asks = (m) => String(m.ask || '').split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
   // A journey needs at least two real steps, so it never reads as filler.
   const journeys = all.filter((m) => [m.joined, m.learned, m.building, teachers(m).length, students(m).length].filter(Boolean).length >= 2);
   const workWith = waLink('Hi Rock & Anchor, I would like to work with you or join the team.');
@@ -34,14 +33,13 @@ function teamPage(data, opts = {}) {
   const avatar = (m, cls = 'tm-av') => (m.photo ? `<img class="${cls}" src="${esc(m.photo)}" alt="${esc(m.name)}" loading="lazy">` : `<span class="${cls} tm-ini">${esc(initials(m.name))}</span>`);
   // Profile: present tense. Who they are, what they know, what they lead, what to ask them.
   const profile = (m) => {
-    const f = first(m.name), a = asks(m);
+    const f = first(m.name);
     const rows = [['Has learned', m.learned]].filter(([, v]) => v);
     return `<article class="tm-card rv" data-kind="${esc(m.ks.join('|'))}">
     <div class="tm-card-top">${avatar(m)}<div><span class="tm-role">${esc(m.role)}</span><h3>${esc(m.name)}</h3>${m.joined ? `<small class="tm-since">With us since ${esc(m.joined)}</small>` : ''}</div></div>
     ${m.bio ? `<div class="tm-bio">${p(m.bio)}</div>` : ''}
     ${rows.length ? `<dl>${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${p(v)}</dd></div>`).join('')}</dl>` : ''}
-    ${a.length ? `<div class="tm-ask"><b>Ask ${esc(f)} about</b><ul>${a.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
-    ${!rows.length && !a.length && drafts ? `<p class="tm-hint">Staging only: add Has Learned and Ask Me About in Airtable (Website Team) to fill this profile.</p>` : ''}
+    ${!rows.length && drafts ? `<p class="tm-hint">Staging only: add Has Learned in Airtable (Website Team) to fill this profile.</p>` : ''}
   </article>`;
   };
   // Journey: who did this person become? Joined us > developed a skill > now teaching > next.
@@ -74,7 +72,7 @@ ${drafts ? '<div class="tm-staging">Staging preview: the yellow hints are only v
 <section class="tm-people" id="people"><div class="wrap">
   <p class="tm-kicker rv">The people</p>
   <h2 class="tm-h rv">Who might lead your experience.</h2>
-  <p class="tm-lead rv">What they have learned, and what you can ask them when you meet.</p>
+  <p class="tm-lead rv">What they have learned. Ask them about it when you meet.</p>
   ${people.length ? `<div class="tm-filter rv" role="group" aria-label="Show people"><button type="button" class="on" data-filter="all">Everyone</button>${KINDS.filter(([k]) => people.some((m) => m.ks.includes(k))).map(([k, t]) => `<button type="button" data-filter="${k}">${t.replace('The people who ', '').replace(/^./, (c) => c.toUpperCase())}</button>`).join('')}</div>
   <div class="tm-cards">${people.map(profile).join('')}</div>` : ''}
 </div></section>
@@ -170,9 +168,6 @@ const TEAM_CSS = `
 .tm-card h3{margin:2px 0 0;font-size:34px;line-height:1}
 .tm-since{color:var(--muted);font-size:13.5px}
 .tm-bio p{margin:0 0 6px;color:var(--ink2)}
-.tm-ask b{display:block;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--forest);margin-bottom:8px}
-.tm-ask ul{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:6px}
-.tm-ask li{background:var(--moss);color:var(--forest);font-weight:600;font-size:14px;padding:5px 11px;border-radius:999px}
 .tm dl{margin:0}.tm dl>div{padding:10px 0;border-top:1px solid var(--line)}
 .tm dt{font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--clay);margin-bottom:4px}
 .tm dd{margin:0;color:var(--ink2)}.tm dd p{margin:0 0 6px}
