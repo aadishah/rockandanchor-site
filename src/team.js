@@ -2,8 +2,7 @@
 // Four voices: About speaks as Rock & Anchor (what we believe). Impact speaks as evidence (what happened).
 // Team speaks through people (who we are, present tense). Curate speaks to the customer.
 // So this page avoids the About manifesto, the Educate > Employ > Empower model, impact numbers and project case studies.
-// Profiles read from the Website Team table. Every rich field (Knows, Leads, Has Learned, Creates,
-// Building Towards) is hidden until filled in. On the staging address, empty profiles show a hint.
+// Profiles read from the Website Team table. Has Learned, Learned From and Building Towards are hidden until filled in. On the staging address, empty profiles show a hint.
 function teamPage(data, opts = {}) {
   const drafts = !!opts.drafts;
   const photo = (slug, i) => { const x = bySlug(data, slug); const ph = x && x.photos && (x.photos[i] || x.photos[0]); return ph ? ph.url : cover(sorted(data)[0], true); };
@@ -26,34 +25,27 @@ function teamPage(data, opts = {}) {
   const people = all.filter((m) => m.k !== 'Founder');
   const teachers = (m) => (m.from || []).map((id) => byId[id]).filter(Boolean);
   const students = (m) => all.filter((x) => (x.from || []).includes(m.id));
-  // A journey needs at least two real steps, so it never reads as filler.
-  const journeys = all.filter((m) => [m.joined, m.learned, m.building, teachers(m).length, students(m).length].filter(Boolean).length >= 2);
   const workWith = waLink('Hi Rock & Anchor, I would like to work with you or join the team.');
 
   const avatar = (m, cls = 'tm-av') => (m.photo ? `<img class="${cls}" src="${esc(m.photo)}" alt="${esc(m.name)}" loading="lazy">` : `<span class="${cls} tm-ini">${esc(initials(m.name))}</span>`);
-  // Profile: present tense. Who they are and what they have learned.
+  // One card per person: who they are, what they have learned, and (if known) who taught them, who they teach, what is next.
+  // This is where "from participant to leader" lives now: in the person's own card, not a separate section.
   const profile = (m) => {
-    const f = first(m.name);
-    const rows = [['Has learned', m.learned]].filter(([, v]) => v);
+    const t = teachers(m), st = students(m);
+    const rows = [
+      ['Has learned', m.learned ? p(m.learned) : ''],
+      ['Learned from', t.map((x) => esc(x.name)).join(', ')],
+      ['Now teaching', st.map((x) => esc(x.name)).join(', ')],
+      ['Next', m.building ? p(m.building) : ''],
+    ].filter(([, v]) => v);
     return `<article class="tm-card rv" data-kind="${esc(m.ks.join('|'))}">
     <div class="tm-card-top">${avatar(m)}<div><span class="tm-role">${esc(m.role)}</span><h3>${esc(m.name)}</h3>${m.joined ? `<small class="tm-since">With us since ${esc(m.joined)}</small>` : ''}</div></div>
     ${m.bio ? `<div class="tm-bio">${p(m.bio)}</div>` : ''}
-    ${rows.length ? `<dl>${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${p(v)}</dd></div>`).join('')}</dl>` : ''}
-    ${!rows.length && drafts ? `<p class="tm-hint">Staging only: add Has Learned in Airtable (Website Team) to fill this profile.</p>` : ''}
+    ${rows.length ? `<dl>${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>` : ''}
+    ${!m.learned && drafts ? `<p class="tm-hint">Staging only: add Has Learned in Airtable (Website Team) to fill this profile.</p>` : ''}
   </article>`;
   };
-  // Journey: who did this person become? Joined us > developed a skill > now teaching > next.
-  const journey = (m) => {
-    const t = teachers(m), s = students(m);
-    const steps = [
-      m.joined || t.length ? ['Joined us', [m.joined ? `In ${esc(m.joined)}.` : '', t.length ? `Learned from ${t.map((x) => esc(x.name)).join(' and ')}.` : ''].filter(Boolean).join(' ')] : null,
-      m.learned ? ['Developed', esc(String(m.learned).split(/\n+/)[0])] : null,
-      s.length ? ['Now teaching', s.map((x) => esc(x.name)).join(', ')] : null,
-      m.building ? ['Next', esc(String(m.building).split(/\n+/)[0])] : null,
-    ].filter(Boolean);
-    return `<article class="tm-journey rv">${avatar(m, 'tm-face')}<div><h3>${esc(m.name)}</h3><span class="tm-role">${esc(m.role)}</span>
-      <ol>${steps.map(([k, v]) => `<li><b>${k}</b><span>${v}</span></li>`).join('')}</ol></div></article>`;
-  };
+  const tabs = KINDS.filter(([k]) => all.some((m) => m.ks.includes(k)));
 
   const body = `<style>${TEAM_CSS}</style>
 <div class="tm">
@@ -64,17 +56,12 @@ ${drafts ? '<div class="tm-staging">Staging preview: the yellow hints are only v
   <a class="tm-scroll" href="#people">Meet them ↓</a>
 </div></section>
 
-<section class="tm-kinds" id="kinds"><div class="wrap">
-  <h2 class="tm-h rv">There is no single kind of person at Rock &amp; Anchor.</h2>
-  <div class="tm-kind-grid">${KINDS.map(([k, t, d], i) => { const ms = all.filter((m) => m.ks.includes(k)); return `<button type="button" class="tm-kind rv" data-filter="${k}"><span class="tm-num">0${i + 1}</span><h3>${t}</h3><p>${d}</p>${ms.length ? `<span class="tm-faces">${ms.slice(0, 5).map((m) => avatar(m, 'tm-face')).join('')}<em>${ms.length === 1 ? esc(first(ms[0].name)) : `${ms.length} people`}</em></span>` : ''}</button>`; }).join('')}</div>
-</div></section>
-
 <section class="tm-people" id="people"><div class="wrap">
   <p class="tm-kicker rv">The people</p>
-  <h2 class="tm-h rv">Who might lead your experience.</h2>
-  <p class="tm-lead rv">What they have learned. Ask them about it when you meet.</p>
-  ${people.length ? `<div class="tm-filter rv" role="group" aria-label="Show people"><button type="button" class="on" data-filter="all">Everyone</button>${KINDS.filter(([k]) => people.some((m) => m.ks.includes(k))).map(([k, t]) => `<button type="button" data-filter="${k}">${t.replace('The people who ', '').replace(/^./, (c) => c.toUpperCase())}</button>`).join('')}</div>
-  <div class="tm-cards">${people.map(profile).join('')}</div>` : ''}
+  <h2 class="tm-h rv">There is no single kind of person at Rock &amp; Anchor.</h2>
+  ${tabs.length ? `<div class="tm-filter rv" role="tablist" aria-label="Show people"><button type="button" role="tab" class="on" data-filter="all">Everyone</button>${tabs.map(([k, t]) => `<button type="button" role="tab" data-filter="${k}">${t.replace('The people who ', '').replace(/^./, (c) => c.toUpperCase())}</button>`).join('')}</div>
+  <div class="tm-kind-desc" aria-live="polite"><p data-kind="all">Local guides, experience leaders, outdoor educators and the people behind the scenes. Here is who you might meet.</p>${tabs.map(([k, t, d]) => { const fs = founders.filter((m) => m.ks.includes(k)); return `<p data-kind="${k}" hidden><b>${t}.</b> ${d}${fs.length ? ` <a href="#founders">${fs.map((m) => esc(first(m.name))).join(' and ')} ${fs.length > 1 ? 'are' : 'is'} here too, with the founders ↓</a>` : ''}</p>`; }).join('')}</div>` : ''}
+  <div class="tm-cards">${people.map(profile).join('')}</div>
 </div></section>
 
 <section class="tm-know" id="knowledge"><div class="wrap">
@@ -86,11 +73,6 @@ ${drafts ? '<div class="tm-staging">Staging preview: the yellow hints are only v
     <div class="rv tm-lived"><h3>Lived knowledge</h3><p>What our team grew up with.</p><ul>${['These mountains', 'These villages', 'The weather', 'Farming', 'Local stories', 'Seasonal changes', 'Places that do not appear on Google Maps'].map((x) => `<li>${x}</li>`).join('')}</ul></div>
   </div>
 </div></section>
-
-${journeys.length ? `<section class="tm-journeys" id="journeys"><div class="wrap">
-  <p class="tm-kicker rv">From participant to leader</p><h2 class="tm-h rv">Who they have become.</h2>
-  <div class="tm-journey-list">${journeys.map(journey).join('')}</div>
-</div></section>` : drafts ? `<section class="tm-journeys" id="journeys"><div class="wrap"><p class="tm-kicker">From participant to leader</p><p class="tm-hint">Staging only: this section appears for people with at least two of Joined, Has Learned, Building Towards or Learned From filled in. It tells their journey in their own steps, not as a framework.</p></div></section>` : ''}
 
 ${founders.length ? `<section class="tm-founders" id="founders"><div class="wrap">
   <p class="tm-kicker rv">The founders</p><h2 class="tm-h rv">Started it. Still learning how to build it.</h2>
@@ -113,10 +95,9 @@ var d=document,w=window,rm=w.matchMedia&&w.matchMedia('(prefers-reduced-motion: 
 d.documentElement.classList.add('tmjs');
 var io=('IntersectionObserver' in w)?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{rootMargin:'0px 0px -8% 0px'}):null;
 d.querySelectorAll('.tm .rv').forEach(function(el){if(io&&!rm)io.observe(el);else el.classList.add('in')});
-var fb=d.querySelectorAll('.tm-filter button'),cards=d.querySelectorAll('.tm-people .tm-card');
-function filt(k){fb.forEach(function(b){b.classList.toggle('on',b.dataset.filter===k)});cards.forEach(function(c){c.hidden=!(k==='all'||c.dataset.kind.split('|').indexOf(k)>-1);if(!c.hidden)c.classList.add('in')})}
+var fb=d.querySelectorAll('.tm-filter button'),cards=d.querySelectorAll('.tm-people .tm-card'),desc=d.querySelectorAll('.tm-kind-desc p');
+function filt(k){var n=0;fb.forEach(function(b){var on=b.dataset.filter===k;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});desc.forEach(function(p){p.hidden=p.dataset.kind!==k});cards.forEach(function(c){c.hidden=!(k==='all'||c.dataset.kind.split('|').indexOf(k)>-1);if(!c.hidden){n++;c.classList.add('in')}})}
 fb.forEach(function(b){b.addEventListener('click',function(){filt(b.dataset.filter)})});
-d.querySelectorAll('.tm-kind').forEach(function(b){b.addEventListener('click',function(){var k=b.dataset.filter,has=false;fb.forEach(function(x){if(x.dataset.filter===k)has=true});var to='people';if(has)filt(k);else{filt('all');if(d.getElementById('founders'))to='founders'}d.getElementById(to).scrollIntoView({behavior:rm?'auto':'smooth'})})});
 })();`;
 
 const TEAM_CSS = `
@@ -140,21 +121,12 @@ const TEAM_CSS = `
 .tm-hero h1{font-size:clamp(46px,7.4vw,104px);max-width:12ch;margin:0 0 .3em;text-shadow:0 2px 20px rgba(0,0,0,.35)}
 .tm-sub{font-size:clamp(17px,1.9vw,21px);max-width:54ch;margin:0 0 26px;color:#f2ede6;text-shadow:0 1px 10px rgba(0,0,0,.5)}
 .tm-scroll{color:#fff;font-weight:700;text-decoration:none;border-bottom:2px solid #f3c9a6;padding-bottom:3px}
-/* kinds */
-.tm-kind-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:30px}
-.tm-kind{text-align:left;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px 22px;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:transform .2s,box-shadow .2s,border-color .2s}
-.tm-kind:hover{transform:translateY(-4px);box-shadow:0 18px 32px -24px rgba(34,29,25,.55);border-color:#d6cbb9}
-.tm-num{font:800 15px "Big Shoulders Display","Arial Narrow",sans-serif;color:var(--clay);letter-spacing:.1em}
-.tm-kind h3{font-size:clamp(24px,2.2vw,30px);margin:0;line-height:1.05}
-.tm-kind p{margin:4px 0 0;color:var(--ink2);font-size:15.5px}
-.tm-faces{display:flex;align-items:center;margin-top:auto;padding-top:14px}
-.tm-faces .tm-face{margin-right:-8px;border:2px solid var(--card)}
-.tm-faces em{font-style:normal;font-weight:700;font-size:14px;color:var(--forest);margin-left:16px}
-.tm-face{width:38px;height:38px;border-radius:50%;object-fit:cover;flex:0 0 38px}
-.tm-ini{display:grid;place-items:center;background:var(--forest);color:#f3c9a6;font:800 15px/1 "Big Shoulders Display","Arial Narrow",sans-serif}
 /* people */
+.tm-face{width:38px;height:38px;border-radius:50%;object-fit:cover;flex:0 0 38px}
+.tm-ini{display:grid;place-items:center;background:var(--forest);color:#f3c9a6;font:800 15px/1 "DM Sans",sans-serif}
+.tm-kind-desc p{margin:0 0 22px;color:var(--ink2);font-size:17px;max-width:62ch}.tm-kind-desc b{color:var(--ink)}.tm-kind-desc a{color:var(--clay);font-weight:700;text-decoration:none}
 .tm-people{background:#efe7da}
-.tm-filter{display:flex;flex-wrap:wrap;gap:10px;margin:30px 0 22px}
+.tm-filter{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0 16px}
 .tm-filter button{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:10px 18px;font:700 15px "DM Sans",sans-serif;color:var(--ink);cursor:pointer}
 .tm-filter button.on{background:var(--forest);border-color:var(--forest);color:#fff}
 .tm-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;align-items:start}
@@ -181,18 +153,6 @@ const TEAM_CSS = `
 .tm-kinds2 li{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-weight:600}
 .tm-lived{background:var(--forest)!important;border-color:var(--forest)!important;color:#fff}.tm-lived>p{color:#cfe0d3!important}
 .tm-lived li{background:rgba(255,255,255,.1)!important;border-color:rgba(255,255,255,.2)!important;color:#fff}
-/* journeys */
-.tm-journeys{background:#efe7da}
-.tm-journey-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;margin-top:24px}
-.tm-journey{display:grid;grid-template-columns:48px 1fr;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px}
-.tm-journey .tm-face{width:48px;height:48px}
-.tm-journey h3{font-size:30px;margin:0;line-height:1}
-.tm-journey ol{list-style:none;padding:0;margin:14px 0 0;border-left:2px dashed var(--clay)}
-.tm-journey li{position:relative;padding:0 0 12px 18px}
-.tm-journey li:before{content:"";position:absolute;left:-7px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--paper);border:2.5px solid var(--clay)}
-.tm-journey li:last-child:before{background:var(--clay)}
-.tm-journey li b{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--clay)}
-.tm-journey li span{color:var(--ink2)}
 /* founders */
 .tm-founders{background:var(--card);border-top:1px solid var(--line)}
 /* end */
@@ -204,7 +164,6 @@ const TEAM_CSS = `
 .tm-say{font-weight:700;color:#f3c9a6!important;margin-bottom:32px!important}
 .tm-end-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 .tm-end .btn-ghost{color:#fff;border-color:rgba(255,255,255,.6)}
-@media(max-width:980px){.tm-kind-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:900px){.tm-know-head,.tm-kinds2{grid-template-columns:1fr;gap:20px}}
-@media(max-width:600px){.tm-kind-grid{grid-template-columns:1fr}.tm-cards,.tm-journey-list{grid-template-columns:1fr}}
+@media(max-width:600px){.tm-cards{grid-template-columns:1fr}}
 `;
