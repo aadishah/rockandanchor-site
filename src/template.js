@@ -17,13 +17,9 @@ const TF = { name: 'fldOCEREnRFIAh8zc', role: 'fldgPjOaXv7pTdwmD', group: 'fldfn
   joined: 'fld4STp2AroKaSvaQ', learned: 'fld4BlKDhsKL2zAbt', building: 'fldR905xb7rpp0vyz', from: 'fldN74fuymMhezvYj', kinds: 'fldj9E9s2cXNzQ0zq' };
 const TEAM_GROUPS = ['Founders', 'Experience Leaders', 'Business Development', 'Social Media'];
 const IF = { metric: 'fldX1aQLHwAWY4A0C', value: 'fldcFhyLkZhdUiyF2', order: 'fldWCIzvRPTsj0hQW', show: 'fldMKHdAIyLWJJsKQ', category: 'fldoPU4x6KqBKNdrY', opens: 'fldkAcX2ofFwe8OgO' };
-// Impact Created evidence tables. Rows only appear publicly when Show on Website is ticked (stories also need Consent Given).
-const IT = { proj: 'tblO5fhefTEiwPCrL', story: 'tbl0qmZJYSqfbJPUj', learn: 'tblNiUX5KTmF7D1CM', money: 'tblpE6SiN0rR5PKuq', place: 'tblTlUsc0d0JYOR6P' };
+// Impact Created evidence. Rows only appear publicly when Show on Website is ticked.
+const IT = { proj: 'tblO5fhefTEiwPCrL' };
 const PJ = { title: 'fldTSF31PRLJ2VDeM', show: 'fldHwPFRFC0ei7dsQ', order: 'fld5u5mysc1bnMX6K', category: 'fld5UnNMP9SNHFLJ3', year: 'fldGlQfsKw3M6ZuXI', area: 'fldA8qAyT2ixMo8Io', saw: 'fldx1ED4Oddqyvx9h', did: 'fldy7AxYXMBasLAan', who: 'fldmDFfJ8fYM51NgE', changed: 'fldZKJATOSDzZOjDN', next: 'fldc3WXuspgOcij8y', status: 'fldpKDvyuT7aO26YN', photo: 'fldW56CKYufKiFFhA' };
-const SF = { name: 'fldVcU4eB8TqKPiaO', show: 'fldVQzuRbZSF6H6cs', consent: 'fldnZfxv83ykIjY1a', order: 'fldQY0jW37UyJqSQh', then: 'fldH8cFHumuHuIzjP', now: 'fldKaffXv65WAWCUg', started: 'fldlcLjE7kNu4TGCo', learned: 'fldzdoWIVzDwNsXQ2', today: 'fldMzdH3RBe1sWXyq', next: 'fldmm2M9C8ZjQEjyV', year: 'fld3k824zqqmAAQlI', photo: 'fldIc3PUOTLYVo06E' };
-const LF = { title: 'fldGjJZumW4W0OKVE', show: 'fldGAmjvMowzEaMmz', order: 'fld42U9WiAX6hzK6P', year: 'fldmCe3hLHpHgbwzH', tried: 'fldvqHI1Rc6An6XBw', happened: 'fldbDSD1So0q3W1t6', learned: 'fld8EqBtdIB11ZeV8', changed: 'fldilg6anHBcWdhe0' };
-const MF = { label: 'fldyOm06vfgUjJLjk', show: 'fldhXmpFSwlKjwO4u', order: 'fldTCSD4CBGtHqS5B', step: 'fldvek276UVHNdmPT', amount: 'fldtBn2DWYxpFhkQ8', count: 'fldQ7xl2LK0n3niOq', period: 'fld7Xk6GxMTEwgMzT', note: 'fldfab4l9TAVOBZrT' };
-const PF = { area: 'fldMKXm0cOPMmxS4o', show: 'fldc7wAz0K6cHezsf', order: 'fld2c2Ksv3uScyAq2', lat: 'fldUo21hlsmghGass', lng: 'fldOIWCHP3Tt5bvoi', summary: 'fldh2IoMFc76i9zu3', hosts: 'fldZ0EgBYWWzJzcpZ', schools: 'fldkYkg0RC1b2pd53', training: 'fldkMVQg7ebvQ4nQY', env: 'fldld8V4SatweATYJ', stories: 'fld20XuWae734vxp1', match: 'fldlnrIe1SXnI1kXH' };
 const LIVE_STATUSES = ['Approved', 'Ready', 'Future'];
 const CACHE_SECONDS = 300;
 
@@ -73,15 +69,11 @@ const attUrl = (a, big) => { const p = (a || [])[0]; if (!p) return ''; const t 
 // Loads the Impact Created evidence. Every row keeps its publish flags so drafts can be previewed on staging only.
 async function loadEvidence(env) {
   const get = (t, f) => atList(env, t, Object.values(f)).catch(() => []);
-  const [pj, st, ln, mo, pl] = await Promise.all([get(IT.proj, PJ), get(IT.story, SF), get(IT.learn, LF), get(IT.money, MF), get(IT.place, PF)]);
+  const pj = await get(IT.proj, PJ);
   const o = (v) => (typeof v === 'number' ? v : 999);
   const by = (a, b) => a.order - b.order;
   return {
     projects: pj.filter((r) => r.fields[PJ.title]).map((r) => { const f = r.fields; return { title: f[PJ.title], live: !!f[PJ.show], order: o(f[PJ.order]), category: selName(f[PJ.category]), year: f[PJ.year] || null, area: f[PJ.area] || '', saw: f[PJ.saw] || '', did: f[PJ.did] || '', who: f[PJ.who] || '', changed: f[PJ.changed] || '', next: f[PJ.next] || '', status: selName(f[PJ.status]), photo: attUrl(f[PJ.photo], true) }; }).sort(by),
-    stories: st.filter((r) => r.fields[SF.name]).map((r) => { const f = r.fields; return { name: f[SF.name], live: !!(f[SF.show] && f[SF.consent]), order: o(f[SF.order]), then: f[SF.then] || '', now: f[SF.now] || '', started: f[SF.started] || '', learned: f[SF.learned] || '', today: f[SF.today] || '', next: f[SF.next] || '', year: f[SF.year] || null, photo: attUrl(f[SF.photo]) }; }).sort(by),
-    learnings: ln.filter((r) => r.fields[LF.title]).map((r) => { const f = r.fields; return { title: f[LF.title], live: !!f[LF.show], order: o(f[LF.order]), year: f[LF.year] || null, tried: f[LF.tried] || '', happened: f[LF.happened] || '', learned: f[LF.learned] || '', changed: f[LF.changed] || '' }; }).sort(by),
-    money: mo.filter((r) => r.fields[MF.label]).map((r) => { const f = r.fields; return { label: f[MF.label], live: !!f[MF.show], order: o(f[MF.order]), step: selName(f[MF.step]), amount: f[MF.amount] ?? null, count: f[MF.count] ?? null, period: f[MF.period] || '', note: f[MF.note] || '' }; }).sort(by),
-    places: pl.filter((r) => r.fields[PF.area]).map((r) => { const f = r.fields; return { area: f[PF.area], live: !!f[PF.show], order: o(f[PF.order]), lat: f[PF.lat] ?? null, lng: f[PF.lng] ?? null, summary: f[PF.summary] || '', hosts: f[PF.hosts] ?? null, schools: f[PF.schools] || '', training: f[PF.training] || '', env: f[PF.env] || '', stories: f[PF.stories] || '', match: String(f[PF.match] || f[PF.area]).split(',').map((x) => x.trim().toLowerCase()).filter(Boolean) }; }).sort(by),
   };
 }
 

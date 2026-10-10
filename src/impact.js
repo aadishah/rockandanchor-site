@@ -2,22 +2,21 @@
 // Impact speaks as evidence: what happened, what changed, where the money went. No philosophy, no team directory,
 // no selling, no people profiles (those live on Team).
 // About Us explains the system. Impact Created opens it up: numbers, money flow, projects,
-// what we measure, what did not work and a year-by-year archive.
+// what we measure and a year-by-year archive.
 // Evidence sections read from the Website Impact tables in Airtable and stay hidden until rows are published.
 // On the staging address, unpublished rows are shown with a "Draft" badge so they can be reviewed.
 function impactPage(data, opts = {}) {
   const drafts = !!opts.drafts;
-  const ev = data.evidence || { projects: [], stories: [], learnings: [], money: [], places: [] };
+  const ev = data.evidence || { projects: [] };
   const vis = (list) => (list || []).filter((x) => x.live || drafts);
-  const projects = vis(ev.projects), learnings = vis(ev.learnings), money = vis(ev.money);
+  const projects = vis(ev.projects);
   const draft = (x) => (x.live ? '' : '<span class="im-draft">Draft, not public</span>');
   const p = (t) => (t ? String(t).split(/\n+/).filter(Boolean).map((l) => `<p>${esc(l)}</p>`).join('') : '');
   const photo = (slug, i, big = true) => { const x = bySlug(data, slug); const ph = x && x.photos && (x.photos[i] || x.photos[0]); return ph ? (big ? ph.url : ph.thumb) : cover(sorted(data)[0], big); };
-  const inr = (n) => '₹' + Number(n).toLocaleString('en-IN');
   const workWith = waLink('Hi Rock & Anchor, I would like to work with you (school, company or partnership).');
 
   // 2. Numbers: from the Website Impact table. "Click Opens" decides what each number reveals.
-  const has = { Projects: projects.length, Money: money.length };
+  const has = { Projects: projects.length, Money: 1 };
   const nums = (data.impact || []).map((m, i) => ({ ...m, i, link: has[m.opens] ? m.opens : '' }));
   const numCard = (m) => `<${m.link ? 'button type="button"' : 'div'} class="im-num${m.link ? ' im-click' : ''}"${m.link ? ` data-open="${m.link}"` : ''}><b>${esc(m.value)}</b><span>${esc(m.metric)}</span>${m.link ? `<em>See the evidence →</em>` : ''}</${m.link ? 'button' : 'div'}>`;
   const schoolsCard = `<button type="button" class="im-num im-click im-accent" data-open="${projects.some((x) => x.category === 'Education') ? 'Education' : 'Money'}"><b>25%</b><span>Of Net Profit goes to village schools</span><em>See what it funded →</em></button>`;
@@ -31,8 +30,6 @@ function impactPage(data, opts = {}) {
     ['25% of Net Profit supports village schools', 'Village schools'],
     ['Skills, infrastructure and opportunity', 'Skills, infrastructure and opportunity'],
   ];
-  const moneyFor = (k) => money.filter((m) => k && m.step === k);
-  const fig = (m) => `<li>${draft(m)}<b>${m.amount != null ? inr(m.amount) : m.count != null ? Number(m.count).toLocaleString('en-IN') : ''}</b> <span>${esc(m.label)}</span>${m.period ? ` <small>${esc(m.period)}</small>` : ''}${m.note ? `<p>${esc(m.note)}</p>` : ''}</li>`;
 
   // 4. Projects.
   const projCard = (x) => `<article class="im-proj rv" data-cat="${esc(x.category)}">${x.photo ? `<img src="${esc(x.photo)}" alt="" loading="lazy">` : ''}<div class="im-proj-body">${draft(x)}
@@ -45,7 +42,6 @@ function impactPage(data, opts = {}) {
   const years = {};
   const addY = (y, kind, label, live) => { if (!y) return; (years[y] = years[y] || []).push({ kind, label, live }); };
   projects.forEach((x) => addY(x.year, 'Project', x.title, x.live));
-  learnings.forEach((x) => addY(x.year, 'Learning', x.title, x.live));
   const yearList = Object.keys(years).sort();
 
   // Modal content for clickable numbers.
@@ -53,7 +49,7 @@ function impactPage(data, opts = {}) {
   const modals = [
     projects.length ? modal('Projects', 'The work behind the number', `<ul class="im-mlist">${projects.map((x) => `<li><b>${esc(x.title)}</b>${x.did ? `<p>${esc(x.did)}</p>` : ''}${draft(x)}</li>`).join('')}</ul><a class="im-link" href="#projects" data-close>See all projects →</a>`) : '',
     projects.some((x) => x.category === 'Education') ? modal('Education', 'What 25% of Net Profit has funded', `<ul class="im-mlist">${projects.filter((x) => x.category === 'Education').map((x) => `<li><b>${esc(x.title)}</b>${x.did ? `<p>${esc(x.did)}</p>` : ''}${draft(x)}</li>`).join('')}</ul><a class="im-link" href="#projects" data-close>See all projects →</a>`) : '',
-    money.length ? modal('Money', 'Where the money went', `<ul class="im-mlist">${money.map(fig).join('')}</ul><a class="im-link" href="#money" data-close>Follow the money →</a>`) : modal('Money', 'Where the money goes', `<p>25% of Net Profit funds schools in the mountain villages we work in.</p><a class="im-link" href="#money" data-close>Follow the money →</a>`),
+    modal('Money', 'Where the money goes', `<p>25% of Net Profit funds schools in the mountain villages we work in.</p><a class="im-link" href="#money" data-close>Follow the money →</a>`),
   ].join('');
 
   const body = `<style>${IMPACT_CSS}</style>
@@ -72,8 +68,8 @@ ${drafts ? '<div class="im-staging">Staging preview: rows marked <b>Draft, not p
 <section class="im-money" id="money"><div class="wrap im-money-grid">
   <div><p class="im-kicker rv">Follow the money</p><h2 class="im-h rv">Where does your money go?</h2>
   <p class="im-p rv">Not a promise that your booking creates impact. The actual path it takes.</p>
-  ${money.length ? '' : '<p class="im-note rv">We are adding the real figures for each step. Until then, we would rather show you the path than an estimate.</p>'}</div>
-  <ol class="im-flow">${steps.map(([label, key], i) => `<li class="rv"><span class="im-step">${String(i + 1).padStart(2, '0')}</span><div><h3>${label}</h3>${moneyFor(key).length ? `<ul class="im-figs">${moneyFor(key).map(fig).join('')}</ul>` : ''}</div></li>`).join('')}</ol>
+</div>
+  <ol class="im-flow">${steps.map(([label, key], i) => `<li class="rv"><span class="im-step">${String(i + 1).padStart(2, '0')}</span><div><h3>${label}</h3></div></li>`).join('')}</ol>
 </div></section>
 
 ${projects.length ? `<section class="im-projects" id="projects"><div class="wrap">
@@ -91,10 +87,7 @@ ${projects.length ? `<section class="im-projects" id="projects"><div class="wrap
   <p class="im-quote rv">We are not claiming we have solved anything. We are paying attention.</p>
 </div></section>
 
-${learnings.length ? `<section class="im-learn" id="learning"><div class="wrap">
-  <p class="im-kicker rv">What did not work</p><h2 class="im-h rv">Impact is not always a success story.</h2>
-  <div class="im-learns">${learnings.map((x) => `<article class="rv">${draft(x)}<h3>${esc(x.title)}${x.year ? ` <small>${x.year}</small>` : ''}</h3><dl>${[['What we tried', x.tried], ['What happened', x.happened], ['What we learned', x.learned], ['What we changed', x.changed]].filter(([, v]) => v).map(([k, v]) => `<div><dt>${k}</dt><dd>${p(v)}</dd></div>`).join('')}</dl></article>`).join('')}</div>
-</div></section>` : ''}
+
 
 ${yearList.length ? `<section class="im-archive" id="archive"><div class="wrap">
   <p class="im-kicker rv">The archive</p><h2 class="im-h rv">Our work, year by year.</h2>
@@ -110,7 +103,7 @@ ${yearList.length ? `<section class="im-archive" id="archive"><div class="wrap">
 <div class="im-modal" id="imModal" hidden role="dialog" aria-modal="true"><div class="im-modal-card"><button type="button" class="im-x" aria-label="Close">×</button>${modals}</div></div>
 </div>
 <script>${IMPACT_JS}</script>`;
-  return layout({ title: 'Impact Created', desc: 'What happens because you travel with Rock & Anchor: the numbers, where the money goes, the projects and what we have learned.', path: '/impact', body, image: photo('be-a-villager', 3), data });
+  return layout({ title: 'Impact Created', desc: 'What happens because you travel with Rock & Anchor: the numbers, where the money goes and the projects.', path: '/impact', body, image: photo('be-a-villager', 3), data });
 }
 
 const IMPACT_JS = `(function(){
@@ -188,13 +181,6 @@ const IMPACT_CSS = `
 .im-measure-grid li:before{content:"✓";position:absolute;left:4px;color:var(--forest);font-weight:800}
 .im-measure-grid .towards li:before{content:"○";color:var(--clay)}
 .im-quote{font:800 clamp(26px,3.4vw,42px)/1.1 "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase;color:var(--forest);max-width:26ch;margin:40px 0 0}
-/* learnings */
-.im-learn{background:var(--night);color:#fff}
-.im-learn .im-kicker{color:#f3c9a6}
-.im-learns{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;margin-top:24px}
-.im-learns article{border:1px solid rgba(255,255,255,.15);border-radius:var(--r);padding:22px}
-.im-learns h3{font-size:28px;margin:0 0 10px}.im-learns small{color:#f3c9a6;font-size:.6em}
-.im-learn dl>div{border-color:rgba(255,255,255,.12)}.im-learn dd{color:#d8d2c8}.im-learn dt{color:#f3c9a6}
 /* archive */
 .im-years{list-style:none;padding:0;margin:24px 0 0;border-left:2px solid var(--line)}
 .im-years>li{padding:0 0 28px 28px;position:relative}
