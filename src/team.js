@@ -31,7 +31,7 @@ function teamPage(data, opts = {}) {
   const workWith = waLink('Hi Rock & Anchor, I would like to work with you or join the team.');
 
   const avatar = (m, cls = 'tm-av') => (m.photo ? `<img class="${cls}" src="${esc(m.photo)}" alt="${esc(m.name)}" loading="lazy">` : `<span class="${cls} tm-ini">${esc(initials(m.name))}</span>`);
-  // Profile: present tense. Who they are, what they know, what they lead, what to ask them.
+  // Profile: present tense. Who they are and what they have learned.
   const profile = (m) => {
     const f = first(m.name);
     const rows = [['Has learned', m.learned]].filter(([, v]) => v);
