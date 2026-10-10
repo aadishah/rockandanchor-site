@@ -1343,7 +1343,7 @@ function teamPage(data, opts = {}) {
 <div class="tm">
 ${drafts ? '<div class="tm-staging">Staging preview: the yellow hints are only visible here. The live site shows nothing until it is filled in Airtable.</div>' : ''}
 <section class="tm-hero"><img src="${esc(photo('winter-trekking', 1))}" alt="A Rock &amp; Anchor leader pointing out the valley on a Sahyadri ridge" fetchpriority="high"><div class="wrap">
-  <p class="tm-kicker">Team</p><h1>People make the experience.</h1>
+  <h1>People make the experience.</h1>
   <p class="tm-sub">These are the people you will walk with, eat with, learn from and trust on the mountain. Some of them know these places better than any map.</p>
   <a class="tm-scroll" href="#people">Meet them ↓</a>
 </div></section>
