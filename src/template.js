@@ -6,8 +6,8 @@ const BASE = 'app0sjg0lmpX4ERo1';
 const T = { exp: 'tblG7E0qqHtLi6FWF', ev: 'tblnbaixvh6vsXuj2', rev: 'tblj3xNFQV7dKuine', imp: 'tblpfX3SNtM7qTNNf', team: 'tblBOYVbIlfeBRg4w' };
 const EF = {
   name: 'fldlKTxLU6u6l2qFm',
-  show: 'fldPkhXdD91l3gZ8Y', title: 'fldM3NSq47YsF9tR2', slug: 'fld4JwhapQZdKtBcA', order: 'fld0ZNPcdfO412lmd',
-  summary: 'fldQm3jgyBV5X1nzK', description: 'fldylkcJyzF9uK0Xi', photos: 'fldiamuh0iIFn0Fjs', itinerary: 'fldePmvVNr0Plgo4D',
+  show: 'fldPkhXdD91l3gZ8Y', slug: 'fld4JwhapQZdKtBcA', order: 'fld0ZNPcdfO412lmd',
+  summary: 'fld2EwKi6nLfYfVJn', description: 'fldylkcJyzF9uK0Xi', photos: 'fldiamuh0iIFn0Fjs', itinerary: 'fldePmvVNr0Plgo4D',
   faqs: 'fld89jnU68Zl9q6nM', prices: 'fldLEraHeNPgjjG8T', age: 'fldF1U1n4ks9FSFtP', location: 'fld2m8zyHAoKGlZEi',
   timing: 'fldlwqH0kyOcnhSm3', categories: 'fldIyJ28XTWNtfRm3', fromPrice: 'fldiOgiemRJAEgWdP', datesAhead: 'fld99ABUSbxPmP0v7',
 };
@@ -77,6 +77,10 @@ async function loadEvidence(env) {
   };
 }
 
+// Experience text comes from Airtable's "Description" (rich text). The site shows it as plain text.
+const plainText = (t) => String(t || '').replace(/^\s*#+\s*/gm, '').replace(/^\s*[-*]\s+/gm, '').replace(/\*\*|__|(^|\s)_|_(\s|$)/g, '$1$2').replace(/\s*\n+\s*/g, ' ').trim();
+const shortText = (t, n = 160) => (t.length <= n ? t : t.slice(0, t.lastIndexOf(' ', n)).replace(/[,.;:]$/, '') + '…');
+
 async function loadLive(env) {
   const [exps, evs, revs, imps, tms] = await Promise.all([
     atList(env, T.exp, Object.values(EF)),
@@ -87,15 +91,15 @@ async function loadLive(env) {
   ]);
   const ev = await loadEvidence(env);
   const experiences = exps
-    .filter((r) => r.fields[EF.show] && String(r.fields[EF.slug] || '').trim() && (r.fields[EF.title] || r.fields[EF.name]))
+    .filter((r) => r.fields[EF.show] && String(r.fields[EF.slug] || '').trim() && r.fields[EF.name])
     .map((r) => {
       const f = r.fields;
       return {
         id: r.id,
-        title: String(f[EF.title] || f[EF.name]).trim(),
+        title: String(f[EF.name]).trim(),
         slug: String(f[EF.slug]).trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-'),
         order: typeof f[EF.order] === 'number' ? f[EF.order] : 999,
-        summary: f[EF.summary] || '',
+        summary: plainText(f[EF.summary]),
         description: f[EF.description] || '',
         itinerary: f[EF.itinerary] || '',
         faqs: f[EF.faqs] || '',
@@ -442,6 +446,7 @@ section{padding:64px 0}section.tight{padding:48px 0}section.first{padding-top:44
 .prices th{font-weight:500}.prices td{font-weight:700;white-space:nowrap;text-align:right}
 .prices tr:last-child th,.prices tr:last-child td{border-bottom:0}
 .note{color:var(--ink2);font-size:15px}
+.clamp3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .faq{border-bottom:1px solid var(--line);padding:4px 0}
 .faq summary{cursor:pointer;font-weight:700;padding:14px 30px 14px 0;list-style:none;position:relative}
 .faq summary::-webkit-details-marker{display:none}
@@ -535,7 +540,7 @@ function photoBox(src, alt, cls) {
 function card(data, e) {
   return `<a class="card" href="/experiences/${esc(e.slug)}" data-cats="${esc(e.categories.join('|'))}">
 <div class="ph">${photoBox(cover(e), e.title)}${badgeFor(data, e)}</div>
-<div class="body"><span class="cat">${esc(e.categories.slice(0, 2).join(' · ') || 'Experience')}</span><h3>${esc(e.title)}</h3><p>${esc(e.summary || firstLine(e))}</p>
+<div class="body"><span class="cat">${esc(e.categories.slice(0, 2).join(' · ') || 'Experience')}</span><h3>${esc(e.title)}</h3><p class="clamp3">${esc(e.summary || firstLine(e))}</p>
 ${cardMeta(e)}</div></a>`;
 }
 const firstLine = (e) => (String(e.description || '').split('\n').find((l) => l.trim() && !/^(##|-)/.test(l.trim())) || '').trim();
@@ -667,7 +672,7 @@ ${datesHtml}
 ${revs.length ? `<section><div class="wrap"><h2>What people say</h2>${reviewsBlock(revs)}</div></section>` : ''}
 <div class="bookbar"><a href="#book" style="text-decoration:none"><small>${up.length ? 'Next date' : 'Dates'}</small><b>${up.length ? esc(dayStr(up[0].start)) : 'On request'}</b> <span style="color:var(--clay);font-size:13px;font-weight:700">${up.length > 1 ? 'All dates ↓' : ''}</span></a><a class="btn btn-wa" href="${ask('')}">${ICON.wa}Book</a></div>
 <script>document.body.classList.add('has-bookbar')</script>`;
-  return layout({ title: e.title, desc: e.summary, path: `/experiences/${e.slug}`, body, image: cover(e, true), data });
+  return layout({ title: e.title, desc: shortText(e.summary || firstLine(e)), path: `/experiences/${e.slug}`, body, image: cover(e, true), data });
 }
 
 __ABOUT__
