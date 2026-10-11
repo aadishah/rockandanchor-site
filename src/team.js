@@ -6,6 +6,7 @@
 function teamPage(data, opts = {}) {
   const drafts = !!opts.drafts;
   const photo = (slug, i) => { const x = bySlug(data, slug); const ph = x && x.photos && (x.photos[i] || x.photos[0]); return ph ? ph.url : cover(sorted(data)[0], true); };
+  const heroP = slot(data, 'team.hero', photo('winter-trekking', 1)), knowP = slot(data, 'team.know', photo('hidden-kingdom', 2)), endP = slot(data, 'team.end', photo('little-feet-sunset-safari', 1));
   const p = (t) => (t ? String(t).split(/\n+/).filter(Boolean).map((l) => `<p>${esc(l)}</p>`).join('') : '');
   const first = (n) => String(n).split(/\s+/)[0];
   const initials = (n) => n.split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
@@ -50,7 +51,7 @@ function teamPage(data, opts = {}) {
   const body = `<style>${TEAM_CSS}</style>
 <div class="tm">
 ${drafts ? '<div class="tm-staging">Staging preview: the yellow hints are only visible here. The live site shows nothing until it is filled in Airtable.</div>' : ''}
-<section class="tm-hero"><img src="${esc(photo('winter-trekking', 1))}" alt="A Rock &amp; Anchor leader pointing out the valley on a Sahyadri ridge" fetchpriority="high"><div class="wrap">
+<section class="tm-hero"><img src="${esc(heroP.src)}"${posStyle(heroP)} alt="${esc(heroP.alt || 'A Rock & Anchor leader on a Sahyadri ridge')}" fetchpriority="high"><div class="wrap">
   <h1>People make the experience.</h1>
   <p class="tm-sub">These are the people you will walk with, eat with, learn from and trust on the mountain. Some of them know these places better than any map.</p>
   <a class="tm-scroll" href="#people">Meet them ↓</a>
@@ -67,7 +68,7 @@ ${drafts ? '<div class="tm-staging">Staging preview: the yellow hints are only v
 <section class="tm-know" id="knowledge"><div class="wrap">
   <div class="tm-know-head"><div><p class="tm-kicker rv">Why it matters who your guide is</p><h2 class="tm-h rv">Some knowledge cannot be Googled.</h2>
   <p class="tm-lead rv">Certification tells you someone knows how to manage risk. It does not tell you where the best trail starts after the rain.</p></div>
-  <img class="rv" src="${esc(photo('hidden-kingdom', 2))}" alt="A shared meal on leaves after dark" loading="lazy"></div>
+  <img class="rv" src="${esc(knowP.src)}"${posStyle(knowP)} alt="${esc(knowP.alt)}" loading="lazy"></div>
   <div class="tm-kinds2">
     <div class="rv"><h3>Learned knowledge</h3><p>What our team trains for.</p><ul>${['Mountaineering', 'First aid', 'Outdoor safety', 'Astronomy', 'Leadership'].map((x) => `<li>${x}</li>`).join('')}</ul></div>
     <div class="rv tm-lived"><h3>Lived knowledge</h3><p>What our team grew up with.</p><ul>${['These mountains', 'These villages', 'The weather', 'Farming', 'Local stories', 'Seasonal changes', 'Places that do not appear on Google Maps'].map((x) => `<li>${x}</li>`).join('')}</ul></div>
@@ -79,7 +80,7 @@ ${founders.length ? `<section class="tm-founders" id="founders"><div class="wrap
   <div class="tm-cards tm-cards-2">${founders.map(profile).join('')}</div>
 </div></section>` : ''}
 
-<section class="tm-end" id="meet"><img src="${esc(photo('little-feet-sunset-safari', 1))}" alt="" loading="lazy"><div class="wrap">
+<section class="tm-end" id="meet"><img src="${esc(endP.src)}"${posStyle(endP)} alt="" loading="lazy"><div class="wrap">
   <h2>Who will you meet?</h2>
   <p>The next time you come to the mountains with us, you will probably meet someone who knows the place better than we ever could.</p>
   <p class="tm-say">Say hello. Ask questions. Learn something. And maybe teach them something too.</p>
@@ -87,7 +88,7 @@ ${founders.length ? `<section class="tm-founders" id="founders"><div class="wrap
 </div></section>
 </div>
 <script>${TEAM_JS}</script>`;
-  return layout({ title: 'Team', desc: 'The people behind Rock & Anchor experiences: local guides, experience leaders, outdoor educators and the people learning to lead.', path: '/team', body, image: photo('winter-trekking', 1), data });
+  return layout({ title: 'Team', desc: 'The people behind Rock & Anchor experiences: local guides, experience leaders, outdoor educators and the people learning to lead.', path: '/team', body, image: heroP.src, data });
 }
 
 const TEAM_JS = `(function(){

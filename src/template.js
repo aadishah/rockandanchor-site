@@ -19,6 +19,9 @@ const TEAM_GROUPS = ['Founders', 'Experience Leaders', 'Business Development', '
 const IF = { metric: 'fldX1aQLHwAWY4A0C', value: 'fldcFhyLkZhdUiyF2', order: 'fldWCIzvRPTsj0hQW', show: 'fldMKHdAIyLWJJsKQ', category: 'fldoPU4x6KqBKNdrY', opens: 'fldkAcX2ofFwe8OgO' };
 // Impact Created evidence. Rows only appear publicly when Show on Website is ticked.
 const IT = { proj: 'tblO5fhefTEiwPCrL' };
+// Website Page Photos: one row per photo spot on Home, About Us, Impact Created and Team.
+const PP = { table: 'tblzv9vppnT0t3ASr', slot: 'fldHCkMOQq2cgWxNB', photo: 'fldmrI2y69VgI6nRz', alt: 'fld1FiXLRsfBUEWwQ', focus: 'fldepHEkij6OSKfOw' };
+const FOCUS = { Center: 'center center', Top: 'center 0%', Upper: 'center 30%', Lower: 'center 70%', Bottom: 'center 100%', Left: '0% center', Right: '100% center' };
 const PJ = { title: 'fldTSF31PRLJ2VDeM', show: 'fldHwPFRFC0ei7dsQ', order: 'fld5u5mysc1bnMX6K', category: 'fld5UnNMP9SNHFLJ3', year: 'fldGlQfsKw3M6ZuXI', area: 'fldA8qAyT2ixMo8Io', saw: 'fldx1ED4Oddqyvx9h', did: 'fldy7AxYXMBasLAan', who: 'fldmDFfJ8fYM51NgE', changed: 'fldZKJATOSDzZOjDN', next: 'fldc3WXuspgOcij8y', status: 'fldpKDvyuT7aO26YN', photo: 'fldW56CKYufKiFFhA' };
 const LIVE_STATUSES = ['Approved', 'Ready', 'Future'];
 const CACHE_SECONDS = 300;
@@ -94,6 +97,7 @@ async function loadLive(env) {
     atList(env, T.imp, Object.values(IF)).catch(() => null),
     atList(env, T.team, Object.values(TF)).catch(() => []),
   ]);
+  const pps = await atList(env, PP.table, [PP.slot, PP.photo, PP.alt, PP.focus]).catch(() => null);
   const ev = await loadEvidence(env);
   const experiences = exps
     .filter((r) => r.fields[EF.show] && String(r.fields[EF.slug] || '').trim() && r.fields[EF.name])
@@ -148,7 +152,11 @@ async function loadLive(env) {
         joined: f[TF.joined] || null, learned: f[TF.learned] || '',
         building: f[TF.building] || '', from: f[TF.from] || [], kinds: (f[TF.kinds] || []).map(selName) };
     });
-  return { experiences, events, reviews, impact, team, evidence: ev, source: 'live' };
+  const slots = pps === null ? (MEMO && MEMO.d.slots) || {} : Object.fromEntries(pps
+    .filter((r) => r.fields[PP.slot] && (r.fields[PP.photo] || []).length)
+    .map((r) => { const f = r.fields, a = f[PP.photo][0], t = a.thumbnails || {};
+      return [String(f[PP.slot]).trim(), { url: (t.full && t.full.url) || a.url, thumb: (t.large && t.large.url) || a.url, alt: f[PP.alt] || '', pos: FOCUS[selName(f[PP.focus])] || '' }]; }));
+  return { experiences, events, reviews, impact, team, evidence: ev, slots, source: 'live' };
 }
 
 let MEMO = null;
@@ -157,7 +165,7 @@ async function getData(env, ctx) {
   const now = Date.now();
   if (MEMO && now - MEMO.t < CACHE_SECONDS * 1000) return MEMO.d;
   const cache = caches.default;
-  const key = new Request('https://data.cache/rock-anchor-v2');
+  const key = new Request('https://data.cache/rock-anchor-v3');
   const hit = await cache.match(key);
   if (hit) {
     const d = await hit.json();
@@ -541,8 +549,8 @@ function badgeFor(data, e) {
 function cardMeta(e) {
   return `<dl class="meta3"><div><dt>Age</dt><dd>${esc(fmtAge(e.age))}</dd></div><div><dt>Location</dt><dd>${esc(fmtPlace(e.location))}</dd></div><div><dt>Price</dt><dd class="price">${esc(fmtPrice(e))}</dd></div></dl>`;
 }
-function photoBox(src, alt, cls) {
-  return src ? `<img ${cls ? `class="${cls}" ` : ''}src="${esc(src)}" alt="${esc(alt)}" loading="lazy">` : `<div class="noimg${cls ? ' ' + cls : ''}"><img src="/logo.png" alt=""></div>`;
+function photoBox(src, alt, cls, pos) {
+  return src ? `<img ${cls ? `class="${cls}" ` : ''}src="${esc(src)}"${pos ? ` style="object-position:${pos}"` : ''} alt="${esc(alt)}" loading="lazy">` : `<div class="noimg${cls ? ' ' + cls : ''}"><img src="/logo.png" alt=""></div>`;
 }
 function card(data, e) {
   return `<a class="card" href="/experiences/${esc(e.slug)}" data-cats="${esc(e.categories.join('|'))}">
@@ -588,6 +596,13 @@ lb.addEventListener('touchstart',function(ev){x0=ev.touches[0].clientX},{passive
 if(U.length<2)lb.querySelectorAll('.lb-nav').forEach(function(b){b.hidden=true})})();</script>`;
 }
 
+// A photo spot chosen in the Website Page Photos table, or the fallback when the row is empty.
+function slot(data, key, fallback = '', big = true) {
+  const x = data && data.slots && data.slots[key];
+  return x ? { src: big ? x.url : x.thumb, alt: x.alt, pos: x.pos } : { src: fallback, alt: '', pos: '' };
+}
+const posStyle = (s) => (s && s.pos ? ` style="object-position:${s.pos}"` : '');
+
 // ---------- pages ----------
 function home(data) {
   const exps = sorted(data);
@@ -597,13 +612,14 @@ function home(data) {
   const pick = (slug, i) => { const x = bySlug(data, slug); const p = x && x.photos && (x.photos[i] || x.photos[0]); return p ? p.thumb : ''; };
   const anyPhoto = (n) => { const all = exps.flatMap((x) => x.photos || []); return all.length ? all[n % all.length].thumb : ''; };
   const why = [
-    ['Safety first', 'Experienced leaders, thoughtful planning and the skills to handle the outdoors responsibly.', pick('winter-trekking', 1) || anyPhoto(1)],
-    ['Hidden places', 'Crowd-free trails, quiet villages, forests, lakes and night skies across the Sahyadris.', pick('ridge-and-lake', 0) || anyPhoto(5)],
-    ['Local knowledge', 'Experiences shaped and hosted with people who know these places as home.', pick('be-a-villager', 3) || anyPhoto(9)],
-    ['Meant to be experienced', "Small groups, thoughtful activities and experiences designed around the people you're with.", pick('young-explorers-winter-school', 0) || anyPhoto(13)],
+    ['Safety first', 'Experienced leaders, thoughtful planning and the skills to handle the outdoors responsibly.', slot(data, 'home.why.safety', pick('winter-trekking', 1) || anyPhoto(1), false)],
+    ['Hidden places', 'Crowd-free trails, quiet villages, forests, lakes and night skies across the Sahyadris.', slot(data, 'home.why.hidden', pick('ridge-and-lake', 0) || anyPhoto(5), false)],
+    ['Local knowledge', 'Experiences shaped and hosted with people who know these places as home.', slot(data, 'home.why.local', pick('be-a-villager', 3) || anyPhoto(9), false)],
+    ['Meant to be experienced', "Small groups, thoughtful activities and experiences designed around the people you're with.", slot(data, 'home.why.experienced', pick('young-explorers-winter-school', 0) || anyPhoto(13), false)],
   ];
+  const heroP = slot(data, 'home.hero', cover(hero, true));
   const body = `
-<section class="hero"><img class="bg" src="${esc(cover(hero, true))}" alt="" fetchpriority="high"><div class="wrap">
+<section class="hero"><img class="bg" src="${esc(heroP.src)}"${posStyle(heroP)} alt="" fetchpriority="high"><div class="wrap">
 <p class="eyebrow">Outdoor experiences in the Sahyadris</p><h1>Come outside.<br>Find something real.</h1>
 <p class="hero-sub">Treks, stargazing, village experiences and outdoor learning that reconnect you with nature and the communities that call the Sahyadris home.</p>
 <div class="row"><a class="btn btn-clay" href="/experiences">Explore experiences</a><a class="btn btn-ghost" href="${waLink('Hi Rock & Anchor, I would like to know more about your experiences.')}">${ICON.wa}WhatsApp us</a></div></div></section>
@@ -612,7 +628,7 @@ function home(data) {
 <div class="grid">${featured.map((e) => card(data, e)).join('')}</div></div></section>
 
 <section><div class="wrap"><h2>Outdoors, with purpose</h2>
-<div class="why">${why.map(([h, t, img]) => `<div>${photoBox(img, h, 'why-img')}<div class="why-body"><h3>${h}</h3><p>${t}</p></div></div>`).join('')}</div></div></section>
+<div class="why">${why.map(([h, t, img]) => `<div>${photoBox(img.src, img.alt || h, 'why-img', img.pos)}<div class="why-body"><h3>${h}</h3><p>${t}</p></div></div>`).join('')}</div></div></section>
 
 <section class="band"><div class="wrap"><h2>The outdoors should give back</h2>
 <p class="lead">We use outdoor experiences to create opportunities for people, support village schools and build a deeper connection with the places we visit.</p>
@@ -627,7 +643,7 @@ ${data.impact.length ? `<div class="stats">${data.impact.map((i) => `<div class=
 ${data.reviews.length ? `<section style="padding-top:0"><div class="wrap"><div class="sec-head"><div><p class="eyebrow">In their words</p><h2>What people say</h2></div></div>${reviewsBlock(data.reviews.slice(0, 6))}</div></section>` : ''}
 <section class="tight"><div class="wrap"><div class="cta"><div class="cta-text"><h2>Your next adventure is out there.</h2><p>Come explore the Sahyadris with us.</p></div>
 <div class="cta-actions"><a class="btn btn-clay" href="/experiences">Explore experiences</a><a class="btn btn-ghost" href="${waLink('Hi Rock & Anchor, I would like to plan an experience.')}">${ICON.wa}Talk to us on WhatsApp</a></div></div></div></section>`;
-  return layout({ title: '', desc: 'Authentic outdoor experiences in the Sahyadris near Mumbai: treks, stargazing, village stays and nature days for families, schools and teams.', path: '/', body, image: cover(hero, true), data });
+  return layout({ title: '', desc: 'Authentic outdoor experiences in the Sahyadris near Mumbai: treks, stargazing, village stays and nature days for families, schools and teams.', path: '/', body, image: heroP.src, data });
 }
 
 function experiencesPage(data) {

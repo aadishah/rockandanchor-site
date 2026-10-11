@@ -16,12 +16,15 @@ function aboutPage(data) {
     const all = sorted(data).flatMap((e) => e.photos || []);
     return all.length ? (big ? all[(i * 7) % all.length].url : all[(i * 7) % all.length].thumb) : '';
   };
-  const img = (src, alt, cls = '') => (src ? `<img class="${cls}" src="${esc(src)}" alt="${esc(alt)}" loading="lazy">` : `<div class="${cls} ab-noimg"></div>`);
+  // S(key, fallback) reads a spot from the Website Page Photos table; the alt text there replaces the default.
+  const S = (key, fb) => slot(data, key, fb);
+  const heroP = S('about.hero', ph('ridge-and-lake', 0, true)), earthP = S('about.earth', ph('winter-trekking', 1, true)), endP = S('about.end', ph('ridge-and-lake', 2, true));
+  const img = (src, alt, cls = '') => { const o = typeof src === 'object' && src ? src : { src, alt: '', pos: '' }; return o.src ? `<img class="${cls}" src="${esc(o.src)}"${posStyle(o)} alt="${esc(o.alt || alt)}" loading="lazy">` : `<div class="${cls} ab-noimg"></div>`; };
 
   const problems = [
-    ['01', 'We are losing our connection with nature', 'Modern life has made it easier to be connected to everything except the natural world around us.', ph('night-sky-experience', 1), 'A guest looking out of a tent at sunrise over the Sahyadris', '<span>City</span><span>Phone</span><span>Screen</span><i></i><span>Forest</span><span>Mountains</span><span>Night sky</span>'],
-    ['02', 'Rural communities are losing opportunity', 'In many rural communities, young people leave because meaningful work is limited. When people leave, villages do not just lose workers. They can lose knowledge, traditions, relationships and the people who hold communities together.', ph('be-a-villager', 0), 'Village life in the Sahyadris', ''],
-    ['03', 'The places we depend on need us to care', 'Tourism can either extract value from a place or help create value within it.', ph('winter-trekking', 2), 'A gorge in the Sahyadris', ''],
+    ['01', 'We are losing our connection with nature', 'Modern life has made it easier to be connected to everything except the natural world around us.', S('about.problem.1', ph('night-sky-experience', 1, true)), 'A guest looking out of a tent at sunrise over the Sahyadris', '<span>City</span><span>Phone</span><span>Screen</span><i></i><span>Forest</span><span>Mountains</span><span>Night sky</span>'],
+    ['02', 'Rural communities are losing opportunity', 'In many rural communities, young people leave because meaningful work is limited. When people leave, villages do not just lose workers. They can lose knowledge, traditions, relationships and the people who hold communities together.', S('about.problem.2', ph('be-a-villager', 0, true)), 'Village life in the Sahyadris', ''],
+    ['03', 'The places we depend on need us to care', 'Tourism can either extract value from a place or help create value within it.', S('about.problem.3', ph('winter-trekking', 2, true)), 'A gorge in the Sahyadris', ''],
   ];
   const circles = [
     ['people', 'People', 'connection', 'Reconnect with nature, themselves and others.'],
@@ -29,16 +32,16 @@ function aboutPage(data) {
     ['places', 'Places', 'care', 'Protect ecosystems, culture and local knowledge.'],
   ];
   const tmi = [
-    ['Touch', 'You encounter a place, a person, a story.', ph('hidden-kingdom', 1), 'Snail shells held in a guest’s palm'],
-    ['Move', 'You participate rather than simply observe.', ph('monsoon-village-1-day', 2), 'Children floating in a monsoon stream'],
-    ['Inspire', 'You leave with a possibility you did not have before.', ph('rooftop-stargazing', 0), 'A girl looking through a telescope'],
+    ['Touch', 'You encounter a place, a person, a story.', S('about.tmi.touch', ph('hidden-kingdom', 1, true)), 'Snail shells held in a guest’s palm'],
+    ['Move', 'You participate rather than simply observe.', S('about.tmi.move', ph('monsoon-village-1-day', 2, true)), 'Children floating in a monsoon stream'],
+    ['Inspire', 'You leave with a possibility you did not have before.', S('about.tmi.inspire', ph('rooftop-stargazing', 0, true)), 'A girl looking through a telescope'],
   ];
   const model = [
-    ['Educate', 'We use the outdoors as a classroom.', ph('young-explorers-winter-school', 2), 'A child learning with a facilitator',
+    ['Educate', 'We use the outdoors as a classroom.', S('about.model.educate', ph('young-explorers-winter-school', 2, true)), 'A child learning with a facilitator',
       `<p>Participants learn about:</p><ul class="ab-list"><li>Nature</li><li>Local ecosystems</li><li>Survival and life skills</li><li>Sustainability</li><li>Local culture</li></ul><p>And we support learning in the communities around us. 25% of Net Profit funds schools in the mountain villages we work in.</p>`],
-    ['Employ', 'We create meaningful opportunities for people from the villages where we operate.', ph('hidden-kingdom', 2), 'A shared meal served on leaves',
+    ['Employ', 'We create meaningful opportunities for people from the villages where we operate.', S('about.model.employ', ph('hidden-kingdom', 2, true)), 'A shared meal served on leaves',
       `<p>Not simply as labour. As:</p><ul class="ab-list"><li>Guides</li><li>Facilitators</li><li>Hosts</li><li>Cooks</li><li>Leaders</li><li>Specialists</li></ul>`],
-    ['Empower', 'Skills become confidence. Confidence becomes leadership. Leadership creates possibilities for others.', ph('be-a-villager', 1), 'A facilitator sitting in a circle with village children',
+    ['Empower', 'Skills become confidence. Confidence becomes leadership. Leadership creates possibilities for others.', S('about.model.empower', ph('be-a-villager', 1, true)), 'A facilitator sitting in a circle with village children',
       `<ul class="ab-steps"><li><b>Create</b> their own projects and experiences</li><li><b>Bring others along</b> and build a team</li><li><b>Find their voice</b> and speak with confidence</li><li><b>Set goals</b> and work towards them</li><li><b>Lead</b> groups and make decisions</li><li><b>Hand over</b> to the next person they have trained</li></ul>`],
   ];
   const ring = ['Guest', 'Experience', 'Local people', 'Local economy', 'Community', 'Place', 'Better care'];
@@ -51,11 +54,11 @@ function aboutPage(data) {
   ];
   // "This is why": About makes the argument. The evidence lives on Impact Created.
   const ground = [
-    ['This is why we work with villages.', 'Villages hold knowledge, food, stories and ways of living that are quietly disappearing. When a village hosts an experience, the value stays in the village.', ph('little-feet-sunset-safari', 2), 'Guests with their village hosts'],
-    ['This is why we care about nature.', 'You cannot care for a place you have never felt. We bring people close to the natural world, and leave it as we found it.', ph('monsoon-village-1-day', 0), 'A monsoon waterfall in the Sahyadris'],
-    ['This is why we employ locally.', 'The people who live here know these mountains better than anyone. Meaningful work close to home means young people do not have to leave to find it.', ph('young-explorers-winter-school', 1), 'A local guide leading a group'],
-    ['This is why we support village schools.', 'A community that learns can build its own future. 25% of Net Profit goes to schools in the villages we work in.', ph('be-a-villager', 3), 'Village school children'],
-    ['This is why experiences matter.', 'People learn by touching, building, getting wet and asking questions. A day outside teaches what a classroom or a screen cannot.', ph('little-feet-sensory', 2), 'Children playing in a stream'],
+    ['This is why we work with villages.', 'Villages hold knowledge, food, stories and ways of living that are quietly disappearing. When a village hosts an experience, the value stays in the village.', S('about.ground.villages', ph('little-feet-sunset-safari', 2, true)), 'Guests with their village hosts'],
+    ['This is why we care about nature.', 'You cannot care for a place you have never felt. We bring people close to the natural world, and leave it as we found it.', S('about.ground.nature', ph('monsoon-village-1-day', 0, true)), 'A monsoon waterfall in the Sahyadris'],
+    ['This is why we employ locally.', 'The people who live here know these mountains better than anyone. Meaningful work close to home means young people do not have to leave to find it.', S('about.ground.employ', ph('young-explorers-winter-school', 1, true)), 'A local guide leading a group'],
+    ['This is why we support village schools.', 'A community that learns can build its own future. 25% of Net Profit goes to schools in the villages we work in.', S('about.ground.schools', ph('be-a-villager', 3, true)), 'Village school children'],
+    ['This is why experiences matter.', 'People learn by touching, building, getting wet and asking questions. A day outside teaches what a classroom or a screen cannot.', S('about.ground.experiences', ph('little-feet-sensory', 2, true)), 'Children playing in a stream'],
   ];
   const roles = [
     ['Local guides', 'People who know every trail, river and season, trained to lead groups safely.'],
@@ -79,7 +82,7 @@ ${ringNodes.map((n) => `<g class="rn"><circle cx="${n.x.toFixed(1)}" cy="${n.y.t
   const body = `<style>${ABOUT_CSS}</style>
 <div class="ab">
 <section class="ab-hero" id="why"><div class="ab-stick">
-  <img class="ab-bg" data-par src="${esc(ph('ridge-and-lake', 0, true))}" alt="" fetchpriority="high">
+  <img class="ab-bg" data-par src="${esc(heroP.src)}"${posStyle(heroP)} alt="" fetchpriority="high">
   <div class="wrap ab-hero-text"><p class="ab-kicker">Why we exist</p><h1>We believe getting outside can change more than you.</h1>
   <p class="ab-sub">Rock &amp; Anchor exists to reconnect people with nature, create meaningful livelihoods in rural communities, and help protect the places that make those connections possible.</p></div>
   <a class="ab-scroll" href="#problem" aria-label="Scroll to read more"><span></span></a>
@@ -91,7 +94,7 @@ ${ringNodes.map((n) => `<g class="rn"><circle cx="${n.x.toFixed(1)}" cy="${n.y.t
 </div></section>
 
 <section class="ab-earth" id="earth"><div class="ab-earth-stick">
-  <img class="ab-earth-img" src="${esc(ph('winter-trekking', 1, true))}" alt="The Sahyadri mountains">
+  <img class="ab-earth-img" src="${esc(earthP.src)}"${posStyle(earthP)} alt="${esc(earthP.alt || 'The Sahyadri mountains')}">
   <p class="ab-earth-text">We do not have an <span>Earth&nbsp;2.0.</span></p>
 </div></section>
 
@@ -146,7 +149,7 @@ ${ringNodes.map((n) => `<g class="rn"><circle cx="${n.x.toFixed(1)}" cy="${n.y.t
 </div></section>
 
 <section class="ab-origin" id="origin"><div class="wrap ab-origin-grid">
-  ${img(ph('winter-trekking', 0, true), 'A Rock & Anchor group in the Sahyadris', 'ab-origin-img rv')}
+  ${img(S('about.origin', ph('winter-trekking', 0, true)), 'A Rock & Anchor group in the Sahyadris', 'ab-origin-img rv')}
   <div class="ab-origin-text"><p class="ab-kicker rv">The origin</p><h2 class="ab-h rv">It started with Aaditya and Mansi.</h2>
   <p class="rv">Aaditya and Mansi met on a trek in the Sahyadris, brought together by a shared love for the outdoors and the experiences that happen there.</p>
   <p class="rv">Over time, they began to see that these experiences could mean more than a day in the mountains. They could connect people with nature, create meaningful work in rural communities, and help people see the places they visit differently.</p>
@@ -172,13 +175,13 @@ ${ringNodes.map((n) => `<g class="rn"><circle cx="${n.x.toFixed(1)}" cy="${n.y.t
   <ul>${ABOUT_BELIEFS.map((b) => `<li class="rv">${b}</li>`).join('')}</ul>
 </div></section>
 
-<section class="ab-end" id="come"><img class="ab-end-img" src="${esc(ph('ridge-and-lake', 2, true))}" alt="" loading="lazy"><div class="wrap">
+<section class="ab-end" id="come"><img class="ab-end-img" src="${esc(endP.src)}"${posStyle(endP)} alt="" loading="lazy"><div class="wrap">
   <h2 class="ab-end-h rv">Get outside. Come back changed.</h2>
   <div class="ab-end-cta rv"><a class="btn btn-clay" href="/experiences">Explore experiences</a><a class="btn btn-ghost" href="${workWith}">${ICON.wa}Work with us</a></div>
 </div></section>
 </div>
 <script>${ABOUT_JS}</script>`;
-  return layout({ title: 'About Us', desc: 'Why Rock & Anchor exists: reconnecting people with nature, creating meaningful livelihoods in rural communities and caring for the places we visit.', path: '/about', body, image: ph('ridge-and-lake', 0, true), data });
+  return layout({ title: 'About Us', desc: 'Why Rock & Anchor exists: reconnecting people with nature, creating meaningful livelihoods in rural communities and caring for the places we visit.', path: '/about', body, image: heroP.src, data });
 }
 
 const ABOUT_JS = `(function(){

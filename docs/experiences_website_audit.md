@@ -88,3 +88,13 @@ Source: past event albums in the Events table (Photo Album (Post Trip)).
 
 ## Video support (staging only, commit 12d56d4, version 2c19ec23)
 Website Photos can now hold videos. The gallery plays them muted in the tiles (small play mark) and with controls in the slideshow. Cards and the home page still use photos only. To add a video from Google Photos, use the album item's base URL with =dv.
+
+## Page photos: Home, About Us, Impact Created, Team (12 Oct 2026)
+Problem: these pages picked "photo number N" from an experience's Website Photos. When an experience's photos changed, was hidden or renamed, the spot showed an unrelated or random photo. Wide boxes also cropped tall photos through people's heads.
+
+Fix (staging version 831091af, live untouched):
+- New Airtable table **Website Page Photos**, one row per photo spot (27 rows). Fields: Slot (code key, do not rename), Page, Text beside the photo, Photo, Alt text, Focus, Order.
+- To change a photo, drop a new image in the Photo field of that row. The site updates within about 5 minutes.
+- Focus decides which part of the photo stays visible when it is cropped: Center, Top, Upper, Lower, Bottom, Left, Right. Use Top or Upper when heads are cut, Lower or Bottom when feet or faces at the bottom are cut.
+- If a row's Photo is empty, the page falls back to the old experience photo.
+- Every spot was matched to its text and checked on staging. Focus adjusted on: Hidden places (Upper), problem 01 (Top), problem 02 (Upper), Educate (Top), Empower (Upper), Origin (Lower), Impact hero (Lower), Inspire, Earth, Team hero (Upper).

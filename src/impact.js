@@ -13,6 +13,7 @@ function impactPage(data, opts = {}) {
   const draft = (x) => (x.live ? '' : '<span class="im-draft">Draft, not public</span>');
   const p = (t) => (t ? String(t).split(/\n+/).filter(Boolean).map((l) => `<p>${esc(l)}</p>`).join('') : '');
   const photo = (slug, i, big = true) => { const x = bySlug(data, slug); const ph = x && x.photos && (x.photos[i] || x.photos[0]); return ph ? (big ? ph.url : ph.thumb) : cover(sorted(data)[0], big); };
+  const heroP = slot(data, 'impact.hero', photo('be-a-villager', 3));
   const workWith = waLink('Hi Rock & Anchor, I would like to work with you (school, company or partnership).');
 
   // 2. Numbers: from the Website Impact table. "Click Opens" decides what each number reveals.
@@ -55,7 +56,7 @@ function impactPage(data, opts = {}) {
   const body = `<style>${IMPACT_CSS}</style>
 <div class="im">
 ${drafts ? '<div class="im-staging">Staging preview: rows marked <b>Draft, not public</b> are hidden on the live site until you tick Show on Website in Airtable.</div>' : ''}
-<section class="im-hero"><img src="${esc(photo('be-a-villager', 3))}" alt="" fetchpriority="high"><div class="wrap">
+<section class="im-hero"><img src="${esc(heroP.src)}"${posStyle(heroP)} alt="" fetchpriority="high"><div class="wrap">
   <p class="im-kicker">Impact created</p><h1>What happens because you choose to come with us?</h1>
   <p class="im-sub">Every Rock &amp; Anchor experience is part of something larger. This page shows where that value goes, who it reaches, and what it has helped change.</p>
 </div></section>
@@ -103,7 +104,7 @@ ${yearList.length ? `<section class="im-archive" id="archive"><div class="wrap">
 <div class="im-modal" id="imModal" hidden role="dialog" aria-modal="true"><div class="im-modal-card"><button type="button" class="im-x" aria-label="Close">×</button>${modals}</div></div>
 </div>
 <script>${IMPACT_JS}</script>`;
-  return layout({ title: 'Impact Created', desc: 'What happens because you travel with Rock & Anchor: the numbers, where the money goes and the projects.', path: '/impact', body, image: photo('be-a-villager', 3), data });
+  return layout({ title: 'Impact Created', desc: 'What happens because you travel with Rock & Anchor: the numbers, where the money goes and the projects.', path: '/impact', body, image: heroP.src, data });
 }
 
 const IMPACT_JS = `(function(){

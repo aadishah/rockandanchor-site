@@ -19,6 +19,9 @@ const TEAM_GROUPS = ['Founders', 'Experience Leaders', 'Business Development', '
 const IF = { metric: 'fldX1aQLHwAWY4A0C', value: 'fldcFhyLkZhdUiyF2', order: 'fldWCIzvRPTsj0hQW', show: 'fldMKHdAIyLWJJsKQ', category: 'fldoPU4x6KqBKNdrY', opens: 'fldkAcX2ofFwe8OgO' };
 // Impact Created evidence. Rows only appear publicly when Show on Website is ticked.
 const IT = { proj: 'tblO5fhefTEiwPCrL' };
+// Website Page Photos: one row per photo spot on Home, About Us, Impact Created and Team.
+const PP = { table: 'tblzv9vppnT0t3ASr', slot: 'fldHCkMOQq2cgWxNB', photo: 'fldmrI2y69VgI6nRz', alt: 'fld1FiXLRsfBUEWwQ', focus: 'fldepHEkij6OSKfOw' };
+const FOCUS = { Center: 'center center', Top: 'center 0%', Upper: 'center 30%', Lower: 'center 70%', Bottom: 'center 100%', Left: '0% center', Right: '100% center' };
 const PJ = { title: 'fldTSF31PRLJ2VDeM', show: 'fldHwPFRFC0ei7dsQ', order: 'fld5u5mysc1bnMX6K', category: 'fld5UnNMP9SNHFLJ3', year: 'fldGlQfsKw3M6ZuXI', area: 'fldA8qAyT2ixMo8Io', saw: 'fldx1ED4Oddqyvx9h', did: 'fldy7AxYXMBasLAan', who: 'fldmDFfJ8fYM51NgE', changed: 'fldZKJATOSDzZOjDN', next: 'fldc3WXuspgOcij8y', status: 'fldpKDvyuT7aO26YN', photo: 'fldW56CKYufKiFFhA' };
 const LIVE_STATUSES = ['Approved', 'Ready', 'Future'];
 const CACHE_SECONDS = 300;
@@ -94,6 +97,7 @@ async function loadLive(env) {
     atList(env, T.imp, Object.values(IF)).catch(() => null),
     atList(env, T.team, Object.values(TF)).catch(() => []),
   ]);
+  const pps = await atList(env, PP.table, [PP.slot, PP.photo, PP.alt, PP.focus]).catch(() => null);
   const ev = await loadEvidence(env);
   const experiences = exps
     .filter((r) => r.fields[EF.show] && String(r.fields[EF.slug] || '').trim() && r.fields[EF.name])
@@ -148,7 +152,11 @@ async function loadLive(env) {
         joined: f[TF.joined] || null, learned: f[TF.learned] || '',
         building: f[TF.building] || '', from: f[TF.from] || [], kinds: (f[TF.kinds] || []).map(selName) };
     });
-  return { experiences, events, reviews, impact, team, evidence: ev, source: 'live' };
+  const slots = pps === null ? (MEMO && MEMO.d.slots) || {} : Object.fromEntries(pps
+    .filter((r) => r.fields[PP.slot] && (r.fields[PP.photo] || []).length)
+    .map((r) => { const f = r.fields, a = f[PP.photo][0], t = a.thumbnails || {};
+      return [String(f[PP.slot]).trim(), { url: (t.full && t.full.url) || a.url, thumb: (t.large && t.large.url) || a.url, alt: f[PP.alt] || '', pos: FOCUS[selName(f[PP.focus])] || '' }]; }));
+  return { experiences, events, reviews, impact, team, evidence: ev, slots, source: 'live' };
 }
 
 let MEMO = null;
@@ -157,7 +165,7 @@ async function getData(env, ctx) {
   const now = Date.now();
   if (MEMO && now - MEMO.t < CACHE_SECONDS * 1000) return MEMO.d;
   const cache = caches.default;
-  const key = new Request('https://data.cache/rock-anchor-v2');
+  const key = new Request('https://data.cache/rock-anchor-v3');
   const hit = await cache.match(key);
   if (hit) {
     const d = await hit.json();
@@ -541,8 +549,8 @@ function badgeFor(data, e) {
 function cardMeta(e) {
   return `<dl class="meta3"><div><dt>Age</dt><dd>${esc(fmtAge(e.age))}</dd></div><div><dt>Location</dt><dd>${esc(fmtPlace(e.location))}</dd></div><div><dt>Price</dt><dd class="price">${esc(fmtPrice(e))}</dd></div></dl>`;
 }
-function photoBox(src, alt, cls) {
-  return src ? `<img ${cls ? `class="${cls}" ` : ''}src="${esc(src)}" alt="${esc(alt)}" loading="lazy">` : `<div class="noimg${cls ? ' ' + cls : ''}"><img src="/logo.png" alt=""></div>`;
+function photoBox(src, alt, cls, pos) {
+  return src ? `<img ${cls ? `class="${cls}" ` : ''}src="${esc(src)}"${pos ? ` style="object-position:${pos}"` : ''} alt="${esc(alt)}" loading="lazy">` : `<div class="noimg${cls ? ' ' + cls : ''}"><img src="/logo.png" alt=""></div>`;
 }
 function card(data, e) {
   return `<a class="card" href="/experiences/${esc(e.slug)}" data-cats="${esc(e.categories.join('|'))}">
@@ -588,6 +596,13 @@ lb.addEventListener('touchstart',function(ev){x0=ev.touches[0].clientX},{passive
 if(U.length<2)lb.querySelectorAll('.lb-nav').forEach(function(b){b.hidden=true})})();</script>`;
 }
 
+// A photo spot chosen in the Website Page Photos table, or the fallback when the row is empty.
+function slot(data, key, fallback = '', big = true) {
+  const x = data && data.slots && data.slots[key];
+  return x ? { src: big ? x.url : x.thumb, alt: x.alt, pos: x.pos } : { src: fallback, alt: '', pos: '' };
+}
+const posStyle = (s) => (s && s.pos ? ` style="object-position:${s.pos}"` : '');
+
 // ---------- pages ----------
 function home(data) {
   const exps = sorted(data);
@@ -597,13 +612,14 @@ function home(data) {
   const pick = (slug, i) => { const x = bySlug(data, slug); const p = x && x.photos && (x.photos[i] || x.photos[0]); return p ? p.thumb : ''; };
   const anyPhoto = (n) => { const all = exps.flatMap((x) => x.photos || []); return all.length ? all[n % all.length].thumb : ''; };
   const why = [
-    ['Safety first', 'Experienced leaders, thoughtful planning and the skills to handle the outdoors responsibly.', pick('winter-trekking', 1) || anyPhoto(1)],
-    ['Hidden places', 'Crowd-free trails, quiet villages, forests, lakes and night skies across the Sahyadris.', pick('ridge-and-lake', 0) || anyPhoto(5)],
-    ['Local knowledge', 'Experiences shaped and hosted with people who know these places as home.', pick('be-a-villager', 3) || anyPhoto(9)],
-    ['Meant to be experienced', "Small groups, thoughtful activities and experiences designed around the people you're with.", pick('young-explorers-winter-school', 0) || anyPhoto(13)],
+    ['Safety first', 'Experienced leaders, thoughtful planning and the skills to handle the outdoors responsibly.', slot(data, 'home.why.safety', pick('winter-trekking', 1) || anyPhoto(1), false)],
+    ['Hidden places', 'Crowd-free trails, quiet villages, forests, lakes and night skies across the Sahyadris.', slot(data, 'home.why.hidden', pick('ridge-and-lake', 0) || anyPhoto(5), false)],
+    ['Local knowledge', 'Experiences shaped and hosted with people who know these places as home.', slot(data, 'home.why.local', pick('be-a-villager', 3) || anyPhoto(9), false)],
+    ['Meant to be experienced', "Small groups, thoughtful activities and experiences designed around the people you're with.", slot(data, 'home.why.experienced', pick('young-explorers-winter-school', 0) || anyPhoto(13), false)],
   ];
+  const heroP = slot(data, 'home.hero', cover(hero, true));
   const body = `
-<section class="hero"><img class="bg" src="${esc(cover(hero, true))}" alt="" fetchpriority="high"><div class="wrap">
+<section class="hero"><img class="bg" src="${esc(heroP.src)}"${posStyle(heroP)} alt="" fetchpriority="high"><div class="wrap">
 <p class="eyebrow">Outdoor experiences in the Sahyadris</p><h1>Come outside.<br>Find something real.</h1>
 <p class="hero-sub">Treks, stargazing, village experiences and outdoor learning that reconnect you with nature and the communities that call the Sahyadris home.</p>
 <div class="row"><a class="btn btn-clay" href="/experiences">Explore experiences</a><a class="btn btn-ghost" href="${waLink('Hi Rock & Anchor, I would like to know more about your experiences.')}">${ICON.wa}WhatsApp us</a></div></div></section>
@@ -612,7 +628,7 @@ function home(data) {
 <div class="grid">${featured.map((e) => card(data, e)).join('')}</div></div></section>
 
 <section><div class="wrap"><h2>Outdoors, with purpose</h2>
-<div class="why">${why.map(([h, t, img]) => `<div>${photoBox(img, h, 'why-img')}<div class="why-body"><h3>${h}</h3><p>${t}</p></div></div>`).join('')}</div></div></section>
+<div class="why">${why.map(([h, t, img]) => `<div>${photoBox(img.src, img.alt || h, 'why-img', img.pos)}<div class="why-body"><h3>${h}</h3><p>${t}</p></div></div>`).join('')}</div></div></section>
 
 <section class="band"><div class="wrap"><h2>The outdoors should give back</h2>
 <p class="lead">We use outdoor experiences to create opportunities for people, support village schools and build a deeper connection with the places we visit.</p>
@@ -627,7 +643,7 @@ ${data.impact.length ? `<div class="stats">${data.impact.map((i) => `<div class=
 ${data.reviews.length ? `<section style="padding-top:0"><div class="wrap"><div class="sec-head"><div><p class="eyebrow">In their words</p><h2>What people say</h2></div></div>${reviewsBlock(data.reviews.slice(0, 6))}</div></section>` : ''}
 <section class="tight"><div class="wrap"><div class="cta"><div class="cta-text"><h2>Your next adventure is out there.</h2><p>Come explore the Sahyadris with us.</p></div>
 <div class="cta-actions"><a class="btn btn-clay" href="/experiences">Explore experiences</a><a class="btn btn-ghost" href="${waLink('Hi Rock & Anchor, I would like to plan an experience.')}">${ICON.wa}Talk to us on WhatsApp</a></div></div></div></section>`;
-  return layout({ title: '', desc: 'Authentic outdoor experiences in the Sahyadris near Mumbai: treks, stargazing, village stays and nature days for families, schools and teams.', path: '/', body, image: cover(hero, true), data });
+  return layout({ title: '', desc: 'Authentic outdoor experiences in the Sahyadris near Mumbai: treks, stargazing, village stays and nature days for families, schools and teams.', path: '/', body, image: heroP.src, data });
 }
 
 function experiencesPage(data) {
@@ -700,12 +716,15 @@ function aboutPage(data) {
     const all = sorted(data).flatMap((e) => e.photos || []);
     return all.length ? (big ? all[(i * 7) % all.length].url : all[(i * 7) % all.length].thumb) : '';
   };
-  const img = (src, alt, cls = '') => (src ? `<img class="${cls}" src="${esc(src)}" alt="${esc(alt)}" loading="lazy">` : `<div class="${cls} ab-noimg"></div>`);
+  // S(key, fallback) reads a spot from the Website Page Photos table; the alt text there replaces the default.
+  const S = (key, fb) => slot(data, key, fb);
+  const heroP = S('about.hero', ph('ridge-and-lake', 0, true)), earthP = S('about.earth', ph('winter-trekking', 1, true)), endP = S('about.end', ph('ridge-and-lake', 2, true));
+  const img = (src, alt, cls = '') => { const o = typeof src === 'object' && src ? src : { src, alt: '', pos: '' }; return o.src ? `<img class="${cls}" src="${esc(o.src)}"${posStyle(o)} alt="${esc(o.alt || alt)}" loading="lazy">` : `<div class="${cls} ab-noimg"></div>`; };
 
   const problems = [
-    ['01', 'We are losing our connection with nature', 'Modern life has made it easier to be connected to everything except the natural world around us.', ph('night-sky-experience', 1), 'A guest looking out of a tent at sunrise over the Sahyadris', '<span>City</span><span>Phone</span><span>Screen</span><i></i><span>Forest</span><span>Mountains</span><span>Night sky</span>'],
-    ['02', 'Rural communities are losing opportunity', 'In many rural communities, young people leave because meaningful work is limited. When people leave, villages do not just lose workers. They can lose knowledge, traditions, relationships and the people who hold communities together.', ph('be-a-villager', 0), 'Village life in the Sahyadris', ''],
-    ['03', 'The places we depend on need us to care', 'Tourism can either extract value from a place or help create value within it.', ph('winter-trekking', 2), 'A gorge in the Sahyadris', ''],
+    ['01', 'We are losing our connection with nature', 'Modern life has made it easier to be connected to everything except the natural world around us.', S('about.problem.1', ph('night-sky-experience', 1, true)), 'A guest looking out of a tent at sunrise over the Sahyadris', '<span>City</span><span>Phone</span><span>Screen</span><i></i><span>Forest</span><span>Mountains</span><span>Night sky</span>'],
+    ['02', 'Rural communities are losing opportunity', 'In many rural communities, young people leave because meaningful work is limited. When people leave, villages do not just lose workers. They can lose knowledge, traditions, relationships and the people who hold communities together.', S('about.problem.2', ph('be-a-villager', 0, true)), 'Village life in the Sahyadris', ''],
+    ['03', 'The places we depend on need us to care', 'Tourism can either extract value from a place or help create value within it.', S('about.problem.3', ph('winter-trekking', 2, true)), 'A gorge in the Sahyadris', ''],
   ];
   const circles = [
     ['people', 'People', 'connection', 'Reconnect with nature, themselves and others.'],
@@ -713,16 +732,16 @@ function aboutPage(data) {
     ['places', 'Places', 'care', 'Protect ecosystems, culture and local knowledge.'],
   ];
   const tmi = [
-    ['Touch', 'You encounter a place, a person, a story.', ph('hidden-kingdom', 1), 'Snail shells held in a guest’s palm'],
-    ['Move', 'You participate rather than simply observe.', ph('monsoon-village-1-day', 2), 'Children floating in a monsoon stream'],
-    ['Inspire', 'You leave with a possibility you did not have before.', ph('rooftop-stargazing', 0), 'A girl looking through a telescope'],
+    ['Touch', 'You encounter a place, a person, a story.', S('about.tmi.touch', ph('hidden-kingdom', 1, true)), 'Snail shells held in a guest’s palm'],
+    ['Move', 'You participate rather than simply observe.', S('about.tmi.move', ph('monsoon-village-1-day', 2, true)), 'Children floating in a monsoon stream'],
+    ['Inspire', 'You leave with a possibility you did not have before.', S('about.tmi.inspire', ph('rooftop-stargazing', 0, true)), 'A girl looking through a telescope'],
   ];
   const model = [
-    ['Educate', 'We use the outdoors as a classroom.', ph('young-explorers-winter-school', 2), 'A child learning with a facilitator',
+    ['Educate', 'We use the outdoors as a classroom.', S('about.model.educate', ph('young-explorers-winter-school', 2, true)), 'A child learning with a facilitator',
       `<p>Participants learn about:</p><ul class="ab-list"><li>Nature</li><li>Local ecosystems</li><li>Survival and life skills</li><li>Sustainability</li><li>Local culture</li></ul><p>And we support learning in the communities around us. 25% of Net Profit funds schools in the mountain villages we work in.</p>`],
-    ['Employ', 'We create meaningful opportunities for people from the villages where we operate.', ph('hidden-kingdom', 2), 'A shared meal served on leaves',
+    ['Employ', 'We create meaningful opportunities for people from the villages where we operate.', S('about.model.employ', ph('hidden-kingdom', 2, true)), 'A shared meal served on leaves',
       `<p>Not simply as labour. As:</p><ul class="ab-list"><li>Guides</li><li>Facilitators</li><li>Hosts</li><li>Cooks</li><li>Leaders</li><li>Specialists</li></ul>`],
-    ['Empower', 'Skills become confidence. Confidence becomes leadership. Leadership creates possibilities for others.', ph('be-a-villager', 1), 'A facilitator sitting in a circle with village children',
+    ['Empower', 'Skills become confidence. Confidence becomes leadership. Leadership creates possibilities for others.', S('about.model.empower', ph('be-a-villager', 1, true)), 'A facilitator sitting in a circle with village children',
       `<ul class="ab-steps"><li><b>Create</b> their own projects and experiences</li><li><b>Bring others along</b> and build a team</li><li><b>Find their voice</b> and speak with confidence</li><li><b>Set goals</b> and work towards them</li><li><b>Lead</b> groups and make decisions</li><li><b>Hand over</b> to the next person they have trained</li></ul>`],
   ];
   const ring = ['Guest', 'Experience', 'Local people', 'Local economy', 'Community', 'Place', 'Better care'];
@@ -735,11 +754,11 @@ function aboutPage(data) {
   ];
   // "This is why": About makes the argument. The evidence lives on Impact Created.
   const ground = [
-    ['This is why we work with villages.', 'Villages hold knowledge, food, stories and ways of living that are quietly disappearing. When a village hosts an experience, the value stays in the village.', ph('little-feet-sunset-safari', 2), 'Guests with their village hosts'],
-    ['This is why we care about nature.', 'You cannot care for a place you have never felt. We bring people close to the natural world, and leave it as we found it.', ph('monsoon-village-1-day', 0), 'A monsoon waterfall in the Sahyadris'],
-    ['This is why we employ locally.', 'The people who live here know these mountains better than anyone. Meaningful work close to home means young people do not have to leave to find it.', ph('young-explorers-winter-school', 1), 'A local guide leading a group'],
-    ['This is why we support village schools.', 'A community that learns can build its own future. 25% of Net Profit goes to schools in the villages we work in.', ph('be-a-villager', 3), 'Village school children'],
-    ['This is why experiences matter.', 'People learn by touching, building, getting wet and asking questions. A day outside teaches what a classroom or a screen cannot.', ph('little-feet-sensory', 2), 'Children playing in a stream'],
+    ['This is why we work with villages.', 'Villages hold knowledge, food, stories and ways of living that are quietly disappearing. When a village hosts an experience, the value stays in the village.', S('about.ground.villages', ph('little-feet-sunset-safari', 2, true)), 'Guests with their village hosts'],
+    ['This is why we care about nature.', 'You cannot care for a place you have never felt. We bring people close to the natural world, and leave it as we found it.', S('about.ground.nature', ph('monsoon-village-1-day', 0, true)), 'A monsoon waterfall in the Sahyadris'],
+    ['This is why we employ locally.', 'The people who live here know these mountains better than anyone. Meaningful work close to home means young people do not have to leave to find it.', S('about.ground.employ', ph('young-explorers-winter-school', 1, true)), 'A local guide leading a group'],
+    ['This is why we support village schools.', 'A community that learns can build its own future. 25% of Net Profit goes to schools in the villages we work in.', S('about.ground.schools', ph('be-a-villager', 3, true)), 'Village school children'],
+    ['This is why experiences matter.', 'People learn by touching, building, getting wet and asking questions. A day outside teaches what a classroom or a screen cannot.', S('about.ground.experiences', ph('little-feet-sensory', 2, true)), 'Children playing in a stream'],
   ];
   const roles = [
     ['Local guides', 'People who know every trail, river and season, trained to lead groups safely.'],
@@ -763,7 +782,7 @@ ${ringNodes.map((n) => `<g class="rn"><circle cx="${n.x.toFixed(1)}" cy="${n.y.t
   const body = `<style>${ABOUT_CSS}</style>
 <div class="ab">
 <section class="ab-hero" id="why"><div class="ab-stick">
-  <img class="ab-bg" data-par src="${esc(ph('ridge-and-lake', 0, true))}" alt="" fetchpriority="high">
+  <img class="ab-bg" data-par src="${esc(heroP.src)}"${posStyle(heroP)} alt="" fetchpriority="high">
   <div class="wrap ab-hero-text"><p class="ab-kicker">Why we exist</p><h1>We believe getting outside can change more than you.</h1>
   <p class="ab-sub">Rock &amp; Anchor exists to reconnect people with nature, create meaningful livelihoods in rural communities, and help protect the places that make those connections possible.</p></div>
   <a class="ab-scroll" href="#problem" aria-label="Scroll to read more"><span></span></a>
@@ -775,7 +794,7 @@ ${ringNodes.map((n) => `<g class="rn"><circle cx="${n.x.toFixed(1)}" cy="${n.y.t
 </div></section>
 
 <section class="ab-earth" id="earth"><div class="ab-earth-stick">
-  <img class="ab-earth-img" src="${esc(ph('winter-trekking', 1, true))}" alt="The Sahyadri mountains">
+  <img class="ab-earth-img" src="${esc(earthP.src)}"${posStyle(earthP)} alt="${esc(earthP.alt || 'The Sahyadri mountains')}">
   <p class="ab-earth-text">We do not have an <span>Earth&nbsp;2.0.</span></p>
 </div></section>
 
@@ -830,7 +849,7 @@ ${ringNodes.map((n) => `<g class="rn"><circle cx="${n.x.toFixed(1)}" cy="${n.y.t
 </div></section>
 
 <section class="ab-origin" id="origin"><div class="wrap ab-origin-grid">
-  ${img(ph('winter-trekking', 0, true), 'A Rock & Anchor group in the Sahyadris', 'ab-origin-img rv')}
+  ${img(S('about.origin', ph('winter-trekking', 0, true)), 'A Rock & Anchor group in the Sahyadris', 'ab-origin-img rv')}
   <div class="ab-origin-text"><p class="ab-kicker rv">The origin</p><h2 class="ab-h rv">It started with Aaditya and Mansi.</h2>
   <p class="rv">Aaditya and Mansi met on a trek in the Sahyadris, brought together by a shared love for the outdoors and the experiences that happen there.</p>
   <p class="rv">Over time, they began to see that these experiences could mean more than a day in the mountains. They could connect people with nature, create meaningful work in rural communities, and help people see the places they visit differently.</p>
@@ -856,13 +875,13 @@ ${ringNodes.map((n) => `<g class="rn"><circle cx="${n.x.toFixed(1)}" cy="${n.y.t
   <ul>${ABOUT_BELIEFS.map((b) => `<li class="rv">${b}</li>`).join('')}</ul>
 </div></section>
 
-<section class="ab-end" id="come"><img class="ab-end-img" src="${esc(ph('ridge-and-lake', 2, true))}" alt="" loading="lazy"><div class="wrap">
+<section class="ab-end" id="come"><img class="ab-end-img" src="${esc(endP.src)}"${posStyle(endP)} alt="" loading="lazy"><div class="wrap">
   <h2 class="ab-end-h rv">Get outside. Come back changed.</h2>
   <div class="ab-end-cta rv"><a class="btn btn-clay" href="/experiences">Explore experiences</a><a class="btn btn-ghost" href="${workWith}">${ICON.wa}Work with us</a></div>
 </div></section>
 </div>
 <script>${ABOUT_JS}</script>`;
-  return layout({ title: 'About Us', desc: 'Why Rock & Anchor exists: reconnecting people with nature, creating meaningful livelihoods in rural communities and caring for the places we visit.', path: '/about', body, image: ph('ridge-and-lake', 0, true), data });
+  return layout({ title: 'About Us', desc: 'Why Rock & Anchor exists: reconnecting people with nature, creating meaningful livelihoods in rural communities and caring for the places we visit.', path: '/about', body, image: heroP.src, data });
 }
 
 const ABOUT_JS = `(function(){
@@ -1105,6 +1124,7 @@ function impactPage(data, opts = {}) {
   const draft = (x) => (x.live ? '' : '<span class="im-draft">Draft, not public</span>');
   const p = (t) => (t ? String(t).split(/\n+/).filter(Boolean).map((l) => `<p>${esc(l)}</p>`).join('') : '');
   const photo = (slug, i, big = true) => { const x = bySlug(data, slug); const ph = x && x.photos && (x.photos[i] || x.photos[0]); return ph ? (big ? ph.url : ph.thumb) : cover(sorted(data)[0], big); };
+  const heroP = slot(data, 'impact.hero', photo('be-a-villager', 3));
   const workWith = waLink('Hi Rock & Anchor, I would like to work with you (school, company or partnership).');
 
   // 2. Numbers: from the Website Impact table. "Click Opens" decides what each number reveals.
@@ -1147,7 +1167,7 @@ function impactPage(data, opts = {}) {
   const body = `<style>${IMPACT_CSS}</style>
 <div class="im">
 ${drafts ? '<div class="im-staging">Staging preview: rows marked <b>Draft, not public</b> are hidden on the live site until you tick Show on Website in Airtable.</div>' : ''}
-<section class="im-hero"><img src="${esc(photo('be-a-villager', 3))}" alt="" fetchpriority="high"><div class="wrap">
+<section class="im-hero"><img src="${esc(heroP.src)}"${posStyle(heroP)} alt="" fetchpriority="high"><div class="wrap">
   <p class="im-kicker">Impact created</p><h1>What happens because you choose to come with us?</h1>
   <p class="im-sub">Every Rock &amp; Anchor experience is part of something larger. This page shows where that value goes, who it reaches, and what it has helped change.</p>
 </div></section>
@@ -1195,7 +1215,7 @@ ${yearList.length ? `<section class="im-archive" id="archive"><div class="wrap">
 <div class="im-modal" id="imModal" hidden role="dialog" aria-modal="true"><div class="im-modal-card"><button type="button" class="im-x" aria-label="Close">×</button>${modals}</div></div>
 </div>
 <script>${IMPACT_JS}</script>`;
-  return layout({ title: 'Impact Created', desc: 'What happens because you travel with Rock & Anchor: the numbers, where the money goes and the projects.', path: '/impact', body, image: photo('be-a-villager', 3), data });
+  return layout({ title: 'Impact Created', desc: 'What happens because you travel with Rock & Anchor: the numbers, where the money goes and the projects.', path: '/impact', body, image: heroP.src, data });
 }
 
 const IMPACT_JS = `(function(){
@@ -1310,6 +1330,7 @@ const IMPACT_CSS = `
 function teamPage(data, opts = {}) {
   const drafts = !!opts.drafts;
   const photo = (slug, i) => { const x = bySlug(data, slug); const ph = x && x.photos && (x.photos[i] || x.photos[0]); return ph ? ph.url : cover(sorted(data)[0], true); };
+  const heroP = slot(data, 'team.hero', photo('winter-trekking', 1)), knowP = slot(data, 'team.know', photo('hidden-kingdom', 2)), endP = slot(data, 'team.end', photo('little-feet-sunset-safari', 1));
   const p = (t) => (t ? String(t).split(/\n+/).filter(Boolean).map((l) => `<p>${esc(l)}</p>`).join('') : '');
   const first = (n) => String(n).split(/\s+/)[0];
   const initials = (n) => n.split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
@@ -1354,7 +1375,7 @@ function teamPage(data, opts = {}) {
   const body = `<style>${TEAM_CSS}</style>
 <div class="tm">
 ${drafts ? '<div class="tm-staging">Staging preview: the yellow hints are only visible here. The live site shows nothing until it is filled in Airtable.</div>' : ''}
-<section class="tm-hero"><img src="${esc(photo('winter-trekking', 1))}" alt="A Rock &amp; Anchor leader pointing out the valley on a Sahyadri ridge" fetchpriority="high"><div class="wrap">
+<section class="tm-hero"><img src="${esc(heroP.src)}"${posStyle(heroP)} alt="${esc(heroP.alt || 'A Rock & Anchor leader on a Sahyadri ridge')}" fetchpriority="high"><div class="wrap">
   <h1>People make the experience.</h1>
   <p class="tm-sub">These are the people you will walk with, eat with, learn from and trust on the mountain. Some of them know these places better than any map.</p>
   <a class="tm-scroll" href="#people">Meet them ↓</a>
@@ -1371,7 +1392,7 @@ ${drafts ? '<div class="tm-staging">Staging preview: the yellow hints are only v
 <section class="tm-know" id="knowledge"><div class="wrap">
   <div class="tm-know-head"><div><p class="tm-kicker rv">Why it matters who your guide is</p><h2 class="tm-h rv">Some knowledge cannot be Googled.</h2>
   <p class="tm-lead rv">Certification tells you someone knows how to manage risk. It does not tell you where the best trail starts after the rain.</p></div>
-  <img class="rv" src="${esc(photo('hidden-kingdom', 2))}" alt="A shared meal on leaves after dark" loading="lazy"></div>
+  <img class="rv" src="${esc(knowP.src)}"${posStyle(knowP)} alt="${esc(knowP.alt)}" loading="lazy"></div>
   <div class="tm-kinds2">
     <div class="rv"><h3>Learned knowledge</h3><p>What our team trains for.</p><ul>${['Mountaineering', 'First aid', 'Outdoor safety', 'Astronomy', 'Leadership'].map((x) => `<li>${x}</li>`).join('')}</ul></div>
     <div class="rv tm-lived"><h3>Lived knowledge</h3><p>What our team grew up with.</p><ul>${['These mountains', 'These villages', 'The weather', 'Farming', 'Local stories', 'Seasonal changes', 'Places that do not appear on Google Maps'].map((x) => `<li>${x}</li>`).join('')}</ul></div>
@@ -1383,7 +1404,7 @@ ${founders.length ? `<section class="tm-founders" id="founders"><div class="wrap
   <div class="tm-cards tm-cards-2">${founders.map(profile).join('')}</div>
 </div></section>` : ''}
 
-<section class="tm-end" id="meet"><img src="${esc(photo('little-feet-sunset-safari', 1))}" alt="" loading="lazy"><div class="wrap">
+<section class="tm-end" id="meet"><img src="${esc(endP.src)}"${posStyle(endP)} alt="" loading="lazy"><div class="wrap">
   <h2>Who will you meet?</h2>
   <p>The next time you come to the mountains with us, you will probably meet someone who knows the place better than we ever could.</p>
   <p class="tm-say">Say hello. Ask questions. Learn something. And maybe teach them something too.</p>
@@ -1391,7 +1412,7 @@ ${founders.length ? `<section class="tm-founders" id="founders"><div class="wrap
 </div></section>
 </div>
 <script>${TEAM_JS}</script>`;
-  return layout({ title: 'Team', desc: 'The people behind Rock & Anchor experiences: local guides, experience leaders, outdoor educators and the people learning to lead.', path: '/team', body, image: photo('winter-trekking', 1), data });
+  return layout({ title: 'Team', desc: 'The people behind Rock & Anchor experiences: local guides, experience leaders, outdoor educators and the people learning to lead.', path: '/team', body, image: heroP.src, data });
 }
 
 const TEAM_JS = `(function(){
