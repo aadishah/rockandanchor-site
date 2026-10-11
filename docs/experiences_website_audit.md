@@ -74,3 +74,17 @@ This easy, gradual trek is perfect for all ages and families. Along
 the way, you'll encounter lush green landscapes, cascading
 waterfalls, and panoramic valley views. Experience the cultural and
 ecological treasures of the region.
+
+## Photos rematched to the text (12 Oct 2026)
+Source: past event albums in the Events table (Photo Album (Post Trip)).
+- The Greatest Show On Earth: kept Milky Way, telescope and stargazing shots; added lake dip with floats (2), sunset over the hills, dinner at the host home, campfire, campsite tents and the bird watching trail. Albums: Nov 2025 and Dec 2025 stargazing events.
+- Ridge & Lake: Chasing Sunsets: 10 new from the Dec 2025 ridge treks (sunset over the lake, ridge walk, trail, group). No dinner or stargazing photos exist in those albums.
+- Little Feet: Sensory: removed 2 video stills, an older-kids group shot and a slip on rock; added toddler and parent trail shots and flower close ups from the Little Feet events. No craft or printing photos exist yet.
+- The Hidden Kingdom: now 2 photos and 8 real videos (night herping walk, torchlight finds, morning waterfall) instead of video stills.
+- Be a Villager: 5 video stills replaced with the real videos (farmer, cattle, grinding, pounding, the group).
+- Young Explorers: added 2 photos and 3 videos from the Aug 2026 school group trek.
+- The Night Sky Experience: removed a camping photo, a handpump photo and a city rooftop photo (not part of this experience). Now 7.
+- Unchanged, already matched: Talking to the Planets, Floating Picnic, Winter Trekking, Little Feet: Sunset Safari (no past albums).
+
+## Video support (staging only, commit 12d56d4, version 2c19ec23)
+Website Photos can now hold videos. The gallery plays them muted in the tiles (small play mark) and with controls in the slideshow. Cards and the home page still use photos only. To add a video from Google Photos, use the album item's base URL with =dv.
