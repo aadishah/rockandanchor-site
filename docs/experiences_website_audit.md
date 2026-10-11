@@ -98,3 +98,6 @@ Fix (staging version 831091af, live untouched):
 - Focus decides which part of the photo stays visible when it is cropped: Center, Top, Upper, Lower, Bottom, Left, Right. Use Top or Upper when heads are cut, Lower or Bottom when feet or faces at the bottom are cut.
 - If a row's Photo is empty, the page falls back to the old experience photo.
 - Every spot was matched to its text and checked on staging. Focus adjusted on: Hidden places (Upper), problem 01 (Top), problem 02 (Upper), Educate (Top), Empower (Upper), Origin (Lower), Impact hero (Lower), Inspire, Earth, Team hero (Upper).
+
+## Pushed to live (12 Oct 2026, 02:15 IST)
+With approval, production now runs version 831091af (previously fc565657). This brings to rockandanchor.in: the deleted-fields fix (the site reads Airtable again instead of the frozen copy), video playback in experience galleries, and the Website Page Photos spots. Checked on rockandanchor.in: Home, About Us, Impact Created, Team and an experience page all load (200), photo spots and videos present, no staging banners. To roll back, deploy fc565657 at 100% from the Cloudflare dashboard.
