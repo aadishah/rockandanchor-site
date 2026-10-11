@@ -115,12 +115,14 @@ async function loadLive(env) {
         categories: (f[EF.categories] || []).map((c) => (typeof c === 'string' ? c : c.name)),
         fromPrice: null,
         datesAhead: f[EF.datesAhead] ?? null,
-        photos: (f[EF.photos] || []).map((p) => ({
-          url: (p.thumbnails && p.thumbnails.full && p.thumbnails.full.url) || p.url,
-          thumb: (p.thumbnails && p.thumbnails.large && p.thumbnails.large.url) || p.url,
+        media: (f[EF.photos] || []).map((p) => ({
+          video: /^video\//.test(p.type || ''),
+          url: /^video\//.test(p.type || '') ? p.url : (p.thumbnails && p.thumbnails.full && p.thumbnails.full.url) || p.url,
+          thumb: (p.thumbnails && p.thumbnails.large && p.thumbnails.large.url) || (/^video\//.test(p.type || '') ? '' : p.url),
         })),
       };
     });
+  experiences.forEach((x) => { x.photos = x.media.filter((m) => !m.video); });
   const events = evs
     .filter((r) => {
       const f = r.fields;
@@ -416,8 +418,8 @@ section{padding:64px 0}section.tight{padding:48px 0}section.first{padding-top:44
 .page-head .lead{margin-top:10px}
 .exp-hero{display:grid;grid-template-columns:1.25fr 1fr;gap:12px;margin-top:6px;height:min(520px,46vw)}
 .exp-hero.one{grid-template-columns:1fr}
-.exp-hero .tile{position:relative;display:block;border-radius:var(--r);overflow:hidden;background:#d8d0c3;min-height:0;cursor:zoom-in}.exp-hero .tile img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}.exp-hero .tile:hover img{transform:scale(1.03)}.exp-hero .more{position:absolute;inset:0;display:grid;place-items:center;background:rgba(12,16,22,.5);color:#fff;font:800 clamp(30px,3.4vw,44px)/1 "Big Shoulders Display","Arial Narrow",sans-serif;letter-spacing:.02em}
-.lb{position:fixed;inset:0;z-index:100;background:rgba(10,12,16,.97);display:flex;align-items:center;justify-content:center}.lb[hidden]{display:none}.lb figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:12px;max-width:min(92vw,1400px)}.lb img{max-width:100%;max-height:82vh;object-fit:contain;border-radius:8px}.lb figcaption{color:#cfc8bd;font-size:14px;letter-spacing:.08em}.lb button{background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:999px;cursor:pointer;display:grid;place-items:center}.lb button:hover{background:rgba(255,255,255,.25)}.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:52px;height:52px;font-size:34px;line-height:1}.lb-prev{left:18px}.lb-next{right:18px}.lb-x{position:absolute;top:16px;right:16px;width:44px;height:44px;font-size:28px}.lb button[hidden]{display:none}
+.exp-hero .tile{position:relative;display:block;border-radius:var(--r);overflow:hidden;background:#d8d0c3;min-height:0;cursor:zoom-in}.exp-hero .tile img,.exp-hero .tile video{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}.exp-hero .vid::after{content:"";position:absolute;right:10px;bottom:10px;border-style:solid;border-width:7px 0 7px 12px;border-color:transparent transparent transparent #fff;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}.exp-hero .tile:hover img{transform:scale(1.03)}.exp-hero .more{position:absolute;inset:0;display:grid;place-items:center;background:rgba(12,16,22,.5);color:#fff;font:800 clamp(30px,3.4vw,44px)/1 "Big Shoulders Display","Arial Narrow",sans-serif;letter-spacing:.02em}
+.lb{position:fixed;inset:0;z-index:100;background:rgba(10,12,16,.97);display:flex;align-items:center;justify-content:center}.lb[hidden]{display:none}.lb figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:12px;max-width:min(92vw,1400px)}.lb img,.lb video{max-width:100%;max-height:82vh;object-fit:contain;border-radius:8px}.lb img[hidden],.lb video[hidden]{display:none}.lb figcaption{color:#cfc8bd;font-size:14px;letter-spacing:.08em}.lb button{background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:999px;cursor:pointer;display:grid;place-items:center}.lb button:hover{background:rgba(255,255,255,.25)}.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:52px;height:52px;font-size:34px;line-height:1}.lb-prev{left:18px}.lb-next{right:18px}.lb-x{position:absolute;top:16px;right:16px;width:44px;height:44px;font-size:28px}.lb button[hidden]{display:none}
 .exp-hero .side{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;min-height:0}
 .exp-hero .side .tile:only-child{grid-column:span 2;grid-row:span 2}
 .exp-hero .side .tile:first-child:nth-last-child(2),.exp-hero .side .tile:first-child:nth-last-child(2)~.tile{grid-column:span 2}
@@ -569,15 +571,15 @@ function galleryHtml(e, ph) {
   if (!ph.length) return '';
   const SHOW = 5;
   const extra = ph.length - SHOW;
-  const tile = (p, i, cls, big) => `<a class="tile${cls}" href="${esc(p.url)}" data-i="${i}" aria-label="Open photo ${i + 1} of ${ph.length}"><img src="${esc(big ? p.url : p.thumb)}" alt="${esc(e.title)}"${i ? ' loading="lazy"' : ' fetchpriority="high"'}>${i === SHOW - 1 && extra > 0 ? `<span class="more">+${extra}</span>` : ''}</a>`;
+  const tile = (p, i, cls, big) => `<a class="tile${cls}${p.video ? ' vid' : ''}" href="${esc(p.url)}" data-i="${i}" aria-label="Open ${p.video ? 'video' : 'photo'} ${i + 1} of ${ph.length}">${p.video ? `<video src="${esc(p.url)}"${p.thumb ? ` poster="${esc(p.thumb)}"` : ''} muted loop playsinline autoplay preload="metadata"></video>` : `<img src="${esc(big ? p.url : p.thumb)}" alt="${esc(e.title)}"${i ? ' loading="lazy"' : ' fetchpriority="high"'}>`}${i === SHOW - 1 && extra > 0 ? `<span class="more">+${extra}</span>` : ''}</a>`;
   const side = ph.slice(1, SHOW).map((p, k) => tile(p, k + 1, '', false)).join('');
-  const urls = JSON.stringify(ph.map((p) => p.url)).replace(/</g, '\\u003c');
+  const urls = JSON.stringify(ph.map((p) => (p.video ? { v: p.url } : p.url))).replace(/</g, '\\u003c');
   return `<div class="exp-hero${ph.length === 1 ? ' one' : ''}" id="gallery">${tile(ph[0], 0, ' main', true)}${ph.length > 1 ? `<div class="side">${side}</div>` : ''}</div>
-<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Photos"><button class="lb-x" type="button" aria-label="Close">&times;</button><button class="lb-nav lb-prev" type="button" aria-label="Previous photo">&#8249;</button><figure><img alt="${esc(e.title)}"><figcaption></figcaption></figure><button class="lb-nav lb-next" type="button" aria-label="Next photo">&#8250;</button></div>
-<script>(function(){var U=${urls},lb=document.getElementById('lb'),im=lb.querySelector('img'),cap=lb.querySelector('figcaption'),i=0,x0=null;
-function show(n){i=(n+U.length)%U.length;im.src=U[i];cap.textContent=(i+1)+' / '+U.length;[i+1,i-1].forEach(function(k){var p=new Image();p.src=U[(k+U.length)%U.length]})}
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Photos"><button class="lb-x" type="button" aria-label="Close">&times;</button><button class="lb-nav lb-prev" type="button" aria-label="Previous photo">&#8249;</button><figure><img alt="${esc(e.title)}"><video controls playsinline hidden></video><figcaption></figcaption></figure><button class="lb-nav lb-next" type="button" aria-label="Next photo">&#8250;</button></div>
+<script>(function(){var U=${urls},lb=document.getElementById('lb'),im=lb.querySelector('img'),vd=lb.querySelector('video'),cap=lb.querySelector('figcaption'),i=0,x0=null;
+function show(n){i=(n+U.length)%U.length;var u=U[i];vd.pause();if(u&&u.v){im.hidden=true;vd.hidden=false;vd.src=u.v;vd.play().catch(function(){})}else{vd.hidden=true;vd.removeAttribute('src');im.hidden=false;im.src=u}cap.textContent=(i+1)+' / '+U.length;[i+1,i-1].forEach(function(k){var q=U[(k+U.length)%U.length];if(typeof q==='string'){var p=new Image();p.src=q}})}
 function open(n){show(n);lb.hidden=false;document.body.style.overflow='hidden';lb.querySelector('.lb-next').focus()}
-function close(){lb.hidden=true;document.body.style.overflow=''}
+function close(){lb.hidden=true;vd.pause();document.body.style.overflow=''}
 document.querySelectorAll('#gallery .tile').forEach(function(a){a.addEventListener('click',function(ev){ev.preventDefault();open(+a.dataset.i)})});
 lb.querySelector('.lb-prev').onclick=function(){show(i-1)};lb.querySelector('.lb-next').onclick=function(){show(i+1)};lb.querySelector('.lb-x').onclick=close;
 lb.addEventListener('click',function(ev){if(ev.target===lb||ev.target.tagName==='FIGURE')close()});
@@ -642,7 +644,7 @@ ${ctaBlock()}
 
 function experiencePage(data, e) {
   const up = upcoming(data, e);
-  const ph = e.photos || [];
+  const ph = e.media || e.photos || [];
   const ask = (when) => waLink(`Hi Rock & Anchor, I would like to book ${e.title}${when ? ' on ' + when : ''}.`);
   const dateLi = (ev) => { const l = eventLabel(ev); return `<li><span>${esc(l)}</span><a href="${ask(l)}">Ask →</a></li>`; };
   const datesHtml = up.length
