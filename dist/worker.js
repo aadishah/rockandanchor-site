@@ -5,11 +5,11 @@
 const BASE = 'app0sjg0lmpX4ERo1';
 const T = { exp: 'tblG7E0qqHtLi6FWF', ev: 'tblnbaixvh6vsXuj2', rev: 'tblj3xNFQV7dKuine', imp: 'tblpfX3SNtM7qTNNf', team: 'tblBOYVbIlfeBRg4w' };
 const EF = {
-  name: 'fldlKTxLU6u6l2qFm',
+  name: 'fldlKTxLU6u6l2qFm', title: 'fldM3NSq47YsF9tR2',
   show: 'fldPkhXdD91l3gZ8Y', slug: 'fld4JwhapQZdKtBcA', order: 'fld0ZNPcdfO412lmd',
-  summary: 'fld2EwKi6nLfYfVJn', description: 'fldylkcJyzF9uK0Xi', photos: 'fldiamuh0iIFn0Fjs', itinerary: 'fldePmvVNr0Plgo4D',
+  summary: 'fldQm3jgyBV5X1nzK', description: 'fldylkcJyzF9uK0Xi', photos: 'fldiamuh0iIFn0Fjs', itinerary: 'fldePmvVNr0Plgo4D',
   faqs: 'fld89jnU68Zl9q6nM', prices: 'fldLEraHeNPgjjG8T', age: 'fldF1U1n4ks9FSFtP', location: 'fld2m8zyHAoKGlZEi',
-  timing: 'fldlwqH0kyOcnhSm3', categories: 'fldIyJ28XTWNtfRm3', fromPrice: 'fldiOgiemRJAEgWdP', datesAhead: 'fld99ABUSbxPmP0v7',
+  timing: 'fldWvIcsAEx3PJYKN', categories: 'fldIyJ28XTWNtfRm3', datesAhead: 'fld99ABUSbxPmP0v7',
 };
 const VF = { start: 'fldWr96uilLEjfI24', end: 'fldLWXxoeM3Xr7Qkd', exp: 'fldTwb0rZY39trwD4', status: 'fldEueCyQC6zJEEux', hide: 'fldYwt0HrpvixX8gg' };
 const RF = { name: 'fldIgYRm1oIN51m2Z', text: 'fldoiPyv0cAhFNMtJ', exp: 'fldCKUcXdn2vivo5h', show: 'fldwAqYVwcDDwqxLf', photo: 'fldsq62JdBgiw4j8A' };
@@ -55,7 +55,12 @@ async function atList(env, table, fields, formula) {
     fields.forEach((f) => u.searchParams.append('fields[]', f));
     if (formula) u.searchParams.set('filterByFormula', formula);
     if (offset) u.searchParams.set('offset', offset);
-    const r = await fetch(u, { headers: { Authorization: `Bearer ${env.AIRTABLE_TOKEN}` } });
+    let r = await fetch(u, { headers: { Authorization: `Bearer ${env.AIRTABLE_TOKEN}` } });
+    if (r.status === 422 && fields.length) {
+      // A field was deleted or renamed in Airtable. Fetch all fields instead so the site keeps working.
+      u.searchParams.delete('fields[]');
+      r = await fetch(u, { headers: { Authorization: `Bearer ${env.AIRTABLE_TOKEN}` } });
+    }
     if (!r.ok) throw new Error(`Airtable ${table} ${r.status}`);
     const j = await r.json();
     out.push(...j.records);
@@ -96,7 +101,7 @@ async function loadLive(env) {
       const f = r.fields;
       return {
         id: r.id,
-        title: String(f[EF.name]).trim(),
+        title: String(f[EF.title] || f[EF.name]).trim(),
         slug: String(f[EF.slug]).trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-'),
         order: typeof f[EF.order] === 'number' ? f[EF.order] : 999,
         summary: plainText(f[EF.summary]),
@@ -108,7 +113,7 @@ async function loadLive(env) {
         location: f[EF.location] || '',
         timing: f[EF.timing] || '',
         categories: (f[EF.categories] || []).map((c) => (typeof c === 'string' ? c : c.name)),
-        fromPrice: f[EF.fromPrice] ?? null,
+        fromPrice: null,
         datesAhead: f[EF.datesAhead] ?? null,
         photos: (f[EF.photos] || []).map((p) => ({
           url: (p.thumbnails && p.thumbnails.full && p.thumbnails.full.url) || p.url,
