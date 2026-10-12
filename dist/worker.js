@@ -8,7 +8,7 @@ const EF = {
   name: 'fldlKTxLU6u6l2qFm', title: 'fldM3NSq47YsF9tR2',
   show: 'fldPkhXdD91l3gZ8Y', slug: 'fld4JwhapQZdKtBcA', order: 'fld0ZNPcdfO412lmd',
   summary: 'fldQm3jgyBV5X1nzK', description: 'fldylkcJyzF9uK0Xi', photos: 'fldiamuh0iIFn0Fjs', itinerary: 'fldePmvVNr0Plgo4D',
-  faqs: 'fld89jnU68Zl9q6nM', prices: 'fldLEraHeNPgjjG8T', age: 'fldF1U1n4ks9FSFtP', location: 'fld2m8zyHAoKGlZEi',
+  faqs: 'fld89jnU68Zl9q6nM', contact: 'fld56hCJ24gyK8iV0', prices: 'fldLEraHeNPgjjG8T', age: 'fldF1U1n4ks9FSFtP', location: 'fld2m8zyHAoKGlZEi',
   timing: 'fldWvIcsAEx3PJYKN', categories: 'fldIyJ28XTWNtfRm3', datesAhead: 'fld99ABUSbxPmP0v7',
 };
 const VF = { start: 'fldWr96uilLEjfI24', end: 'fldLWXxoeM3Xr7Qkd', exp: 'fldTwb0rZY39trwD4', status: 'fldEueCyQC6zJEEux', hide: 'fldYwt0HrpvixX8gg' };
@@ -129,6 +129,7 @@ async function loadLive(env) {
         categories: (f[EF.categories] || []).map((c) => (typeof c === 'string' ? c : c.name)),
         fromPrice: null,
         datesAhead: f[EF.datesAhead] ?? null,
+        contact: String(f[EF.contact] || '').replace(/\D/g, '').slice(-10),
         media: (f[EF.photos] || []).map((p) => ({
           video: /^video\//.test(p.type || ''),
           url: /^video\//.test(p.type || '') ? p.url : (p.thumbnails && p.thumbnails.full && p.thumbnails.full.url) || p.url,
@@ -230,27 +231,31 @@ function upcoming(data, exp) {
 }
 const waLink = (msg) => `https://wa.me/${SITE.wa}?text=${encodeURIComponent(msg)}`;
 function priceInfo(e) {
-  let min = null, group = false;
+  let min = null, group = false, free = '', minLabel = '';
   for (const raw of String(e.prices || '').split('\n')) {
     const i = raw.indexOf('|');
     if (i < 0) continue;
     const label = raw.slice(0, i).trim(), val = raw.slice(i + 1);
     if (/optional|add.?on|^transport|^travel/i.test(label)) continue;
+    // A line such as "Villagers | Free" is shown as "Free for villagers".
+    if (/^\s*free\b/i.test(val)) { if (!free) free = label; continue; }
     const m = val.match(/(?:₹|rs\.?|inr)\s*([\d,]+)/i);
     if (!m) continue;
     const n = Number(m[1].replace(/,/g, ''));
-    if (n && (min === null || n < min)) { min = n; group = /people|group/i.test(label) && !/per person/i.test(val); }
+    if (n && (min === null || n < min)) { min = n; minLabel = label; group = /people|group/i.test(label) && !/per person/i.test(val); }
   }
   if (min === null && e.fromPrice && !/price on request/i.test(e.prices || '')) min = e.fromPrice;
-  return { min, group };
+  return { min, group, free, minLabel };
 }
-const priceOnRequest = (e) => priceInfo(e).min === null;
+const priceOnRequest = (e) => priceInfo(e).min === null && !priceInfo(e).free;
+const freeFor = (e) => priceInfo(e).free;
+const paidLine = (e) => { const p = priceInfo(e); return p.min === null ? '' : `${p.minLabel ? p.minLabel + ' ' : 'Others '}${rupees(p.min)} ${p.group ? 'per group' : 'per person'}`; };
 const lowest = (e) => priceInfo(e).min;
 const rupees = (n) => '₹' + Number(n).toLocaleString('en-IN');
 // Consistent display values. Airtable stays free text; the site normalises the wording.
 const fmtAge = (a) => String(a || '').trim().replace(/(\d+)\s*(?:to|-|–)\s*(\d+)/g, '$1–$2').replace(/\s*\(([^)]*)\)/, ', $1') || 'Ask us';
 const fmtPlace = (l) => String(l || '').trim().replace(/\s*,\s*within\s+/i, ' · ').replace(/\s*,\s*/, ' · ') || 'Shared on booking';
-const fmtPrice = (e) => (priceOnRequest(e) ? 'On request' : `From ${rupees(lowest(e))}`);
+const fmtPrice = (e) => (freeFor(e) ? `Free for ${freeFor(e).toLowerCase()}` : priceOnRequest(e) ? 'On request' : `From ${rupees(lowest(e))}`);
 const INCLUDED_RE = /^what'?s included|^included|^inclusions/i;
 // Packing lists are private (sent on WhatsApp after booking), so these sections are never shown.
 const PRIVATE_RE = /^what to (bring|carry|pack)|^packing/i;
@@ -542,26 +547,29 @@ body.has-bookbar .float-wa{display:none}body.has-bookbar footer.site{padding-bot
 
 const FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">';
 
-function layout({ title, desc, path, body, image, data }) {
+function layout({ title, desc, path, body, image, data, contact }) {
   const full = title ? `${title} | Rock & Anchor` : 'Rock & Anchor | Authentic outdoor experiences in the Sahyadris';
   const nav = [['/experiences', 'Experiences'], ['/impact', 'Impact Created'], ['/about', 'About Us'], ['/team', 'Team'], ['/contact', 'Contact']];
   const navHtml = nav.map(([h, l]) => `<a href="${h}"${path.startsWith(h) ? ' class="on"' : ''}>${l}</a>`).join('');
   const wa = waLink('Hi Rock & Anchor, I would like to know more about your experiences.');
+  // On an experience with its own contact number, the header, menu and floating WhatsApp buttons use that number.
+  const pwa = contact ? `https://wa.me/${contact.wa}?text=${encodeURIComponent(`Hi Rock & Anchor, I would like to know more about ${title}.`)}` : wa;
+  const pphone = contact ? contact.phone : SITE.phone;
   return `<!doctype html><html lang="en-IN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(full)}</title><meta name="description" content="${esc(desc || '')}">
 <link rel="canonical" href="${SITE.url}${path}"><link rel="icon" type="image/png" href="/favicon.png">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Rock & Anchor"><meta property="og:title" content="${esc(full)}"><meta property="og:description" content="${esc(desc || '')}">${image ? `<meta property="og:image" content="${esc(image)}">` : ''}
 <meta name="theme-color" content="#f6f1e8">${FONTS}<style>${CSS}</style></head><body>
 <header class="site"><div class="wrap"><a class="brand" href="/" aria-label="Rock & Anchor home"><img src="/logo.png" alt="Rock & Anchor" width="56" height="46"></a>
-<nav class="main">${navHtml}<a class="btn btn-wa" href="${wa}">${ICON.wa}WhatsApp us</a></nav>
-<details class="menu"><summary aria-label="Menu"><span></span><span></span><span></span></summary><div class="panel"><a href="/">Home</a>${navHtml}<a class="btn btn-wa" href="${wa}">${ICON.wa}WhatsApp ${SITE.phone}</a></div></details></div></header>
+<nav class="main">${navHtml}<a class="btn btn-wa" href="${pwa}">${ICON.wa}WhatsApp us</a></nav>
+<details class="menu"><summary aria-label="Menu"><span></span><span></span><span></span></summary><div class="panel"><a href="/">Home</a>${navHtml}<a class="btn btn-wa" href="${pwa}">${ICON.wa}WhatsApp ${pphone}</a></div></details></div></header>
 <main>${body}</main>
 <footer class="site"><div class="wrap"><div class="cols">
 <div><img class="logo" src="/logo.png" alt="Rock & Anchor"><p>Curated outdoor experiences in the Sahyadris, led by certified outdoor educators and the villagers who call these mountains home.</p>${socialRow()}</div>
 <div><h4>Explore</h4><a href="/experiences">Experiences</a><a href="/impact">Impact Created</a><a href="/about">About Us</a><a href="/team">Team</a><a href="/contact">Contact</a></div>
 <div><h4>Talk to us</h4><a href="tel:${SITE.tel}">${SITE.phone}</a><a href="${wa}">WhatsApp</a><a href="mailto:${SITE.email}">${SITE.email}</a><a href="https://instagram.com/${SITE.insta}">Instagram @${SITE.insta}</a></div>
 </div><div class="fine">© ${new Date().getFullYear()} Rock & Anchor · <a style="display:inline" href="/terms">Terms</a> · <a style="display:inline" href="/privacy">Privacy</a> · <a style="display:inline" href="/cancellation-and-refunds">Cancellation and refunds</a><br>Bookings are confirmed over call or WhatsApp on ${SITE.phone}.</div></div></footer>
-<a class="float-wa" href="${wa}" aria-label="WhatsApp Rock & Anchor">${ICON.wa}</a>
+<a class="float-wa" href="${pwa}" aria-label="WhatsApp Rock & Anchor">${ICON.wa}</a>
 </body></html>`;
 }
 
@@ -688,7 +696,9 @@ ${ctaBlock()}
 function experiencePage(data, e) {
   const up = upcoming(data, e);
   const ph = e.media || e.photos || [];
-  const ask = (when) => waLink(`Hi Rock & Anchor, I would like to book ${e.title}${when ? ' on ' + when : ''}.`);
+  // An experience can have its own contact number (Website Contact Number in Airtable); otherwise the business number.
+  const c = /^\d{10}$/.test(e.contact || '') ? { wa: '91' + e.contact, tel: '+91' + e.contact, phone: `+91 ${e.contact.slice(0, 5)} ${e.contact.slice(5)}` } : SITE;
+  const ask = (when) => `https://wa.me/${c.wa}?text=${encodeURIComponent(`Hi Rock & Anchor, I would like to book ${e.title}${when ? ' on ' + when : ''}.`)}`;
   const dateLi = (ev) => { const l = eventLabel(ev); return `<li><span>${esc(l)}</span><a href="${ask(l)}">Ask →</a></li>`; };
   const datesHtml = up.length
     ? `<p class="muted" style="font-size:14px;margin:0 0 8px">Upcoming dates</p><ul class="dates">${up.slice(0, 6).map(dateLi).join('')}</ul>${up.length > 6 ? `<details class="dates"><summary>${up.length - 6} more dates</summary><ul class="dates" style="margin-top:8px">${up.slice(6).map(dateLi).join('')}</ul></details>` : ''}`
@@ -705,7 +715,7 @@ function experiencePage(data, e) {
 <p class="eyebrow"><a href="/experiences" style="text-decoration:none">Experiences</a> · ${esc(e.categories.join(' · '))}</p><h1>${esc(e.title)}</h1>
 <p class="lead">${esc(e.summary || firstLine(e))}</p>
 ${galleryHtml(e, ph)}
-<div class="facts">${fact(ICON.people, 'Who is it for', fmtAge(e.age))}${fact(ICON.pin, 'Where', fmtPlace(e.location))}${fact(ICON.clock, 'When', e.timing || 'On request', nextLbl)}${fact(ICON.tag, 'Price', fmtPrice(e), priceOnRequest(e) ? '' : (priceInfo(e).group ? 'per group' : 'per person'))}</div>
+<div class="facts">${fact(ICON.people, 'Who is it for', fmtAge(e.age))}${fact(ICON.pin, 'Where', fmtPlace(e.location))}${fact(ICON.clock, 'When', e.timing || 'On request', nextLbl)}${fact(ICON.tag, 'Price', fmtPrice(e), freeFor(e) ? paidLine(e) : priceOnRequest(e) ? '' : (priceInfo(e).group ? 'per group' : 'per person'))}</div>
 <nav class="toc"><a href="#about">About</a><a href="#included">Included</a><a href="#plan">Itinerary</a><a href="#pricing">Price</a><a href="#faqs">FAQs</a><a href="#how">How to book</a></nav>
 <div class="exp-layout"><div class="content">
 ${block('about', 'What is it?', aboutHtml || fallback('Message us and we will tell you all about it.'))}
@@ -713,16 +723,16 @@ ${block('included', "What's included", sec.included ? md(sec.included.lines.join
 ${block('plan', 'Itinerary', e.itinerary ? itineraryHtml(e.itinerary) : fallback('The detailed plan is shared when you book.'))}
 ${block('pricing', 'Price', priceOnRequest(e) ? fallback('Price depends on your group size and date. Message us for a quote.') + pricesHtml(String(e.prices || '').split('\n').filter((l) => !/price on request/i.test(l)).join('\n')) : pricesHtml(e.prices))}
 ${block('faqs', 'FAQs', e.faqs ? faqsHtml(e.faqs) : fallback('Have a question? WhatsApp us and a real person will answer.'))}
-${block('how', 'How to book', `<ol class="steps">${steps.map((t) => `<li>${t}</li>`).join('')}</ol><div class="row"><a class="btn btn-wa" href="${ask('')}">${ICON.wa}Book on WhatsApp</a><a class="btn btn-ghost" href="tel:${SITE.tel}">${ICON.phone}Call ${SITE.phone}</a></div>`)}
+${block('how', 'How to book', `<ol class="steps">${steps.map((t) => `<li>${t}</li>`).join('')}</ol><div class="row"><a class="btn btn-wa" href="${ask('')}">${ICON.wa}Book on WhatsApp</a><a class="btn btn-ghost" href="tel:${c.tel}">${ICON.phone}Call ${c.phone}</a></div>`)}
 </div>
-<aside class="side-card" id="book"><h3>${esc(e.title)}</h3><div class="from">${priceOnRequest(e) ? 'Price on request' : `From <b>${rupees(lowest(e))}</b> ${priceInfo(e).group ? 'per group' : 'per person'}`}</div>
+<aside class="side-card" id="book"><h3>${esc(e.title)}</h3><div class="from">${freeFor(e) ? `<b>Free</b> for ${esc(freeFor(e).toLowerCase())}${paidLine(e) ? `<br><small>${esc(paidLine(e))}</small>` : ''}` : priceOnRequest(e) ? 'Price on request' : `From <b>${rupees(lowest(e))}</b> ${priceInfo(e).group ? 'per group' : 'per person'}`}</div>
 ${datesHtml}
-<a class="btn btn-wa" href="${ask('')}">${ICON.wa}Book on WhatsApp</a><a class="btn btn-ghost" href="tel:${SITE.tel}">${ICON.phone}Call ${SITE.phone}</a>
+<a class="btn btn-wa" href="${ask('')}">${ICON.wa}Book on WhatsApp</a><a class="btn btn-ghost" href="tel:${c.tel}">${ICON.phone}Call ${c.phone}</a>
 <p class="small">No online payment. We confirm your spot over call or WhatsApp.</p></aside></div></div></section>
 ${revs.length ? `<section><div class="wrap"><h2>What people say</h2>${reviewsBlock(revs)}</div></section>` : ''}
 <div class="bookbar"><a href="#book" style="text-decoration:none"><small>${up.length ? 'Next date' : 'Dates'}</small><b>${up.length ? esc(dayStr(up[0].start)) : 'On request'}</b> <span style="color:var(--clay);font-size:13px;font-weight:700">${up.length > 1 ? 'All dates ↓' : ''}</span></a><a class="btn btn-wa" href="${ask('')}">${ICON.wa}Book</a></div>
 <script>document.body.classList.add('has-bookbar')</script>`;
-  return layout({ title: e.title, desc: shortText(e.summary || firstLine(e)), path: `/experiences/${e.slug}`, body, image: cover(e, true), data });
+  return layout({ title: e.title, desc: shortText(e.summary || firstLine(e)), path: `/experiences/${e.slug}`, body, image: cover(e, true), data, contact: c === SITE ? null : c });
 }
 
 // ---------- About page: an interactive manifesto ----------
