@@ -108,4 +108,19 @@ Changes in code (commit below, file worker-staging21.js in website-2026):
 - Data: the saved copy is served instantly; when older than 5 minutes it refreshes in the background. Visitors only wait if the copy is over 1 hour old. All Airtable tables now load at the same time instead of in three rounds (tested: cold load 1 round, stale load 3 ms).
 - Gallery videos: no autoplay. Tiles show the first frame; the video downloads only when opened.
 - Page photos: cards and tiles use Airtable's 512 px version; only banners (hero, earth, end) use the full size. Earth image now loads lazily.
-Status: upload to staging was blocked by a permission check on the Cloudflare dashboard. Needs the user to allow it.
+Status: on staging as version 3a684ac8 (staging26). Live still 831091af until approved.
+
+### Found while testing
+- The real cause of the 8 second wait was the Events table: the date filter named a field "Start" that no longer exists under that name, so Airtable rejected it and the site downloaded every event ever, with all fields (8.1 s). The site now asks for events newest first by field ID and stops at 2 days ago: 2.4 s, same 150 dates, and renaming a field can no longer break it.
+- Impact Created project cards loaded original photos (9.8 MB and 10.9 MB). Now 512 px versions: page went from 21.8 MB to 2.5 MB.
+- Gallery video tiles: browsers could not show a first frame from these large iPhone videos, so tiles are now a dark card with a play button. Nothing downloads until someone taps.
+- Most gallery videos are iPhone .mov files of 5 to 82 MB (Hidden Kingdom: 82, 53, 40, 30 MB). Even when tapped they take a long time to start on mobile data. Recommended: re-export as compressed MP4 (720p, under about 10 MB) before adding to Website Photos.
+- Staging only: /__timing shows how long each Airtable table took on the last refresh.
+
+### Measured on staging after the fixes
+| Page | Before | After |
+|---|---|---|
+| Wait for data (cold) | 8.6 s every 5 min | never for visitors; background refresh 2.4 s |
+| About Us photos | 13.5 MB | 4.9 MB |
+| Impact Created photos | 21.8 MB | 2.5 MB |
+| Hidden Kingdom gallery | 129 MB of autoplay video | 0 MB until tapped |

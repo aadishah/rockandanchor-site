@@ -48,27 +48,34 @@ const LOGO = 'iVBORw0KGgoAAAANSUhEUgAAAPAAAADJCAMAAAAq/k/FAAAASFBMVEUoHhAAAAAqIB
 const FAVICON = 'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAASFBMVEUAAAAoHhArIBEnHQ8nHQ8nHQ8nHQ8nHQ8nHQ8pGhA9AAAnJAodHRE5OQBVAAAnIA8qIBAAPwAsIBFVVQAAAAAAAAAAAAAAAAC0FRqkAAAAGHRSTlMA+v7OLlCvjm8TBA8KBAMrVgTZAwAAAADeOaORAAAE7ElEQVR42uVX25bcKAwEdAGMPZ3s/v+/bkkC231JcmZf45POYBuVhFQqcEp/3bWtwdd3rL627f/4wvXiZjD/YARxMFF79M+uXp2NziytKkxazrlI2olskDNf63pd0OjdrKqqzc0FV56Xcp3jQs++zJMZ3a0uu49XhDCkilTSy+j3VtdVmhVlS7ackv9k9QE2ABL/3sZ+WFKk8OV9NYD6/JDmP7NTQVq06Di0cJLyGYDenhOjBmqv/SJKSXM/6juA2nuddw1mvSNOCoIQnO61bZhgYeLB+xrJJ040CX8Vmem1Dgw4caEDxiM1mqkqvwbAekQ2rBQAGTYCSAwSU+5JahKfVvc5iGtcS7AV54KpNqD8cKQdFnCKpy01L0diSXqF0T3mMyHqUautXzBwpOKEm2ZFN2SkXQA7AGQR2wBgl+egZ53rs5vhQ4C3J4DxDFAxdSyAOQjC/WurcYsuNwBM266c7Kn9g+6whVkp4HIBIL9bLBVrAPKdy8diMnFaxDYAD78vqwRlmfN4u60A0McZwRQCz1nzlJ4AXu5tJgFILHcur15qBxTBiyIoodPXkKzDyUXHm4kxp3a+uHwBWLFo2K2VIgcV0UBarRnYlMx5gDnp1CSFlvUFYJVj/IKBSKkDWHGCy2ZGTo9+cRlpO65mGLmlQUjtsEwalwGwbRU3LXtwGcYEDaM7EW7dlKtVDpnJ5QFf8tVJhxlvRmwr6hTik809nYLgpUegzduq9uByNLzd0N6RfBJIDOmTrE40TP/SvEUCo7GxIog1sg+lPkv/LLx3AA0u27oFkuRSR6fCTzHwltS6EF1FVk3I9C8rrZwsWS1TVqGrzEaGhwfohHwCuNmF4fRfG3pryEygeL3HHrW0xF3NdQGRQlOVV2s0zPP6m0SS37RoTwdYch2xN0Tpr8k2O2tC2ZqTp6YRomEAFOX3QsmZQ4tlGJWq88XqB2OjkwJR02EE1fNtmcL+ODWRndDRi5QPlziTBnZxcqfWIqi3Na/lzvuMTx6NSCtfzdx8f3GH5FvDbA+FsITKbmkqjK0bVtYI+BPerZktyuGhA9F3OJMeiGmnxeWxKPET6XAA9khlphehsWeT/SFP6ZnF4wVgKoDh3C/ZSydl7T5eLPY+4dyw6/Ay47Md8bqjyAgYI/F9RdYUFmsnSVFPPKm6WkBOAOTMYqR0VPQdHNSZXuoRutdfA0BmFYJJAQX3vmqkCua+r/QVZVsAXg5PxDwv+JIdAFJHvq12jw+lJmNr8fTGjnsSyABk8gf0CkYgpiAfMhQ643WvEuWwrdepOOIAgNp0ihwfURCE0sTY8YhW8XOFlodLY+y4Jle1OxXdGccRwY4ELkezWL6/mnQ7ccTV0Lms0c+7VQrea6trQ+Ipr3YOtth2J3QrYNSP7p3kDlEhO3TRlJelahPACetNqtthPmLdrrmQqpqVLk17ukw2Y9ud22JQhEfzsyHOvVMpfnEQpbmhBsUK5IRavZ00PU69zpBvJz1Z5yxdOvvpTJtvOwFdfwFffd+NY4RXtZ3z9VRKXecwmmJrgbWHybvE18LtyKBLwsnm2wNocpmaqYqvgYajfZPWt9sHC7/GG2u3/4p0pWrle3z4bDrWoMX8ONRlQtFak4GfML5d3r6j3r+LEuMUQYQdS/oAe/aXL6mvb37luSt39N3vye1If+P1H1MeJU+/KY/kAAAAAElFTkSuQmCC';
 
 // ---------- data ----------
-async function atList(env, table, fields, formula) {
+let FALLBACKS = [];
+// opts: { sortDesc: fieldId, keep: (record) => bool } reads newest first and stops at the first record keep() rejects.
+// It uses field IDs only, so renaming a field in Airtable cannot break it.
+async function atList(env, table, fields, opts = {}) {
   const out = [];
-  let offset;
+  let offset, done = false;
   do {
     const u = new URL(`https://api.airtable.com/v0/${BASE}/${table}`);
     u.searchParams.set('returnFieldsByFieldId', 'true');
     u.searchParams.set('pageSize', '100');
     fields.forEach((f) => u.searchParams.append('fields[]', f));
-    if (formula) u.searchParams.set('filterByFormula', formula);
+    if (opts.sortDesc) { u.searchParams.set('sort[0][field]', opts.sortDesc); u.searchParams.set('sort[0][direction]', 'desc'); }
     if (offset) u.searchParams.set('offset', offset);
     let r = await fetch(u, { headers: { Authorization: `Bearer ${env.AIRTABLE_TOKEN}` } });
     if (r.status === 422 && fields.length) {
       // A field was deleted or renamed in Airtable. Fetch all fields instead so the site keeps working.
+      FALLBACKS.push(table);
       u.searchParams.delete('fields[]');
       r = await fetch(u, { headers: { Authorization: `Bearer ${env.AIRTABLE_TOKEN}` } });
     }
     if (!r.ok) throw new Error(`Airtable ${table} ${r.status}`);
     const j = await r.json();
-    out.push(...j.records);
+    for (const rec of j.records) {
+      if (opts.keep && !opts.keep(rec)) { done = true; break; }
+      out.push(rec);
+    }
     offset = j.offset;
-  } while (offset && out.length < 3000);
+  } while (offset && !done && out.length < 3000);
   return out;
 }
 
@@ -81,7 +88,7 @@ async function loadEvidence(env) {
   const o = (v) => (typeof v === 'number' ? v : 999);
   const by = (a, b) => a.order - b.order;
   return {
-    projects: pj.filter((r) => r.fields[PJ.title]).map((r) => { const f = r.fields; return { title: f[PJ.title], live: !!f[PJ.show], order: o(f[PJ.order]), category: selName(f[PJ.category]), year: f[PJ.year] || null, area: f[PJ.area] || '', saw: f[PJ.saw] || '', did: f[PJ.did] || '', who: f[PJ.who] || '', changed: f[PJ.changed] || '', next: f[PJ.next] || '', status: selName(f[PJ.status]), photo: attUrl(f[PJ.photo], true) }; }).sort(by),
+    projects: pj.filter((r) => r.fields[PJ.title]).map((r) => { const f = r.fields; return { title: f[PJ.title], live: !!f[PJ.show], order: o(f[PJ.order]), category: selName(f[PJ.category]), year: f[PJ.year] || null, area: f[PJ.area] || '', saw: f[PJ.saw] || '', did: f[PJ.did] || '', who: f[PJ.who] || '', changed: f[PJ.changed] || '', next: f[PJ.next] || '', status: selName(f[PJ.status]), photo: attUrl(f[PJ.photo], false) }; }).sort(by),
   };
 }
 
@@ -90,14 +97,17 @@ const plainText = (t) => String(t || '').replace(/^\s*#+\s*/gm, '').replace(/^\s
 const shortText = (t, n = 160) => (t.length <= n ? t : t.slice(0, t.lastIndexOf(' ', n)).replace(/[,.;:]$/, '') + '…');
 
 async function loadLive(env) {
+  const timing = {}; FALLBACKS = [];
+  const tm = (name, p) => { const t = Date.now(); return p.finally(() => { timing[name] = Date.now() - t; }); };
   const [exps, evs, revs, imps, tms, pps, ev] = await Promise.all([
-    atList(env, T.exp, Object.values(EF)),
-    atList(env, T.ev, Object.values(VF), "IS_AFTER({Start}, DATEADD(NOW(), -2, 'days'))").catch(() => atList(env, T.ev, Object.values(VF))),
-    atList(env, T.rev, Object.values(RF)).catch(() => null),
-    atList(env, T.imp, Object.values(IF)).catch(() => null),
-    atList(env, T.team, Object.values(TF)).catch(() => []),
-    atList(env, PP.table, [PP.slot, PP.photo, PP.alt, PP.focus]).catch(() => null),
-    loadEvidence(env),
+    tm('experiences', atList(env, T.exp, Object.values(EF))),
+    tm('events', atList(env, T.ev, Object.values(VF), { sortDesc: VF.start, keep: (r) => Date.parse(r.fields[VF.start] || 0) > Date.now() - 2 * 86400000 })
+      .catch((e) => { timing.eventsSortError = e.message; return atList(env, T.ev, Object.values(VF)); })),
+    tm('reviews', atList(env, T.rev, Object.values(RF)).catch(() => null)),
+    tm('impact', atList(env, T.imp, Object.values(IF)).catch(() => null)),
+    tm('team', atList(env, T.team, Object.values(TF)).catch(() => [])),
+    tm('pagePhotos', atList(env, PP.table, [PP.slot, PP.photo, PP.alt, PP.focus]).catch(() => null)),
+    tm('projects', loadEvidence(env)),
   ]);
   const experiences = exps
     .filter((r) => r.fields[EF.show] && String(r.fields[EF.slug] || '').trim() && r.fields[EF.name])
@@ -156,11 +166,12 @@ async function loadLive(env) {
     .filter((r) => r.fields[PP.slot] && (r.fields[PP.photo] || []).length)
     .map((r) => { const f = r.fields, a = f[PP.photo][0], t = a.thumbnails || {};
       return [String(f[PP.slot]).trim(), { url: (t.full && t.full.url) || a.url, thumb: (t.large && t.large.url) || a.url, alt: f[PP.alt] || '', pos: FOCUS[selName(f[PP.focus])] || '' }]; }));
-  return { experiences, events, reviews, impact, team, evidence: ev, slots, source: 'live' };
+  return { experiences, events, reviews, impact, team, evidence: ev, slots, timing: { ...timing, fieldFallbacks: FALLBACKS.slice() }, source: 'live' };
 }
 
 let MEMO = null;
 let REFRESHING = null;
+let LAST_ERR = '';
 // Visitors never wait for Airtable once a copy exists. A copy younger than CACHE_SECONDS is served as is.
 // An older copy (up to STALE_SECONDS) is served instantly while a fresh one loads in the background.
 // Only a copy older than STALE_SECONDS (Airtable photo links expire) or no copy at all makes the visitor wait.
@@ -173,7 +184,7 @@ function refreshData(env, ctx) {
       MEMO = { t, d };
       await caches.default.put(new Request(DATA_KEY), new Response(JSON.stringify({ t, d }), { headers: { 'Cache-Control': `max-age=${STALE_SECONDS}`, 'Content-Type': 'application/json' } }));
       return d;
-    }).finally(() => { REFRESHING = null; });
+    }).catch((e) => { LAST_ERR = new Date().toISOString() + ' ' + e.message; throw e; }).finally(() => { REFRESHING = null; });
   }
   if (ctx) ctx.waitUntil(REFRESHING.catch((e) => console.log('refresh failed', e.message)));
   return REFRESHING;
@@ -439,7 +450,7 @@ section{padding:64px 0}section.tight{padding:48px 0}section.first{padding-top:44
 .page-head .lead{margin-top:10px}
 .exp-hero{display:grid;grid-template-columns:1.25fr 1fr;gap:12px;margin-top:6px;height:min(520px,46vw)}
 .exp-hero.one{grid-template-columns:1fr}
-.exp-hero .tile{position:relative;display:block;border-radius:var(--r);overflow:hidden;background:#d8d0c3;min-height:0;cursor:zoom-in}.exp-hero .tile img,.exp-hero .tile video{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}.exp-hero .vid::after{content:"";position:absolute;right:10px;bottom:10px;border-style:solid;border-width:7px 0 7px 12px;border-color:transparent transparent transparent #fff;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}.exp-hero .tile:hover img{transform:scale(1.03)}.exp-hero .more{position:absolute;inset:0;display:grid;place-items:center;background:rgba(12,16,22,.5);color:#fff;font:800 clamp(30px,3.4vw,44px)/1 "Big Shoulders Display","Arial Narrow",sans-serif;letter-spacing:.02em}
+.exp-hero .tile{position:relative;display:block;border-radius:var(--r);overflow:hidden;background:#d8d0c3;min-height:0;cursor:zoom-in}.exp-hero .tile img,.exp-hero .tile video{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}.exp-hero .vtile{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(140deg,#2b3a31,#121a16) center/cover;color:#fff;font-size:13px;letter-spacing:.06em}.exp-hero .vplay{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.16);border:1.5px solid rgba(255,255,255,.7);position:relative;transition:transform .25s}.exp-hero .vplay::after{content:"";position:absolute;left:22px;top:17px;border-style:solid;border-width:11px 0 11px 17px;border-color:transparent transparent transparent #fff}.exp-hero .tile:hover .vplay{transform:scale(1.08)}.exp-hero .tile:has(.more) .vplay,.exp-hero .tile:has(.more) .vlab{display:none}.exp-hero .tile:hover img{transform:scale(1.03)}.exp-hero .more{position:absolute;inset:0;display:grid;place-items:center;background:rgba(12,16,22,.5);color:#fff;font:800 clamp(30px,3.4vw,44px)/1 "Big Shoulders Display","Arial Narrow",sans-serif;letter-spacing:.02em}
 .lb{position:fixed;inset:0;z-index:100;background:rgba(10,12,16,.97);display:flex;align-items:center;justify-content:center}.lb[hidden]{display:none}.lb figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:12px;max-width:min(92vw,1400px)}.lb img,.lb video{max-width:100%;max-height:82vh;object-fit:contain;border-radius:8px}.lb img[hidden],.lb video[hidden]{display:none}.lb figcaption{color:#cfc8bd;font-size:14px;letter-spacing:.08em}.lb button{background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:999px;cursor:pointer;display:grid;place-items:center}.lb button:hover{background:rgba(255,255,255,.25)}.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:52px;height:52px;font-size:34px;line-height:1}.lb-prev{left:18px}.lb-next{right:18px}.lb-x{position:absolute;top:16px;right:16px;width:44px;height:44px;font-size:28px}.lb button[hidden]{display:none}
 .exp-hero .side{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;min-height:0}
 .exp-hero .side .tile:only-child{grid-column:span 2;grid-row:span 2}
@@ -592,7 +603,7 @@ function galleryHtml(e, ph) {
   if (!ph.length) return '';
   const SHOW = 5;
   const extra = ph.length - SHOW;
-  const tile = (p, i, cls, big) => `<a class="tile${cls}${p.video ? ' vid' : ''}" href="${esc(p.url)}" data-i="${i}" aria-label="Open ${p.video ? 'video' : 'photo'} ${i + 1} of ${ph.length}">${p.video ? `<video src="${esc(p.url)}#t=0.1"${p.thumb ? ` poster="${esc(p.thumb)}"` : ''} muted playsinline preload="metadata"></video>` : `<img src="${esc(big ? p.url : p.thumb)}" alt="${esc(e.title)}"${i ? ' loading="lazy"' : ' fetchpriority="high"'}>`}${i === SHOW - 1 && extra > 0 ? `<span class="more">+${extra}</span>` : ''}</a>`;
+  const tile = (p, i, cls, big) => `<a class="tile${cls}${p.video ? ' vid' : ''}" href="${esc(p.url)}" data-i="${i}" aria-label="Open ${p.video ? 'video' : 'photo'} ${i + 1} of ${ph.length}">${p.video ? `<span class="vtile"${p.thumb ? ` style="background-image:url('${esc(p.thumb)}')"` : ''}><span class="vplay"></span><span class="vlab">Play video</span></span>` : `<img src="${esc(big ? p.url : p.thumb)}" alt="${esc(e.title)}"${i ? ' loading="lazy"' : ' fetchpriority="high"'}>`}${i === SHOW - 1 && extra > 0 ? `<span class="more">+${extra}</span>` : ''}</a>`;
   const side = ph.slice(1, SHOW).map((p, k) => tile(p, k + 1, '', false)).join('');
   const urls = JSON.stringify(ph.map((p) => (p.video ? { v: p.url } : p.url))).replace(/</g, '\\u003c');
   return `<div class="exp-hero${ph.length === 1 ? ' one' : ''}" id="gallery">${tile(ph[0], 0, ' main', true)}${ph.length > 1 ? `<div class="side">${side}</div>` : ''}</div>
@@ -1590,6 +1601,7 @@ async function handle(request, env, ctx) {
       return html(notFound(data), 404);
     }
     if (path === '/about') return html(aboutPage(data));
+    if (path === '/__timing' && url.hostname.startsWith('staging-')) return new Response(JSON.stringify({ ageSeconds: MEMO ? Math.round((Date.now() - MEMO.t) / 1000) : null, refreshing: !!REFRESHING, lastError: LAST_ERR, timing: data.timing, events: (data.events || []).length }), { headers: { 'content-type': 'application/json' } });
     if (path === '/team') return html(teamPage(data, { drafts: url.hostname.startsWith('staging-') }), 200, data.source);
     if (path === '/impact') return html(impactPage(data, { drafts: url.hostname.startsWith('staging-') }), 200, data.source);
     if (path === '/contact') return html(contactPage(data));
