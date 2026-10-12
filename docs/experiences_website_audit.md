@@ -136,3 +136,12 @@ Kept as they were because they read well: the Home banner (Come outside. / Find 
 
 ## Pushed to live (12 Oct 2026, 17:50 IST)
 With approval, production now runs version 88b61b20 (staging32), previously 831091af. Live now has: speed fixes (background data refresh, events read by field ID, video play tiles, smaller photos), general Terms and Conditions, balanced headings, "Free for villagers" price lines and the per experience contact number (Guide Training uses 9167954430). Checked on rockandanchor.in: 9 main pages return 200 in about 0.2 s, new terms showing, no autoplaying videos, Guide Training shows the personal number and Free for villagers, no staging banners, /__timing returns 404 on live. Rollback: deploy 831091af at 100% in Cloudflare.
+
+## 25% figure removed (12 Oct 2026, staging34)
+The share of profit supports more than schools, so the site no longer gives a number. Changes:
+- About Us, Educate card: "A share of every booking goes back into the mountain villages we work in, including their schools."
+- About Us, "This is why we support village schools": same idea.
+- Impact Created stat card: "Every booking / Gives back to the villages we work in: their schools and community projects".
+- Impact Created, Follow the money step 05: "A share goes back to the villages".
+- Impact modals: "What your bookings have funded" and "A share of every booking goes back into the mountain villages we work in: their schools, community projects and local livelihoods."
+Not changed: the 25% rescheduling fee and cancellation retention figures in the Cancellation and Refunds policy (those are fees, not the profit share).

@@ -775,7 +775,7 @@ function aboutPage(data) {
   ];
   const model = [
     ['Educate', 'We use the outdoors as a classroom.', S('about.model.educate', ph('young-explorers-winter-school', 2, true)), 'A child learning with a facilitator',
-      `<p>Participants learn about:</p><ul class="ab-list"><li>Nature</li><li>Local ecosystems</li><li>Survival and life skills</li><li>Sustainability</li><li>Local culture</li></ul><p>And we support learning in the communities around us. 25% of Net Profit funds schools in the mountain villages we work in.</p>`],
+      `<p>Participants learn about:</p><ul class="ab-list"><li>Nature</li><li>Local ecosystems</li><li>Survival and life skills</li><li>Sustainability</li><li>Local culture</li></ul><p>And we support learning in the communities around us. A share of every booking goes back into the mountain villages we work in, including their schools.</p>`],
     ['Employ', 'We create meaningful opportunities for people from the villages where we operate.', S('about.model.employ', ph('hidden-kingdom', 2, true)), 'A shared meal served on leaves',
       `<p>Not simply as labour. As:</p><ul class="ab-list"><li>Guides</li><li>Facilitators</li><li>Hosts</li><li>Cooks</li><li>Leaders</li><li>Specialists</li></ul>`],
     ['Empower', 'Skills become confidence. Confidence becomes leadership. Leadership creates possibilities for others.', S('about.model.empower', ph('be-a-villager', 1, true)), 'A facilitator sitting in a circle with village children',
@@ -794,7 +794,7 @@ function aboutPage(data) {
     ['This is why we work with villages.', 'Villages hold knowledge, food, stories and ways of living that are quietly disappearing. When a village hosts an experience, the value stays in the village.', S('about.ground.villages', ph('little-feet-sunset-safari', 2, true)), 'Guests with their village hosts'],
     ['This is why we care about nature.', 'You cannot care for a place you have never felt. We bring people close to the natural world, and leave it as we found it.', S('about.ground.nature', ph('monsoon-village-1-day', 0, true)), 'A monsoon waterfall in the Sahyadris'],
     ['This is why we employ locally.', 'The people who live here know these mountains better than anyone. Meaningful work close to home means young people do not have to leave to find it.', S('about.ground.employ', ph('young-explorers-winter-school', 1, true)), 'A local guide leading a group'],
-    ['This is why we support village schools.', 'A community that learns can build its own future. 25% of Net Profit goes to schools in the villages we work in.', S('about.ground.schools', ph('be-a-villager', 3, true)), 'Village school children'],
+    ['This is why we support village schools.', 'A community that learns can build its own future. A share of every booking goes back into the villages we work in, including their schools.', S('about.ground.schools', ph('be-a-villager', 3, true)), 'Village school children'],
     ['This is why experiences matter.', 'People learn by touching, building, getting wet and asking questions. A day outside teaches what a classroom or a screen cannot.', S('about.ground.experiences', ph('little-feet-sensory', 2, true)), 'Children playing in a stream'],
   ];
   const roles = [
@@ -1168,7 +1168,7 @@ function impactPage(data, opts = {}) {
   const has = { Projects: projects.length, Money: 1 };
   const nums = (data.impact || []).map((m, i) => ({ ...m, i, link: has[m.opens] ? m.opens : '' }));
   const numCard = (m) => `<${m.link ? 'button type="button"' : 'div'} class="im-num${m.link ? ' im-click' : ''}"${m.link ? ` data-open="${m.link}"` : ''}><b>${esc(m.value)}</b><span>${esc(m.metric)}</span>${m.link ? `<em>See the evidence →</em>` : ''}</${m.link ? 'button' : 'div'}>`;
-  const schoolsCard = `<button type="button" class="im-num im-click im-accent" data-open="${projects.some((x) => x.category === 'Education') ? 'Education' : 'Money'}"><b>25%</b><span>Of Net Profit goes to village schools</span><em>See what it funded →</em></button>`;
+  const schoolsCard = `<button type="button" class="im-num im-click im-accent" data-open="${projects.some((x) => x.category === 'Education') ? 'Education' : 'Money'}"><b class="im-words">Every booking</b><span>Gives back to the villages we work in: their schools and community projects</span><em>See what it funded →</em></button>`;
 
   // 3. Follow the money.
   const steps = [
@@ -1176,7 +1176,7 @@ function impactPage(data, opts = {}) {
     ['Experience delivery', ''],
     ['Local people are paid', 'Local people are paid'],
     ['Village businesses participate', 'Village businesses participate'],
-    ['25% of Net Profit supports village schools', 'Village schools'],
+    ['A share goes back to the villages', 'Village schools'],
     ['Skills, infrastructure and opportunity', 'Skills, infrastructure and opportunity'],
   ];
 
@@ -1197,8 +1197,8 @@ function impactPage(data, opts = {}) {
   const modal = (key, title, inner) => `<div class="im-m" data-m="${key}" hidden><h3>${title}</h3>${inner}</div>`;
   const modals = [
     projects.length ? modal('Projects', 'The work behind the number', `<ul class="im-mlist">${projects.map((x) => `<li><b>${esc(x.title)}</b>${x.did ? `<p>${esc(x.did)}</p>` : ''}${draft(x)}</li>`).join('')}</ul><a class="im-link" href="#projects" data-close>See all projects →</a>`) : '',
-    projects.some((x) => x.category === 'Education') ? modal('Education', 'What 25% of Net Profit has funded', `<ul class="im-mlist">${projects.filter((x) => x.category === 'Education').map((x) => `<li><b>${esc(x.title)}</b>${x.did ? `<p>${esc(x.did)}</p>` : ''}${draft(x)}</li>`).join('')}</ul><a class="im-link" href="#projects" data-close>See all projects →</a>`) : '',
-    modal('Money', 'Where the money goes', `<p>25% of Net Profit funds schools in the mountain villages we work in.</p><a class="im-link" href="#money" data-close>Follow the money →</a>`),
+    projects.some((x) => x.category === 'Education') ? modal('Education', 'What your bookings have funded', `<ul class="im-mlist">${projects.filter((x) => x.category === 'Education').map((x) => `<li><b>${esc(x.title)}</b>${x.did ? `<p>${esc(x.did)}</p>` : ''}${draft(x)}</li>`).join('')}</ul><a class="im-link" href="#projects" data-close>See all projects →</a>`) : '',
+    modal('Money', 'Where the money goes', `<p>A share of every booking goes back into the mountain villages we work in: their schools, community projects and local livelihoods.</p><a class="im-link" href="#money" data-close>Follow the money →</a>`),
   ].join('');
 
   const body = `<style>${IMPACT_CSS}</style>
@@ -1297,7 +1297,7 @@ const IMPACT_CSS = `
 .im-num em{font-style:normal;font-weight:700;font-size:14px;color:var(--clay);margin-top:8px}
 .im-click{cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s}
 .im-click:hover{transform:translateY(-3px);box-shadow:0 16px 30px -22px rgba(34,29,25,.5);border-color:#d6cbb9}
-.im-accent{background:var(--forest);border-color:var(--forest)}.im-accent b{color:#f3c9a6}.im-accent span{color:#e6ede7}.im-accent em{color:#f3c9a6}
+.im-accent{background:var(--forest);border-color:var(--forest)}.im-accent b{color:#f3c9a6}.im-num b.im-words{font-size:clamp(34px,3.4vw,44px)}.im-accent span{color:#e6ede7}.im-accent em{color:#f3c9a6}
 /* money */
 .im-money{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .im-money-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:56px;align-items:start}
