@@ -152,3 +152,10 @@ Not changed: the 25% rescheduling fee and cancellation retention figures in the 
 - Impact stat card: "Every experience / Funds the next school or solar panel in the villages we work in".
 - Follow the money step 05: "Funding the next school or solar panel".
 - Impact pop-ups: "What your experiences have funded" and "Every experience funds the next school or solar panel in the mountain villages we work in."
+
+### Wording changed again (staging36, b33c7818)
+Chosen line: "The village decides what it needs. Your experience helps make it happen." What the money funds varies (classrooms, solar panels, clean-ups, vermiculture and more), so no fixed list.
+- About Us, Educate card and village schools tile: the full line.
+- Impact stat card: big "The village decides", then "what it needs. Your experience helps make it happen."
+- Follow the money step 05: "The village decides what it needs".
+- Impact Money pop-up: the full line.

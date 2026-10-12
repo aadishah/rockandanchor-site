@@ -38,7 +38,7 @@ function aboutPage(data) {
   ];
   const model = [
     ['Educate', 'We use the outdoors as a classroom.', S('about.model.educate', ph('young-explorers-winter-school', 2, true)), 'A child learning with a facilitator',
-      `<p>Participants learn about:</p><ul class="ab-list"><li>Nature</li><li>Local ecosystems</li><li>Survival and life skills</li><li>Sustainability</li><li>Local culture</li></ul><p>And we support learning in the communities around us. Every experience funds the next school or solar panel in the mountain villages we work in.</p>`],
+      `<p>Participants learn about:</p><ul class="ab-list"><li>Nature</li><li>Local ecosystems</li><li>Survival and life skills</li><li>Sustainability</li><li>Local culture</li></ul><p>And we support learning in the communities around us. The village decides what it needs. Your experience helps make it happen.</p>`],
     ['Employ', 'We create meaningful opportunities for people from the villages where we operate.', S('about.model.employ', ph('hidden-kingdom', 2, true)), 'A shared meal served on leaves',
       `<p>Not simply as labour. As:</p><ul class="ab-list"><li>Guides</li><li>Facilitators</li><li>Hosts</li><li>Cooks</li><li>Leaders</li><li>Specialists</li></ul>`],
     ['Empower', 'Skills become confidence. Confidence becomes leadership. Leadership creates possibilities for others.', S('about.model.empower', ph('be-a-villager', 1, true)), 'A facilitator sitting in a circle with village children',
@@ -57,7 +57,7 @@ function aboutPage(data) {
     ['This is why we work with villages.', 'Villages hold knowledge, food, stories and ways of living that are quietly disappearing. When a village hosts an experience, the value stays in the village.', S('about.ground.villages', ph('little-feet-sunset-safari', 2, true)), 'Guests with their village hosts'],
     ['This is why we care about nature.', 'You cannot care for a place you have never felt. We bring people close to the natural world, and leave it as we found it.', S('about.ground.nature', ph('monsoon-village-1-day', 0, true)), 'A monsoon waterfall in the Sahyadris'],
     ['This is why we employ locally.', 'The people who live here know these mountains better than anyone. Meaningful work close to home means young people do not have to leave to find it.', S('about.ground.employ', ph('young-explorers-winter-school', 1, true)), 'A local guide leading a group'],
-    ['This is why we support village schools.', 'A community that learns can build its own future. Every experience funds the next school or solar panel in the villages we work in.', S('about.ground.schools', ph('be-a-villager', 3, true)), 'Village school children'],
+    ['This is why we support village schools.', 'A community that learns can build its own future. The village decides what it needs. Your experience helps make it happen.', S('about.ground.schools', ph('be-a-villager', 3, true)), 'Village school children'],
     ['This is why experiences matter.', 'People learn by touching, building, getting wet and asking questions. A day outside teaches what a classroom or a screen cannot.', S('about.ground.experiences', ph('little-feet-sensory', 2, true)), 'Children playing in a stream'],
   ];
   const roles = [
