@@ -159,3 +159,6 @@ Chosen line: "The village decides what it needs. Your experience helps make it h
 - Impact stat card: big "The village decides", then "what it needs. Your experience helps make it happen."
 - Follow the money step 05: "The village decides what it needs".
 - Impact Money pop-up: the full line.
+
+## Pushed to live (12 Oct 2026, 19:15 IST)
+Production now runs b33c7818 (staging36), previously 88b61b20. Adds the "The village decides what it needs. Your experience helps make it happen." wording; no 25% or Net Profit wording left. All main pages return 200. Rollback: deploy 88b61b20 at 100%.
