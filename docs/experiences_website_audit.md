@@ -162,3 +162,6 @@ Chosen line: "The village decides what it needs. Your experience helps make it h
 
 ## Pushed to live (12 Oct 2026, 19:15 IST)
 Production now runs b33c7818 (staging36), previously 88b61b20. Adds the "The village decides what it needs. Your experience helps make it happen." wording; no 25% or Net Profit wording left. All main pages return 200. Rollback: deploy 88b61b20 at 100%.
+
+## Pushed to live (12 Oct 2026, 20:12 IST)
+Production now runs c1339aa6 (staging37), previously b33c7818. Adds Website Dates From. Live check: Sunset Trek and Sunset to Stars both listed and both show 17 dates; main pages return 200. Rollback: deploy b33c7818 at 100%.
