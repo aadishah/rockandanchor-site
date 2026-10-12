@@ -8,7 +8,7 @@ const EF = {
   name: 'fldlKTxLU6u6l2qFm', title: 'fldM3NSq47YsF9tR2',
   show: 'fldPkhXdD91l3gZ8Y', slug: 'fld4JwhapQZdKtBcA', order: 'fld0ZNPcdfO412lmd',
   summary: 'fldQm3jgyBV5X1nzK', description: 'fldylkcJyzF9uK0Xi', photos: 'fldiamuh0iIFn0Fjs', itinerary: 'fldePmvVNr0Plgo4D',
-  faqs: 'fld89jnU68Zl9q6nM', contact: 'fld56hCJ24gyK8iV0', prices: 'fldLEraHeNPgjjG8T', age: 'fldF1U1n4ks9FSFtP', location: 'fld2m8zyHAoKGlZEi',
+  faqs: 'fld89jnU68Zl9q6nM', contact: 'fld56hCJ24gyK8iV0', datesFrom: 'fldejM8Uf4j3VcXr2', prices: 'fldLEraHeNPgjjG8T', age: 'fldF1U1n4ks9FSFtP', location: 'fld2m8zyHAoKGlZEi',
   timing: 'fldWvIcsAEx3PJYKN', categories: 'fldIyJ28XTWNtfRm3', datesAhead: 'fld99ABUSbxPmP0v7',
 };
 const VF = { start: 'fldWr96uilLEjfI24', end: 'fldLWXxoeM3Xr7Qkd', exp: 'fldTwb0rZY39trwD4', status: 'fldEueCyQC6zJEEux', hide: 'fldYwt0HrpvixX8gg' };
@@ -130,6 +130,8 @@ async function loadLive(env) {
         fromPrice: null,
         datesAhead: f[EF.datesAhead] ?? null,
         contact: String(f[EF.contact] || '').replace(/\D/g, '').slice(-10),
+        // Website Dates From: show another experience's dates (e.g. Sunset Trek runs on Sunset to Stars dates).
+        datesFrom: ((f[EF.datesFrom] || [])[0] || null),
         media: (f[EF.photos] || []).map((p) => ({
           video: /^video\//.test(p.type || ''),
           url: /^video\//.test(p.type || '') ? p.url : (p.thumbnails && p.thumbnails.full && p.thumbnails.full.url) || p.url,
@@ -225,7 +227,7 @@ function upcoming(data, exp) {
   const now = Date.now() - 6 * 3600 * 1000;
   const limit = exp.datesAhead ? Date.now() + exp.datesAhead * 86400000 : Infinity;
   return data.events
-    .filter((e) => e.exp === exp.id)
+    .filter((e) => e.exp === (exp.datesFrom || exp.id))
     .filter((e) => { const t = Date.parse(e.start); return t >= now && t <= limit; })
     .sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
 }

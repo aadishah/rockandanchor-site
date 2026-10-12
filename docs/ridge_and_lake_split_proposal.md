@@ -30,3 +30,11 @@ New record, slug ridge-and-lake-sunset-trek.
 - Trek only end time
 - Which dates offer trek only (same 17 dates?)
 - The optional "Farm to table lunch" price line does not fit an evening trek. Drop it?
+
+## Done (12 Oct 2026, 20:10 IST)
+Aaditya approved both names. Trek only price ₹1,300, ends 7:00 pm, same dates, lunch line becomes dinner.
+- recfMj06AyTAQGXsL renamed "Ridge & Lake: Sunset to Stars" (Name and Website Title). Slug ridge-and-lake kept, photos and the 17 dates kept. Optional lunch line removed (dinner is included). FAQ "Can I do just the trek?" added.
+- New record reciUUWdN1Wb6lB7B "Ridge & Lake: Sunset Trek", slug ridge-and-lake-sunset-trek, order 8, ₹1,300 per person, optional farm to table dinner ₹300 adult / ₹150 child under 10, 4:00 to 7:00 pm, same 10 photos, FAQ "Want to stay for the stars?".
+- New Airtable field "Website Dates From" (fldejM8Uf4j3VcXr2, link to Experiences). Sunset Trek links to Sunset to Stars, so its page shows the same 17 dates without duplicating Events.
+- Code: upcoming dates use Website Dates From when set (staging37, c1339aa6). Needs a live push; until then the live Sunset Trek page shows no dates.
+- Renaming the Name field also renames the linked Events (e.g. "12 Dec, 26: Ridge & Lake: Sunset to Stars").
