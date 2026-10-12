@@ -133,3 +133,6 @@ Fix, checked by eye on Home, About Us, Impact Created, Team, Terms and Cancellat
 - Policy page titles 64 px max so Terms and Conditions and Cancellation and Refunds fit on one line.
 - Team card names 30 px so Prasad Sambare fits on one line.
 Kept as they were because they read well: the Home banner (Come outside. / Find something real.), the About banner, the Earth 2.0 line, Get outside. Come back changed., and the heading beside the three circles diagram.
+
+## Pushed to live (12 Oct 2026, 17:50 IST)
+With approval, production now runs version 88b61b20 (staging32), previously 831091af. Live now has: speed fixes (background data refresh, events read by field ID, video play tiles, smaller photos), general Terms and Conditions, balanced headings, "Free for villagers" price lines and the per experience contact number (Guide Training uses 9167954430). Checked on rockandanchor.in: 9 main pages return 200 in about 0.2 s, new terms showing, no autoplaying videos, Guide Training shows the personal number and Free for villagers, no staging banners, /__timing returns 404 on live. Rollback: deploy 831091af at 100% in Cloudflare.
