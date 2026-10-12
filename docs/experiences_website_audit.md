@@ -145,3 +145,10 @@ The share of profit supports more than schools, so the site no longer gives a nu
 - Impact Created, Follow the money step 05: "A share goes back to the villages".
 - Impact modals: "What your bookings have funded" and "A share of every booking goes back into the mountain villages we work in: their schools, community projects and local livelihoods."
 Not changed: the 25% rescheduling fee and cancellation retention figures in the Cancellation and Refunds policy (those are fees, not the profit share).
+
+### Final wording chosen by Aaditya (staging35, ffe25379)
+"Every experience funds the next school or solar panel." Local guides are left out on purpose: paying the team is a given, not a give-back.
+- About Us, Educate card and village schools tile: "Every experience funds the next school or solar panel in the (mountain) villages we work in."
+- Impact stat card: "Every experience / Funds the next school or solar panel in the villages we work in".
+- Follow the money step 05: "Funding the next school or solar panel".
+- Impact pop-ups: "What your experiences have funded" and "Every experience funds the next school or solar panel in the mountain villages we work in."

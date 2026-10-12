@@ -20,7 +20,7 @@ function impactPage(data, opts = {}) {
   const has = { Projects: projects.length, Money: 1 };
   const nums = (data.impact || []).map((m, i) => ({ ...m, i, link: has[m.opens] ? m.opens : '' }));
   const numCard = (m) => `<${m.link ? 'button type="button"' : 'div'} class="im-num${m.link ? ' im-click' : ''}"${m.link ? ` data-open="${m.link}"` : ''}><b>${esc(m.value)}</b><span>${esc(m.metric)}</span>${m.link ? `<em>See the evidence →</em>` : ''}</${m.link ? 'button' : 'div'}>`;
-  const schoolsCard = `<button type="button" class="im-num im-click im-accent" data-open="${projects.some((x) => x.category === 'Education') ? 'Education' : 'Money'}"><b class="im-words">Every booking</b><span>Gives back to the villages we work in: their schools and community projects</span><em>See what it funded →</em></button>`;
+  const schoolsCard = `<button type="button" class="im-num im-click im-accent" data-open="${projects.some((x) => x.category === 'Education') ? 'Education' : 'Money'}"><b class="im-words">Every experience</b><span>Funds the next school or solar panel in the villages we work in</span><em>See what it funded →</em></button>`;
 
   // 3. Follow the money.
   const steps = [
@@ -28,7 +28,7 @@ function impactPage(data, opts = {}) {
     ['Experience delivery', ''],
     ['Local people are paid', 'Local people are paid'],
     ['Village businesses participate', 'Village businesses participate'],
-    ['A share goes back to the villages', 'Village schools'],
+    ['Funding the next school or solar panel', 'Village schools'],
     ['Skills, infrastructure and opportunity', 'Skills, infrastructure and opportunity'],
   ];
 
@@ -49,8 +49,8 @@ function impactPage(data, opts = {}) {
   const modal = (key, title, inner) => `<div class="im-m" data-m="${key}" hidden><h3>${title}</h3>${inner}</div>`;
   const modals = [
     projects.length ? modal('Projects', 'The work behind the number', `<ul class="im-mlist">${projects.map((x) => `<li><b>${esc(x.title)}</b>${x.did ? `<p>${esc(x.did)}</p>` : ''}${draft(x)}</li>`).join('')}</ul><a class="im-link" href="#projects" data-close>See all projects →</a>`) : '',
-    projects.some((x) => x.category === 'Education') ? modal('Education', 'What your bookings have funded', `<ul class="im-mlist">${projects.filter((x) => x.category === 'Education').map((x) => `<li><b>${esc(x.title)}</b>${x.did ? `<p>${esc(x.did)}</p>` : ''}${draft(x)}</li>`).join('')}</ul><a class="im-link" href="#projects" data-close>See all projects →</a>`) : '',
-    modal('Money', 'Where the money goes', `<p>A share of every booking goes back into the mountain villages we work in: their schools, community projects and local livelihoods.</p><a class="im-link" href="#money" data-close>Follow the money →</a>`),
+    projects.some((x) => x.category === 'Education') ? modal('Education', 'What your experiences have funded', `<ul class="im-mlist">${projects.filter((x) => x.category === 'Education').map((x) => `<li><b>${esc(x.title)}</b>${x.did ? `<p>${esc(x.did)}</p>` : ''}${draft(x)}</li>`).join('')}</ul><a class="im-link" href="#projects" data-close>See all projects →</a>`) : '',
+    modal('Money', 'Where the money goes', `<p>Every experience funds the next school or solar panel in the mountain villages we work in.</p><a class="im-link" href="#money" data-close>Follow the money →</a>`),
   ].join('');
 
   const body = `<style>${IMPACT_CSS}</style>
