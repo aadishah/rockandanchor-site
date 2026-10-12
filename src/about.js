@@ -225,7 +225,7 @@ const ABOUT_CSS = `
 .ab{--sp:clamp(72px,10vw,140px)}
 .ab section{padding:var(--sp) 0}
 .ab-kicker{font:700 13px/1 "DM Sans",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--clay);margin:0 0 16px}
-.ab-h{font-size:clamp(36px,5.6vw,72px);max-width:16ch;margin:0 0 .5em}
+.ab-h{font-size:clamp(36px,5.6vw,72px);max-width:30ch;margin:0 0 .5em}
 .ab-p{font-size:clamp(17px,1.6vw,19px);color:var(--ink2);max-width:58ch}
 .ab-wide{max-width:70ch;font-size:clamp(19px,2vw,24px);line-height:1.5}
 .ab-num{display:block;font:800 15px/1 "Big Shoulders Display","Arial Narrow",sans-serif;letter-spacing:.12em;color:var(--clay);margin-bottom:10px}

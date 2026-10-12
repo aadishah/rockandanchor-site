@@ -124,3 +124,12 @@ Status: on staging as version 3a684ac8 (staging26). Live still 831091af until ap
 | About Us photos | 13.5 MB | 4.9 MB |
 | Impact Created photos | 21.8 MB | 2.5 MB |
 | Hidden Kingdom gallery | 129 MB of autoplay video | 0 MB until tapped |
+
+## Heading line breaks (12 Oct 2026, staging29 e30d04db)
+Problem: short headings broke onto two lines although there was room (Terms and / Conditions), or left one word alone on the last line (Who will you / meet?, Started it. Still learning how to build / it.).
+Fix, checked by eye on Home, About Us, Impact Created, Team, Terms and Cancellation at desktop width:
+- All headings use balanced wrapping: when a heading needs two lines, the lines come out even, never one word alone.
+- Section heading width caps raised (About, Impact, Team section headings 30ch; Team banner 16ch; Team and Impact closing headings 20ch), so short headings sit on one line.
+- Policy page titles 64 px max so Terms and Conditions and Cancellation and Refunds fit on one line.
+- Team card names 30 px so Prasad Sambare fits on one line.
+Kept as they were because they read well: the Home banner (Come outside. / Find something real.), the About banner, the Earth 2.0 line, Get outside. Come back changed., and the heading beside the three circles diagram.

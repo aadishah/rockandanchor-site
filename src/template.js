@@ -356,7 +356,8 @@ const CSS = `
 body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.6 "DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
 img{max-width:100%;display:block}a{color:inherit}
 h1,h2,h3,.display{font-family:"Big Shoulders Display","Arial Narrow",sans-serif;font-weight:800;line-height:1.02;letter-spacing:.01em;margin:0 0 .4em;text-transform:uppercase}
-h1{font-size:clamp(44px,8vw,92px)}h2{font-size:clamp(34px,5vw,56px)}h3{font-size:26px;margin-top:1.4em}
+h1{font-size:clamp(44px,8vw,92px)}
+h1,h2,h3,.ab-bigline,.im-quote{text-wrap:balance}h2{font-size:clamp(34px,5vw,56px)}h3{font-size:26px;margin-top:1.4em}
 p{margin:0 0 1em}
 .wrap{max-width:var(--max);margin:0 auto;padding:0 20px}
 .eyebrow{font:700 13px/1 "DM Sans",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--clay);margin:0 0 14px}
@@ -448,6 +449,7 @@ section{padding:64px 0}section.tight{padding:48px 0}section.first{padding-top:44
 @media (max-width:820px){.cta{grid-template-columns:1fr}.cta-actions{min-width:0}}
 .page-head{padding:64px 0 34px}
 .page-head .lead{margin-top:10px}
+.page-head .prose h1{font-size:clamp(40px,6vw,64px)}
 .exp-hero{display:grid;grid-template-columns:1.25fr 1fr;gap:12px;margin-top:6px;height:min(520px,46vw)}
 .exp-hero.one{grid-template-columns:1fr}
 .exp-hero .tile{position:relative;display:block;border-radius:var(--r);overflow:hidden;background:#d8d0c3;min-height:0;cursor:zoom-in}.exp-hero .tile img,.exp-hero .tile video{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}.exp-hero .vtile{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(140deg,#2b3a31,#121a16) center/cover;color:#fff;font-size:13px;letter-spacing:.06em}.exp-hero .vplay{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.16);border:1.5px solid rgba(255,255,255,.7);position:relative;transition:transform .25s}.exp-hero .vplay::after{content:"";position:absolute;left:22px;top:17px;border-style:solid;border-width:11px 0 11px 17px;border-color:transparent transparent transparent #fff}.exp-hero .tile:hover .vplay{transform:scale(1.08)}.exp-hero .tile:has(.more) .vplay,.exp-hero .tile:has(.more) .vlab{display:none}.exp-hero .tile:hover img{transform:scale(1.03)}.exp-hero .more{position:absolute;inset:0;display:grid;place-items:center;background:rgba(12,16,22,.5);color:#fff;font:800 clamp(30px,3.4vw,44px)/1 "Big Shoulders Display","Arial Narrow",sans-serif;letter-spacing:.02em}

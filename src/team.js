@@ -108,7 +108,7 @@ const TEAM_CSS = `
 .tm-draft{display:inline-block;background:#fff1c9;color:#7a5b00;border:1px solid #ecd9a4;font:700 11px/1 "DM Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:5px 8px;border-radius:999px;margin:0 0 10px}
 .tm-hint{background:#fff8e6;border:1px dashed #e2c87a;color:#6b5517;border-radius:12px;padding:12px 14px;font-size:14px;margin:14px 0 0}
 .tm-kicker{font:700 13px/1 "DM Sans",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--clay);margin:0 0 16px}
-.tm-h{font-size:clamp(34px,5.2vw,66px);max-width:20ch;margin:0 0 .5em}
+.tm-h{font-size:clamp(34px,5.2vw,66px);max-width:30ch;margin:0 0 .5em}
 .tm-p{font-size:clamp(17px,1.6vw,19px);color:var(--ink2);max-width:60ch}
 .tm-lead{font-size:clamp(19px,2.1vw,25px);color:var(--ink);max-width:44ch;font-weight:500}
 .tmjs .tm .rv{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s ease}
@@ -119,7 +119,7 @@ const TEAM_CSS = `
 .tm-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(12,16,22,.05) 25%,rgba(12,16,22,.7) 100%)}
 .tm-hero .wrap{position:relative;z-index:2;padding-bottom:clamp(48px,9vh,96px)}
 .tm-hero .tm-kicker{color:#f7d2b2}
-.tm-hero h1{font-size:clamp(46px,7.4vw,104px);max-width:12ch;margin:0 0 .3em;text-shadow:0 2px 20px rgba(0,0,0,.35)}
+.tm-hero h1{font-size:clamp(46px,7.4vw,104px);max-width:16ch;margin:0 0 .3em;text-shadow:0 2px 20px rgba(0,0,0,.35)}
 .tm-sub{font-size:clamp(17px,1.9vw,21px);max-width:54ch;margin:0 0 26px;color:#f2ede6;text-shadow:0 1px 10px rgba(0,0,0,.5)}
 .tm-scroll{color:#fff;font-weight:700;text-decoration:none;border-bottom:2px solid #f3c9a6;padding-bottom:3px}
 /* people */
@@ -138,7 +138,7 @@ const TEAM_CSS = `
 .tm-av{width:84px;height:84px;flex:0 0 84px;border-radius:50%;object-fit:cover}
 .tm-av.tm-ini{font-size:30px}
 .tm-role{color:var(--clay);font-weight:700;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase}
-.tm-card h3{margin:2px 0 0;font-size:34px;line-height:1}
+.tm-card h3{margin:2px 0 0;font-size:30px;line-height:1}
 .tm-since{color:var(--muted);font-size:13.5px}
 .tm-bio p{margin:0 0 6px;color:var(--ink2)}
 .tm dl{margin:0}.tm dl>div{padding:10px 0;border-top:1px solid var(--line)}
@@ -160,7 +160,7 @@ const TEAM_CSS = `
 .tm-end{position:relative;color:#fff;text-align:center;overflow:hidden;background:var(--night)}
 .tm-end img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.45}
 .tm-end .wrap{position:relative}
-.tm-end h2{font-size:clamp(46px,7.4vw,100px);margin:0 auto .3em;max-width:14ch;text-shadow:0 2px 20px rgba(0,0,0,.35)}
+.tm-end h2{font-size:clamp(46px,7.4vw,100px);margin:0 auto .3em;max-width:20ch;text-shadow:0 2px 20px rgba(0,0,0,.35)}
 .tm-end p{font-size:clamp(18px,2vw,22px);max-width:48ch;margin:0 auto 14px;color:#f2ede6;text-shadow:0 1px 10px rgba(0,0,0,.5)}
 .tm-say{font-weight:700;color:#f3c9a6!important;margin-bottom:32px!important}
 .tm-end-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
