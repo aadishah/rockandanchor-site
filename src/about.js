@@ -94,7 +94,7 @@ ${ringNodes.map((n) => `<g class="rn"><circle cx="${n.x.toFixed(1)}" cy="${n.y.t
 </div></section>
 
 <section class="ab-earth" id="earth"><div class="ab-earth-stick">
-  <img class="ab-earth-img" src="${esc(earthP.src)}"${posStyle(earthP)} alt="${esc(earthP.alt || 'The Sahyadri mountains')}">
+  <img class="ab-earth-img" src="${esc(earthP.src)}"${posStyle(earthP)} alt="${esc(earthP.alt || 'The Sahyadri mountains')}" loading="lazy">
   <p class="ab-earth-text">We do not have an <span>Earth&nbsp;2.0.</span></p>
 </div></section>
 

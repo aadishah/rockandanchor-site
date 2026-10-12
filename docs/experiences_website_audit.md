@@ -101,3 +101,11 @@ Fix (staging version 831091af, live untouched):
 
 ## Pushed to live (12 Oct 2026, 02:15 IST)
 With approval, production now runs version 831091af (previously fc565657). This brings to rockandanchor.in: the deleted-fields fix (the site reads Airtable again instead of the frozen copy), video playback in experience galleries, and the Website Page Photos spots. Checked on rockandanchor.in: Home, About Us, Impact Created, Team and an experience page all load (200), photo spots and videos present, no staging banners. To roll back, deploy fc565657 at 100% from the Cloudflare dashboard.
+
+## Speed fixes (12 Oct 2026, built, not yet uploaded)
+Measured on 12 Oct: a cold page load waited 8.6 s for Airtable every time the 5 minute saved copy expired; Hidden Kingdom gallery tiles autoplayed full videos (82 MB, 40 MB, 7 MB); About Us loaded 13.5 MB of full-size photos.
+Changes in code (commit below, file worker-staging21.js in website-2026):
+- Data: the saved copy is served instantly; when older than 5 minutes it refreshes in the background. Visitors only wait if the copy is over 1 hour old. All Airtable tables now load at the same time instead of in three rounds (tested: cold load 1 round, stale load 3 ms).
+- Gallery videos: no autoplay. Tiles show the first frame; the video downloads only when opened.
+- Page photos: cards and tiles use Airtable's 512 px version; only banners (hero, earth, end) use the full size. Earth image now loads lazily.
+Status: upload to staging was blocked by a permission check on the Cloudflare dashboard. Needs the user to allow it.

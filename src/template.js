@@ -90,15 +90,15 @@ const plainText = (t) => String(t || '').replace(/^\s*#+\s*/gm, '').replace(/^\s
 const shortText = (t, n = 160) => (t.length <= n ? t : t.slice(0, t.lastIndexOf(' ', n)).replace(/[,.;:]$/, '') + '…');
 
 async function loadLive(env) {
-  const [exps, evs, revs, imps, tms] = await Promise.all([
+  const [exps, evs, revs, imps, tms, pps, ev] = await Promise.all([
     atList(env, T.exp, Object.values(EF)),
     atList(env, T.ev, Object.values(VF), "IS_AFTER({Start}, DATEADD(NOW(), -2, 'days'))").catch(() => atList(env, T.ev, Object.values(VF))),
     atList(env, T.rev, Object.values(RF)).catch(() => null),
     atList(env, T.imp, Object.values(IF)).catch(() => null),
     atList(env, T.team, Object.values(TF)).catch(() => []),
+    atList(env, PP.table, [PP.slot, PP.photo, PP.alt, PP.focus]).catch(() => null),
+    loadEvidence(env),
   ]);
-  const pps = await atList(env, PP.table, [PP.slot, PP.photo, PP.alt, PP.focus]).catch(() => null);
-  const ev = await loadEvidence(env);
   const experiences = exps
     .filter((r) => r.fields[EF.show] && String(r.fields[EF.slug] || '').trim() && r.fields[EF.name])
     .map((r) => {
@@ -160,23 +160,36 @@ async function loadLive(env) {
 }
 
 let MEMO = null;
+let REFRESHING = null;
+// Visitors never wait for Airtable once a copy exists. A copy younger than CACHE_SECONDS is served as is.
+// An older copy (up to STALE_SECONDS) is served instantly while a fresh one loads in the background.
+// Only a copy older than STALE_SECONDS (Airtable photo links expire) or no copy at all makes the visitor wait.
+const STALE_SECONDS = 3600;
+const DATA_KEY = 'https://data.cache/rock-anchor-v4';
+function refreshData(env, ctx) {
+  if (!REFRESHING) {
+    REFRESHING = loadLive(env).then(async (d) => {
+      const t = Date.now();
+      MEMO = { t, d };
+      await caches.default.put(new Request(DATA_KEY), new Response(JSON.stringify({ t, d }), { headers: { 'Cache-Control': `max-age=${STALE_SECONDS}`, 'Content-Type': 'application/json' } }));
+      return d;
+    }).finally(() => { REFRESHING = null; });
+  }
+  if (ctx) ctx.waitUntil(REFRESHING.catch((e) => console.log('refresh failed', e.message)));
+  return REFRESHING;
+}
 async function getData(env, ctx) {
   if (!env.AIRTABLE_TOKEN) return SNAPSHOT;
-  const now = Date.now();
-  if (MEMO && now - MEMO.t < CACHE_SECONDS * 1000) return MEMO.d;
-  const cache = caches.default;
-  const key = new Request('https://data.cache/rock-anchor-v3');
-  const hit = await cache.match(key);
-  if (hit) {
-    const d = await hit.json();
-    MEMO = { t: now, d };
-    return d;
+  // Another worker instance may already hold a newer copy in the shared cache.
+  if (!MEMO || Date.now() - MEMO.t >= CACHE_SECONDS * 1000) {
+    const hit = await caches.default.match(new Request(DATA_KEY));
+    if (hit) { try { const j = await hit.json(); if (j && j.d && (!MEMO || j.t > MEMO.t)) MEMO = { t: j.t, d: j.d }; } catch (e) {} }
   }
+  const age = MEMO ? (Date.now() - MEMO.t) / 1000 : Infinity;
+  if (age < CACHE_SECONDS) return MEMO.d;
+  if (age < STALE_SECONDS) { refreshData(env, ctx); return MEMO.d; }
   try {
-    const d = await loadLive(env);
-    MEMO = { t: now, d };
-    ctx.waitUntil(cache.put(key, new Response(JSON.stringify(d), { headers: { 'Cache-Control': `max-age=${CACHE_SECONDS}`, 'Content-Type': 'application/json' } })));
-    return d;
+    return await refreshData(env, ctx);
   } catch (e) {
     console.log('live load failed', e.message);
     return (MEMO && MEMO.d) || SNAPSHOT;
@@ -579,7 +592,7 @@ function galleryHtml(e, ph) {
   if (!ph.length) return '';
   const SHOW = 5;
   const extra = ph.length - SHOW;
-  const tile = (p, i, cls, big) => `<a class="tile${cls}${p.video ? ' vid' : ''}" href="${esc(p.url)}" data-i="${i}" aria-label="Open ${p.video ? 'video' : 'photo'} ${i + 1} of ${ph.length}">${p.video ? `<video src="${esc(p.url)}"${p.thumb ? ` poster="${esc(p.thumb)}"` : ''} muted loop playsinline autoplay preload="metadata"></video>` : `<img src="${esc(big ? p.url : p.thumb)}" alt="${esc(e.title)}"${i ? ' loading="lazy"' : ' fetchpriority="high"'}>`}${i === SHOW - 1 && extra > 0 ? `<span class="more">+${extra}</span>` : ''}</a>`;
+  const tile = (p, i, cls, big) => `<a class="tile${cls}${p.video ? ' vid' : ''}" href="${esc(p.url)}" data-i="${i}" aria-label="Open ${p.video ? 'video' : 'photo'} ${i + 1} of ${ph.length}">${p.video ? `<video src="${esc(p.url)}#t=0.1"${p.thumb ? ` poster="${esc(p.thumb)}"` : ''} muted playsinline preload="metadata"></video>` : `<img src="${esc(big ? p.url : p.thumb)}" alt="${esc(e.title)}"${i ? ' loading="lazy"' : ' fetchpriority="high"'}>`}${i === SHOW - 1 && extra > 0 ? `<span class="more">+${extra}</span>` : ''}</a>`;
   const side = ph.slice(1, SHOW).map((p, k) => tile(p, k + 1, '', false)).join('');
   const urls = JSON.stringify(ph.map((p) => (p.video ? { v: p.url } : p.url))).replace(/</g, '\\u003c');
   return `<div class="exp-hero${ph.length === 1 ? ' one' : ''}" id="gallery">${tile(ph[0], 0, ' main', true)}${ph.length > 1 ? `<div class="side">${side}</div>` : ''}</div>
@@ -597,8 +610,9 @@ if(U.length<2)lb.querySelectorAll('.lb-nav').forEach(function(b){b.hidden=true})
 }
 
 // A photo spot chosen in the Website Page Photos table, or the fallback when the row is empty.
-function slot(data, key, fallback = '', big = true) {
+function slot(data, key, fallback = '') {
   const x = data && data.slots && data.slots[key];
+  const big = /\.(hero|earth|end)$/.test(key);
   return x ? { src: big ? x.url : x.thumb, alt: x.alt, pos: x.pos } : { src: fallback, alt: '', pos: '' };
 }
 const posStyle = (s) => (s && s.pos ? ` style="object-position:${s.pos}"` : '');
