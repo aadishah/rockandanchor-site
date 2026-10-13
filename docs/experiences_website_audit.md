@@ -172,3 +172,11 @@ Production now runs c1339aa6 (staging37), previously b33c7818. Adds Website Date
 
 ## Pushed to live (13 Oct 2026, 09:50 IST)
 Production now runs ce1d5fa8 (staging38), previously c1339aa6. Only Approved event dates show. Live check: all experience pages still show their dates; main pages return 200. Rollback: deploy c1339aa6 at 100%.
+
+## 2026-10-13: Trip leaders on approved trips
+
+- Request: every Approved trip should have Sujit, Prasad and Nilesh as trip leaders.
+- Found 151 Approved events. 68 already had Sujit, Prasad and Nilesh (5 of those also have Aaditya). 83 had only "Rock And Anchor Company".
+- Updated the 83 so TripLeaders = Rock And Anchor Company + Sujit + Prasad + Nilesh. All 151 now have all three.
+- Why it happened: no automation adds these three. "Add Rock And Anchor Company as Default Trip Leader" runs on create and adds only the company. "Add Trip to Accounts on Approval" only links Accounts. The 83 trips were created around 8 Oct without them.
+- Automations were not changed. Pending the owner's go ahead to make new trips get Sujit, Prasad and Nilesh automatically.
