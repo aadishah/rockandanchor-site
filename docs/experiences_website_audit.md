@@ -169,3 +169,6 @@ Production now runs c1339aa6 (staging37), previously b33c7818. Adds Website Date
 ## Only Approved dates show (13 Oct 2026)
 - Airtable: all 83 Events with status Future set to Approved (no Ready events existed). Approving runs the "Add Trip to Accounts on Approval" automation for each.
 - Code: LIVE_STATUSES is now ['Approved'] (was Approved, Ready, Future). Staging38 ce1d5fa8; checked with fresh data: all dates still show (Guide Training 1, Sunset to Stars 17, Sunset Trek 17, Talking to the Planets 25, Sunset Safari 14). Needs a live push.
+
+## Pushed to live (13 Oct 2026, 09:50 IST)
+Production now runs ce1d5fa8 (staging38), previously c1339aa6. Only Approved event dates show. Live check: all experience pages still show their dates; main pages return 200. Rollback: deploy c1339aa6 at 100%.
