@@ -165,3 +165,7 @@ Production now runs b33c7818 (staging36), previously 88b61b20. Adds the "The vil
 
 ## Pushed to live (12 Oct 2026, 20:12 IST)
 Production now runs c1339aa6 (staging37), previously b33c7818. Adds Website Dates From. Live check: Sunset Trek and Sunset to Stars both listed and both show 17 dates; main pages return 200. Rollback: deploy b33c7818 at 100%.
+
+## Only Approved dates show (13 Oct 2026)
+- Airtable: all 83 Events with status Future set to Approved (no Ready events existed). Approving runs the "Add Trip to Accounts on Approval" automation for each.
+- Code: LIVE_STATUSES is now ['Approved'] (was Approved, Ready, Future). Staging38 ce1d5fa8; checked with fresh data: all dates still show (Guide Training 1, Sunset to Stars 17, Sunset Trek 17, Talking to the Planets 25, Sunset Safari 14). Needs a live push.

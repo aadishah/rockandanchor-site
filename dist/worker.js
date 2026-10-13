@@ -23,7 +23,7 @@ const IT = { proj: 'tblO5fhefTEiwPCrL' };
 const PP = { table: 'tblzv9vppnT0t3ASr', slot: 'fldHCkMOQq2cgWxNB', photo: 'fldmrI2y69VgI6nRz', alt: 'fld1FiXLRsfBUEWwQ', focus: 'fldepHEkij6OSKfOw' };
 const FOCUS = { Center: 'center center', Top: 'center 0%', Upper: 'center 30%', Lower: 'center 70%', Bottom: 'center 100%', Left: '0% center', Right: '100% center' };
 const PJ = { title: 'fldTSF31PRLJ2VDeM', show: 'fldHwPFRFC0ei7dsQ', order: 'fld5u5mysc1bnMX6K', category: 'fld5UnNMP9SNHFLJ3', year: 'fldGlQfsKw3M6ZuXI', area: 'fldA8qAyT2ixMo8Io', saw: 'fldx1ED4Oddqyvx9h', did: 'fldy7AxYXMBasLAan', who: 'fldmDFfJ8fYM51NgE', changed: 'fldZKJATOSDzZOjDN', next: 'fldc3WXuspgOcij8y', status: 'fldpKDvyuT7aO26YN', photo: 'fldW56CKYufKiFFhA' };
-const LIVE_STATUSES = ['Approved', 'Ready', 'Future'];
+const LIVE_STATUSES = ['Approved'];
 const CACHE_SECONDS = 300;
 
 const SITE = {
