@@ -180,3 +180,6 @@ Production now runs ce1d5fa8 (staging38), previously c1339aa6. Only Approved eve
 - Updated the 83 so TripLeaders = Rock And Anchor Company + Sujit + Prasad + Nilesh. All 151 now have all three.
 - Why it happened: no automation adds these three. "Add Rock And Anchor Company as Default Trip Leader" runs on create and adds only the company. "Add Trip to Accounts on Approval" only links Accounts. The 83 trips were created around 8 Oct without them.
 - Automations were not changed. Pending the owner's go ahead to make new trips get Sujit, Prasad and Nilesh automatically.
+
+## 2026-10-14: Our Values page on staging
+- New /values page (branch about-redesign). Staging version 604d17ad. Live unchanged (ce1d5fa8). Details in docs/our_values_page_2026-10-14.md.

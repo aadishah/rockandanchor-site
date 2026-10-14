@@ -1588,7 +1588,7 @@ const PRACTICES = [
   },
   {
     id: 'geotag', name: 'Say No to Geotagging', line: 'Not every beautiful place needs to become a pin on a map.', from: ['ecosystems', 'culture'],
-    text: 'A waterfall, a cave, a nesting site or a quiet corner of a village can change for good when it suddenly becomes easy to find. Fragile habitats, wildlife and small communities cannot always take a rush of new visitors. That is why we do not publish exact locations. The principle is not “never share”. It is: think about what happens when a fragile place becomes easy to find.',
+    text: 'A waterfall, a cave, a nesting site or a quiet corner of a village can change for good when it suddenly becomes easy to find. Fragile habitats, wildlife and small communities cannot always take a rush of new visitors. That is why we never publish exact locations, on this site or on social media. The principle is not “never share”. It is: think about what happens when a fragile place becomes easy to find.',
   },
   {
     id: 'wildlife', name: 'Respect wildlife', line: 'Observe without interfering.', from: ['ecosystems'],
@@ -1738,7 +1738,7 @@ function valuesPage(data) {
 
 <section class="vl-ten" id="learn-essentials"><div class="wrap">
   <div class="vl-ten-head"><div><p class="vl-kicker rv">Understanding how to prepare</p><h2 class="vl-h rv">The 10 Essentials.</h2></div>
-  <div class="rv"><p class="vl-lead">Preparation is part of adventure.</p><p class="vl-p">This is the Appalachian Mountain Club’s list of 10 Essentials, a checklist outdoor people around the world pack by. It is about being ready, not about being afraid. Each experience also has its own packing list, which we share before you come.</p></div></div>
+  <div class="rv"><p class="vl-lead">Preparation is part of adventure.</p><p class="vl-p">This is the Appalachian Mountain Club’s list of 10 Essentials, a checklist outdoor people around the world pack by. It is about being ready, not about being afraid. Each experience also has its own packing list, which we share with you after you book.</p></div></div>
   <div class="vl-check" data-check>
     <p class="vl-count" aria-live="polite"><span data-n>0</span> of ${ESSENTIALS.length} ready</p>
     <ol>${ESSENTIALS.map(([h, t], i) => `<li><label><input type="checkbox"><span class="vl-box" aria-hidden="true"></span><span class="vl-n">${i + 1}</span><span class="vl-ct"><b>${esc(h)}</b><span>${esc(t)}</span></span></label></li>`).join('')}</ol>

@@ -1,7 +1,7 @@
 # Our Values page (14 Oct 2026)
 
 Branch: `about-redesign`, fast-forwarded to the current live line (`changes-after-3-page-audit`, acd9354) before building, so the page sits on the current site. The live line itself is untouched.
-Status: built and checked locally. **Not on staging and not live.** Staging deploy was blocked because the computer and Chrome were offline at the time.
+Status: **on staging** (version 604d17ad, 14 Oct 2026), not live. https://staging-rockandanchor-site.adityashah-06.workers.dev/values
 
 ## Files changed
 - `src/values.js` (new): the whole page, its data (VALUES, PRACTICES, LEARN, ESSENTIALS, ASK), CSS and a small script.
@@ -49,3 +49,14 @@ Fallbacks come from experience photos. Each spot can be replaced from Airtable (
 
 ## Update (14 Oct 2026, later)
 Switched the 10 Essentials to the AMC list on request. The AMC Outdoor Leader Handbook in the project does not list the Ten Essentials, so the list was taken from AMC's own article on outdoors.org: https://www.outdoors.org/resources/amc-outdoors/outdoor-resources/the-10-essentials-what-to-pack-for-a-backcountry-hike/
+
+## Confirmed by Aaditya (14 Oct 2026)
+- No exact locations: true for all social media too. Copy now says "on this site or on social media".
+- Guides, hosts and cooks come from the villages: true for every role.
+- Saying no to a damaging booking: OK to say publicly.
+- Packing lists are shared after booking. Copy now says "which we share with you after you book".
+- Leader carries the first aid kit and the means to make heat: true on every experience.
+Only photo choices remain open.
+
+## Staging deploy
+Version 604d17ad uploaded to the staging alias only. Live is still ce1d5fa8.
