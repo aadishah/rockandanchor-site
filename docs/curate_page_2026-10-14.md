@@ -71,3 +71,6 @@ Accounts, saved profiles, a database, collaborative editing or voting, drag and 
 
 ## Tested
 Desktop (1366px) and phone (390px): every step, multi and single selection, Back and Next, jumping back by step dot, empty states (skip everything), group size 1, 8 and 250 (big group note), negative input, children's ages shown and cleared, all time options (few hours, half day, full day, one night, weekend), summary, recommendations, cost line, WhatsApp send and share links, copy summary and copy link, refresh on the summary, opening the copied link in a new tab, start again, no sideways scrolling. Nav checked at 821, 850, 880, 921, 1000, 1100 and 1366px. All other routes still return 200.
+
+## Photo slots added in Airtable (14 Oct 2026)
+Website Page Photos now has empty rows (Page = Curate or Values) for curate.hero, curate.act.trek, waterfall, water, nature, village, farming, food, games, skills, trees, sunset, stars, nightwalk, camping, campfire, and values.hero, sustainability, simplicity, culture, learning, ecosystems, end. A row with no photo is ignored, so the defaults stay until a photo is added. Changes show within about 5 minutes.
