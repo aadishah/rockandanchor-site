@@ -1,6 +1,6 @@
 # Curate your own experience (14 Oct 2026)
 
-Branch: `about-redesign`. Status: **on staging** (version ccd42ec4), not live.
+Branch: `about-redesign`. Status: **on staging** (version 51934542), not live.
 https://staging-rockandanchor-site.adityashah-06.workers.dev/curate
 
 ## Files changed
@@ -74,3 +74,13 @@ Desktop (1366px) and phone (390px): every step, multi and single selection, Back
 
 ## Photo slots added in Airtable (14 Oct 2026)
 Website Page Photos now has empty rows (Page = Curate or Values) for curate.hero, curate.act.trek, waterfall, water, nature, village, farming, food, games, skills, trees, sunset, stars, nightwalk, camping, campfire, and values.hero, sustainability, simplicity, culture, learning, ecosystems, end. A row with no photo is ignored, so the defaults stay until a photo is added. Changes show within about 5 minutes.
+
+## Photo and activity changes (14 Oct 2026, afternoon)
+- Camping now uses the photo Tree planting had (family outside their tents).
+- Village life now uses the photo Local food had (village hand pump).
+- Outdoor games now uses the photo Village life had (child in a meadow).
+- Local food now uses the dinner photo from The Greatest Show On Earth.
+- Campfire now uses greatest-show-campfire.jpg.
+- Tree planting: no tree planting photo exists in Airtable or the website images folder. It shows a plain green card until a photo is added to curate.act.trees.
+- New activities, always shown: Swimming (curate.act.swim) and Chocolate fondue (curate.act.fondue). Both show a plain green card until photos are added.
+- Staging version 51934542.

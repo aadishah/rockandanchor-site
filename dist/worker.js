@@ -1938,11 +1938,16 @@ const CURATE_ACTS = [
   ['nightwalk', 'Night walks', 'The forest after dark.', /night (walk|trail)|after dark/, 'night'],
   ['camping', 'Camping', 'Sleep in a tent.', /\btents?\b|camping/, 'stay'],
   ['campfire', 'Campfire', 'Stories around a fire.', /campfire|bonfire/, 'night'],
+  // Added on request (14 Oct 2026): offered even where no experience text mentions them yet. 'always' shows them regardless.
+  ['swim', 'Swimming', 'A proper swim in a lake or river.', /\bswim/, 'day', 'always'],
+  ['fondue', 'Chocolate fondue', 'Something sweet by the fire.', /fondue/, 'night', 'always'],
 ];
 
 function curateData(data) {
   const exps = sorted(data).filter((e) => !(e.categories || []).some((c) => /guide training/i.test(c)));
-  const acts = CURATE_ACTS.map(([id, label, line, re, kind]) => ({ id, label, line, kind, re }));
+  const acts = CURATE_ACTS.map(([id, label, line, re, kind, always]) => ({ id, label, line, kind, re, always: !!always }));
+  // These only use a photo set in Airtable (curate.act.<id>); no matching experience photo exists yet.
+  const OWN_PHOTO_ONLY = ['trees', 'swim', 'fondue'];
   const out = exps.map((e) => {
     const text = [e.title, e.summary, e.description, e.itinerary].join(' ').toLowerCase(); // FAQs left out: they mention safety (first aid) and logistics, not activities
     const p = priceInfo(e);
@@ -1961,10 +1966,10 @@ function curateData(data) {
   // Photo per activity: an Airtable slot (curate.act.<id>) if set, otherwise the cover of the most specific
   // experience that offers it (fewest other activities), never repeating a photo.
   const taken = new Set();
-  const used = acts.filter((a) => out.some((e) => e.a.includes(a.id))).map((a) => {
+  const used = acts.filter((a) => a.always || out.some((e) => e.a.includes(a.id))).map((a) => {
     const sl = slot(data, 'curate.act.' + a.id, '');
     let img = sl.src;
-    if (!img) {
+    if (!img && !OWN_PHOTO_ONLY.includes(a.id)) {
       const cands = out.filter((e) => e.a.includes(a.id)).sort((x, y) => x.a.length - y.a.length);
       for (const e of cands) { const ex = bySlug(data, e.s); for (const ph of (ex && ex.photos) || []) { if (ph.video || taken.has(ph.thumb)) continue; img = ph.thumb; break; } if (img) break; }
     }
@@ -2027,7 +2032,7 @@ function save(){if(S.step<0){if(location.hash)try{history.replaceState(null,'',l
 function load(){var m=location.hash.match(/c=([\w-]+)/);if(!m)return;var o=dec(m[1]);if(!o)return;for(var k in S)if(k in o&&typeof o[k]===typeof S[k])S[k]=o[k];if(S.step>STEPS.length)S.step=STEPS.length}
 function link(){return location.origin+location.pathname+'#c='+enc(S)}
 
-function opt(k,id,title,line,multi,img){var on=multi?has(k,id):S[k]===id;return '<button type="button" class="cu-opt'+(on?' on':'')+(img?' img':'')+'" data-k="'+k+'" data-v="'+h(id)+'"'+(multi?'':' data-one="1"')+' aria-pressed="'+on+'">'+(img?'<span class="cu-opt-ph" style="background-image:url(\''+h(img)+'\')"></span>':'')+'<span class="cu-opt-t">'+h(title)+'</span>'+(line?'<span class="cu-opt-l">'+h(line)+'</span>':'')+'<span class="cu-tick" aria-hidden="true"></span></button>'}
+function opt(k,id,title,line,multi,img){var on=multi?has(k,id):S[k]===id;return '<button type="button" class="cu-opt'+(on?' on':'')+(img?' img':'')+'" data-k="'+k+'" data-v="'+h(id)+'"'+(multi?'':' data-one="1"')+' aria-pressed="'+on+'">'+(img?(img==='none'?'<span class="cu-opt-ph cu-ph-empty" aria-hidden="true"></span>':'<span class="cu-opt-ph" style="background-image:url(\''+h(img)+'\')"></span>'):'')+'<span class="cu-opt-t">'+h(title)+'</span>'+(line?'<span class="cu-opt-l">'+h(line)+'</span>':'')+'<span class="cu-tick" aria-hidden="true"></span></button>'}
 function grid(k,list,multi,cls){return '<div class="cu-grid '+(cls||'')+'">'+list.map(function(o){return opt(k,o[0],o[1],o[2],multi)}).join('')+'</div>'}
 
 function stepHtml(){
@@ -2046,7 +2051,7 @@ function stepHtml(){
     if(S.when==='month'){var mm=[],d=new Date();for(var i=0;i<12;i++){var dd=new Date(d.getFullYear(),d.getMonth()+i,1);mm.push([MONTHS[dd.getMonth()]+' '+dd.getFullYear(),MONTHS[dd.getMonth()].slice(0,3)+' '+String(dd.getFullYear()).slice(2)])}mm.push(['Monsoon (June to September)','Monsoon'],['Winter (November to February)','Winter']);x+='<div class="cu-grid cu-grid-m">'+mm.map(function(m){return opt('month',m[0],m[1],'',0)}).join('')+'</div>'}
     x+='</div>';
   }
-  if(id==='do'){x+='<p class="cu-hint">These all come from experiences we already run. Pick what sounds good.</p><div class="cu-grid cu-grid-img">'+D.acts.map(function(a){return opt('acts',a.id,a.label,a.line,1,a.img)}).join('')+'</div>'}
+  if(id==='do'){x+='<p class="cu-hint">These all come from experiences we already run. Pick what sounds good.</p><div class="cu-grid cu-grid-img">'+D.acts.map(function(a){return opt('acts',a.id,a.label,a.line,1,a.img||'none')}).join('')+'</div>'}
   if(id==='local')x+='<p class="cu-hint">These are real people who live here, not an attraction. Pick any that interest you.</p>'+grid('local',LOCAL,1,'cu-grid-s');
   if(id==='pace')x+='<p class="cu-hint">The same day can feel very different depending on pace.</p>'+grid('pace',PACE,0,'cu-grid-2');
   if(id==='care'){x+='<p class="cu-lead">Every experience we create happens somewhere that already belongs to someone and something.</p><ul class="cu-care">'+['Leave No Trace.','Respect wildlife.','Respect communities.','Do not disturb fragile places.','Think before sharing sensitive locations.'].map(function(p){return '<li>'+p+'</li>'}).join('')+'</ul><p class="cu-hint">More on this on our <a href="/values">Values</a> page.</p>'}
@@ -2218,7 +2223,7 @@ const CURATE_CSS = `
 .cu-opt.on .cu-tick:after{content:"";position:absolute;left:7px;top:3px;width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
 .cu-grid-m .cu-opt{min-height:48px;padding:12px 14px;align-items:center;text-align:center}.cu-grid-m .cu-tick{display:none}.cu-grid-m .cu-opt-t{font-size:15px}
 .cu-opt.img{padding:0 0 14px;overflow:hidden}.cu-opt.img .cu-opt-t,.cu-opt.img .cu-opt-l{padding:0 46px 0 16px}
-.cu-opt-ph{display:block;aspect-ratio:16/10;background:#d8d0c3 center/cover;margin-bottom:6px}
+.cu-opt-ph{display:block;aspect-ratio:16/10;background:#d8d0c3 center/cover;margin-bottom:6px}.cu-ph-empty{background:linear-gradient(135deg,var(--moss),#d9e4d4)}
 .cu-opt.img .cu-tick{top:auto;bottom:14px}
 .cu-opt.img.on .cu-opt-ph{box-shadow:inset 0 0 0 4px var(--forest)}
 .cu-sub2{margin-top:30px;padding-top:24px;border-top:1px solid var(--line)}
