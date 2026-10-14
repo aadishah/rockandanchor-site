@@ -1,7 +1,7 @@
 # Our Values page (14 Oct 2026)
 
 Branch: `about-redesign`, fast-forwarded to the current live line (`changes-after-3-page-audit`, acd9354) before building, so the page sits on the current site. The live line itself is untouched.
-Status: **on staging** (version 604d17ad, 14 Oct 2026), not live. https://staging-rockandanchor-site.adityashah-06.workers.dev/values
+Status: **on staging** (version 26908fc6, 14 Oct 2026), not live. https://staging-rockandanchor-site.adityashah-06.workers.dev/values
 
 ## Files changed
 - `src/values.js` (new): the whole page, its data (VALUES, PRACTICES, LEARN, ESSENTIALS, ASK), CSS and a small script.
@@ -60,3 +60,12 @@ Only photo choices remain open.
 
 ## Staging deploy
 Version 604d17ad uploaded to the staging alias only. Live is still ce1d5fa8.
+
+## Edits from Aaditya (14 Oct 2026, 14:11)
+- "Keeping groups to a size that the trail, and the village, can take." (punctuation)
+- Respect wildlife: "Do not handle, unless there is a real safety, conservation or learning reason."
+- Say No to Geotagging now uses the Instagram message: places get overrun, polluted and damaged because our mountains lack proper regulation; leave location names out of posts, stories and reviews; call it "paradise" or tag/collaborate with @_rockandanchor; thank you for supporting responsible travel. The example village name from the Instagram text was left out, because the website does not name villages.
+- Communication (essential 11): leaders also carry walkie-talkies.
+- Removed the value-to-knowledge map and its intro paragraph under "Being responsible outdoors starts before you arrive".
+- Nav and footer label is now "Values" (page title stays "Our Values").
+- Staging version 26908fc6. Live unchanged (ce1d5fa8).

@@ -552,7 +552,7 @@ const FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com"><link 
 
 function layout({ title, desc, path, body, image, data, contact }) {
   const full = title ? `${title} | Rock & Anchor` : 'Rock & Anchor | Authentic outdoor experiences in the Sahyadris';
-  const nav = [['/experiences', 'Experiences'], ['/impact', 'Impact Created'], ['/about', 'About Us'], ['/team', 'Team'], ['/values', 'Our Values'], ['/contact', 'Contact']];
+  const nav = [['/experiences', 'Experiences'], ['/impact', 'Impact Created'], ['/about', 'About Us'], ['/team', 'Team'], ['/values', 'Values'], ['/contact', 'Contact']];
   const navHtml = nav.map(([h, l]) => `<a href="${h}"${path.startsWith(h) ? ' class="on"' : ''}>${l}</a>`).join('');
   const wa = waLink('Hi Rock & Anchor, I would like to know more about your experiences.');
   // On an experience with its own contact number, the header, menu and floating WhatsApp buttons use that number.
@@ -569,7 +569,7 @@ function layout({ title, desc, path, body, image, data, contact }) {
 <main>${body}</main>
 <footer class="site"><div class="wrap"><div class="cols">
 <div><img class="logo" src="/logo.png" alt="Rock & Anchor"><p>Curated outdoor experiences in the Sahyadris, led by certified outdoor educators and the villagers who call these mountains home.</p>${socialRow()}</div>
-<div><h4>Explore</h4><a href="/experiences">Experiences</a><a href="/impact">Impact Created</a><a href="/about">About Us</a><a href="/team">Team</a><a href="/values">Our Values</a><a href="/contact">Contact</a></div>
+<div><h4>Explore</h4><a href="/experiences">Experiences</a><a href="/impact">Impact Created</a><a href="/about">About Us</a><a href="/team">Team</a><a href="/values">Values</a><a href="/contact">Contact</a></div>
 <div><h4>Talk to us</h4><a href="tel:${SITE.tel}">${SITE.phone}</a><a href="${wa}">WhatsApp</a><a href="mailto:${SITE.email}">${SITE.email}</a><a href="https://instagram.com/${SITE.insta}">Instagram @${SITE.insta}</a></div>
 </div><div class="fine">© ${new Date().getFullYear()} Rock & Anchor · <a style="display:inline" href="/terms">Terms</a> · <a style="display:inline" href="/privacy">Privacy</a> · <a style="display:inline" href="/cancellation-and-refunds">Cancellation and refunds</a><br>Bookings are confirmed over call or WhatsApp on ${SITE.phone}.</div></div></footer>
 <a class="float-wa" href="${pwa}" aria-label="WhatsApp Rock & Anchor">${ICON.wa}</a>

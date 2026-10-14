@@ -8,7 +8,7 @@ const VALUES = [
   {
     id: 'sustainability', name: 'Sustainability', line: 'We do not have an Earth 2.0.', photo: ['values.sustainability', 'winter-trekking', 2],
     text: 'Sustainability is not a list of good habits. It starts from a plain fact: there is no second planet to move to, and no second Sahyadri. So we try to run experiences that the mountains and villages we work in can sustain for years, not just for one season.',
-    ground: ['Keeping groups to a size a trail and a village can take.', 'Carrying out everything we carry in.', 'Thinking about what happens to a place after we leave, not only while we are there.', 'Working with local people, so the value of an experience stays where it happens.', 'Saying no to a booking that would damage a place we cannot repair.'],
+    ground: ['Keeping groups to a size that the trail, and the village, can take.', 'Carrying out everything we carry in.', 'Thinking about what happens to a place after we leave, not only while we are there.', 'Working with local people, so the value of an experience stays where it happens.', 'Saying no to a booking that would damage a place we cannot repair.'],
     not: 'Treating a fragile place as disposable, as if there will always be somewhere else next year.',
     leads: ['lnt'],
   },
@@ -52,11 +52,11 @@ const PRACTICES = [
   },
   {
     id: 'geotag', name: 'Say No to Geotagging', line: 'Not every beautiful place needs to become a pin on a map.', from: ['ecosystems', 'culture'],
-    text: 'A waterfall, a cave, a nesting site or a quiet corner of a village can change for good when it suddenly becomes easy to find. Fragile habitats, wildlife and small communities cannot always take a rush of new visitors. That is why we never publish exact locations, on this site or on social media. The principle is not “never share”. It is: think about what happens when a fragile place becomes easy to find.',
+    text: 'A waterfall, a cave, a nesting site or a quiet corner of a village can change for good when it suddenly becomes easy to find. Our mountains do not yet have proper regulation, so places that go viral get overrun, polluted and damaged. That is why we never publish exact locations, on this site or on social media, and why we ask you not to either. The principle is not “never share”. It is: think about what happens when a fragile place becomes easy to find.',
   },
   {
     id: 'wildlife', name: 'Respect wildlife', line: 'Observe without interfering.', from: ['ecosystems'],
-    list: ['Do not feed.', 'Do not chase.', 'Do not handle, unless there is a real safety or conservation reason.', 'Do not disturb nests or animals with young.', 'Give animals space.'],
+    list: ['Do not feed.', 'Do not chase.', 'Do not handle, unless there is a real safety, conservation or learning reason.', 'Do not disturb nests or animals with young.', 'Give animals space.'],
   },
   {
     id: 'communities', name: 'Respect communities', line: 'We are visitors.', from: ['culture'],
@@ -94,6 +94,8 @@ const LEARN = [
       ['Is it someone’s home?', 'A field, a courtyard or a small village space.'],
       ['Could it take many more visitors?', 'If the answer is no, share the moment, not the pin.'],
     ],
+    ask: 'Leave location names out of your posts, stories and reviews. Call it “paradise” instead, or tag or collaborate with Rock & Anchor to share your experience without revealing where it is.',
+    thanks: 'Thank you for supporting responsible travel.',
   },
   {
     id: 'essentials', name: 'The 10 Essentials', understand: 'Understanding how to prepare', from: ['learning'], fromExtra: 'Responsibility',
@@ -116,7 +118,7 @@ const ESSENTIALS = [
   ['Sun protection', 'Sunscreen, sunglasses and a cap or hat.'],
 ];
 const ESSENTIALS_PLUS = [
-  ['Communication', 'A fully charged phone, emergency numbers saved, and a whistle. Three blasts means help.'],
+  ['Communication', 'A fully charged phone, emergency numbers saved, and a whistle. Three blasts means help. Our leaders also carry walkie-talkies to stay in touch across the group.'],
   ['Attitude and judgment', 'The destination is not the goal. Getting everyone home is. Turning back is a skill.'],
 ];
 
@@ -188,15 +190,14 @@ function valuesPage(data) {
 
 <section class="vl-learn" id="learn"><div class="wrap">
   <p class="vl-kicker rv">Learn before you go</p><h2 class="vl-h rv">Being responsible outdoors starts before you arrive.</h2>
-  <p class="vl-p rv">Three pieces of knowledge turn our values into things you can do. They are not values in themselves. They are how values become action.</p>
-  <ol class="vl-map rv" aria-label="How values connect to what we teach">${LEARN.map((l) => `<li><span class="vl-map-v">${l.from.map((id) => esc(vName[id])).join(' + ')}${l.fromExtra ? ` + ${esc(l.fromExtra)}` : ''}</span><span class="vl-map-arrow" aria-hidden="true">→</span><a class="vl-map-k" href="#learn-${l.id}">${esc(l.name)}</a><span class="vl-map-u">${esc(l.understand)}</span></li>`).join('')}</ol>
 
   <div class="vl-learn-grid">
     <article class="vl-learn-card rv" id="learn-${lnt.id}"><p class="vl-learn-u">${esc(lnt.understand)}</p><h3>${esc(lnt.name)}</h3><p>${esc(lnt.intro)}</p>
       <ol class="vl-seven">${lnt.items.map(([h, t]) => `<li><b>${esc(h)}</b><span>${esc(t)}</span></li>`).join('')}</ol><p class="vl-credit">${esc(lnt.credit)}</p></article>
     <article class="vl-learn-card vl-geo rv" id="learn-${geo.id}"><p class="vl-learn-u">${esc(geo.understand)}</p><h3>${esc(geo.name)}</h3><p>${esc(geo.intro)}</p>
       <ul class="vl-qs">${geo.items.map(([h, t]) => `<li><b>${esc(h)}</b><span>${esc(t)}</span></li>`).join('')}</ul>
-      <p class="vl-pin">Share the moment. Think twice about the pin.</p></article>
+      <div class="vl-geo-ask"><p class="vl-learn-u">What we ask</p><p>${esc(geo.ask)}</p><a class="vl-insta" href="https://www.instagram.com/${SITE.insta}/">Tag @${esc(SITE.insta)}</a></div>
+      <p class="vl-pin">${esc(geo.thanks)}</p></article>
   </div>
 </div></section>
 
@@ -308,14 +309,7 @@ const VALUES_CSS = `
 .vl-prac:first-child .vl-from a,.vl-prac:nth-child(2) .vl-from a{background:rgba(255,255,255,.14);color:#fff}
 /* learn */
 .vl-learn{background:var(--card);border-top:1px solid var(--line)}
-.vl-map{list-style:none;padding:0;margin:30px 0 40px;display:grid;gap:12px}
-.vl-map li{display:grid;grid-template-columns:minmax(0,1.1fr) auto minmax(0,1fr) minmax(0,1.2fr);gap:16px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:16px 20px}
-.vl-map-v{font-weight:700;color:var(--forest)}
-.vl-map-arrow{font-size:26px;color:var(--clay);line-height:1}
-.vl-map-k{font:800 clamp(22px,2.2vw,28px)/1.1 "Big Shoulders Display","Arial Narrow",sans-serif;text-decoration:none;color:var(--ink)!important}
-.vl-map-k:hover{color:var(--clay)!important}
-.vl-map-u{color:var(--muted);font-size:15.5px}
-.vl-learn-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;align-items:start}
+.vl-learn-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;align-items:start;margin-top:30px}
 .vl-learn-card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:clamp(22px,3vw,36px);scroll-margin-top:90px}
 .vl-learn-u{font:700 12px/1.4 "DM Sans",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--clay);margin:0 0 10px}
 .vl-learn-card h3{font-size:clamp(30px,3.2vw,42px);margin:0 0 8px}
@@ -331,6 +325,8 @@ const VALUES_CSS = `
 .vl-qs li{padding:12px 0 12px 34px;border-top:1px solid rgba(255,255,255,.15);position:relative}
 .vl-qs li:before{content:"?";position:absolute;left:0;top:13px;width:22px;height:22px;border-radius:50%;border:1.5px solid #f3c9a6;color:#f3c9a6;display:grid;place-items:center;font-weight:800;font-size:13px}
 .vl-qs span{color:#cfc8bd}
+.vl-geo-ask{margin-top:18px;padding:16px 18px;border-radius:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15)}.vl-geo-ask .vl-learn-u{color:#f3c9a6;margin-bottom:6px}.vl-geo-ask p{margin:0 0 12px;color:#e7e2da}
+.vl-insta{display:inline-block;color:#fff!important;font-weight:700;text-decoration:none;border-bottom:2px solid #f3c9a6;padding-bottom:2px}
 .vl-pin{margin:18px 0 0;font:800 clamp(22px,2.4vw,28px)/1.15 "Big Shoulders Display","Arial Narrow",sans-serif;color:#f3c9a6!important}
 /* ten essentials */
 .vl-ten{background:#efe7da;scroll-margin-top:70px}
@@ -372,7 +368,6 @@ const VALUES_CSS = `
 .vl-end-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 .vl-end .btn-ghost{color:#fff;border-color:rgba(255,255,255,.6)}
 @media(max-width:900px){.vl-intro-grid,.vl-learn-grid,.vl-ten-head{grid-template-columns:1fr;gap:20px}
-.vl-value,.vl-value:nth-child(even){grid-template-columns:1fr}.vl-value:nth-child(even) .vl-value-img{order:0}.vl-value-img{min-height:0;aspect-ratio:16/10}
-.vl-map li{grid-template-columns:1fr;gap:4px}.vl-map-arrow{transform:rotate(90deg);width:fit-content;font-size:22px}}
+.vl-value,.vl-value:nth-child(even){grid-template-columns:1fr}.vl-value:nth-child(even) .vl-value-img{order:0}.vl-value-img{min-height:0;aspect-ratio:16/10}}
 @media(max-width:640px){.vl-check ol,.vl-plus ol,.vl-asks{grid-template-columns:1fr}.vl-tmi{grid-template-columns:1fr}.vl-jump{margin-bottom:28px}.vl-jump a{font-size:14px;padding:8px 13px}}
 `;
