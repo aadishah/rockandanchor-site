@@ -184,3 +184,4 @@ Production now runs ce1d5fa8 (staging38), previously c1339aa6. Only Approved eve
 ## 2026-10-14: Our Values page on staging
 - New /values page (branch about-redesign). Staging version 604d17ad. Live unchanged (ce1d5fa8). Details in docs/our_values_page_2026-10-14.md.
 - 2026-10-14: Values page pushed live. Version 26908fc6 (deployment 9a750e0f), replacing ce1d5fa8.
+- 2026-10-14: Curate page on staging (fe4ac114), branch about-redesign. Live unchanged (26908fc6). Details in docs/curate_page_2026-10-14.md.
