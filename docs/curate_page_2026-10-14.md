@@ -1,6 +1,6 @@
 # Curate your own experience (14 Oct 2026)
 
-Branch: `about-redesign`. Status: **on staging** (version fe4ac114), not live.
+Branch: `about-redesign`. Status: **on staging** (version ccd42ec4), not live.
 https://staging-rockandanchor-site.adityashah-06.workers.dev/curate
 
 ## Files changed
@@ -38,7 +38,7 @@ Each live experience gets a score:
 - +3 for each chosen activity it offers.
 - Each intention maps to categories and activities (for example Look up: Stargazing, Evenings; stars, night walks, sunsets). +2 per matching category, +1 per matching activity.
 - Family or children: +2 for Family & Kids. School: +2 for Schools & Camps or Family & Kids. Corporate or college: +2 for Corporate & Private Groups.
-- Children's ages outside the experience's age range: −4.
+- Children's ages outside the experience's age range: −4. Experiences only for children (upper age 17 or less) get −8 when no family, children or school is picked.
 - Time: short sessions favoured for a few hours or half day, day-long for a full day, overnight for one night or weekend. An overnight experience gets −8 for a few hours, half day or full day.
 - Any local layer: +1 for village experiences. Local meal: +1 if it includes food.
 - Monsoon experiences outside June to September: −4 (uses the chosen date or month, else today).

@@ -2066,6 +2066,7 @@ function score(e){
   if((has('who','children')||has('who','family'))&&hc('Family & Kids'))s+=2;
   if(has('who','school')&&(hc('Schools & Camps')||hc('Family & Kids')))s+=2;
   if((has('who','corporate')||has('who','college'))&&hc('Corporate & Private Groups'))s+=2;
+  if(!(has('who','children')||has('who','family')||has('who','school'))&&e.hi<=17)s-=8;
   for(i=0;i<S.ages.length;i++){var r=AGEN[S.ages[i]];if(r&&(r[1]<e.lo||r[0]>e.hi)){s-=4;break}}
   var t=S.time,L=e.len;
   if(t==='hours'){s+=L==='short'?2:L==='night'?-8:-1}
