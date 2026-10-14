@@ -29,11 +29,12 @@ const CURATE_ACTS = [
   // Added on request (14 Oct 2026): offered even where no experience text mentions them yet. 'always' shows them regardless.
   ['swim', 'Swimming', 'A proper swim in a lake or river.', /\bswim/, 'day', 'always'],
   ['fondue', 'Chocolate fondue', 'Something sweet by the fire.', /fondue/, 'night', 'always'],
+  ['teach', 'Teaching village children', 'An hour with children in the village. Share something you know.', /teach(ing)? (the )?(village )?(children|kids)/, 'day', 'always', '1 hour'],
 ];
 
 function curateData(data) {
   const exps = sorted(data).filter((e) => !(e.categories || []).some((c) => /guide training/i.test(c)));
-  const acts = CURATE_ACTS.map(([id, label, line, re, kind, always]) => ({ id, label, line, kind, re, always: !!always }));
+  const acts = CURATE_ACTS.map(([id, label, line, re, kind, always, dur]) => ({ id, label, line, kind, re, always: !!always, dur: dur || '' }));
   // These only use a photo set in Airtable (curate.act.<id>); no matching experience photo exists yet.
   const OWN_PHOTO_ONLY = ['trees', 'swim', 'fondue'];
   const out = exps.map((e) => {
@@ -56,13 +57,13 @@ function curateData(data) {
   const taken = new Set();
   const used = acts.filter((a) => a.always || out.some((e) => e.a.includes(a.id))).map((a) => {
     const sl = slot(data, 'curate.act.' + a.id, '');
-    let img = sl.src;
+    let img = sl.src || (a.id === 'teach' ? slot(data, 'about.ground.schools', '').src : ''); // village school photo already chosen for About
     if (!img && !OWN_PHOTO_ONLY.includes(a.id)) {
       const cands = out.filter((e) => e.a.includes(a.id)).sort((x, y) => x.a.length - y.a.length);
       for (const e of cands) { const ex = bySlug(data, e.s); for (const ph of (ex && ex.photos) || []) { if (ph.video || taken.has(ph.thumb)) continue; img = ph.thumb; break; } if (img) break; }
     }
     if (img) taken.add(img);
-    return { id: a.id, label: a.label, line: a.line, kind: a.kind, img: img || '' };
+    return { id: a.id, label: a.label, line: a.line, kind: a.kind, dur: a.dur, img: img || '' };
   });
   return { exps: out, acts: used };
 }
@@ -178,7 +179,7 @@ function recs(){return D.exps.map(function(e){return{e:e,s:score(e)}}).filter(fu
 function flow(){
   var pace=S.pace==='decide'||!S.pace?'balanced':S.pace,per={slow:2,balanced:3,active:4}[pace];
   var day=[],eve=[],night=[],stay=0;
-  S.acts.forEach(function(a){var x=ACT[a];if(!x)return;if(x.kind==='night')night.push(x.label);else if(x.kind==='evening')eve.push(x.label);else if(x.kind==='stay')stay=1;else if(x.kind==='day')day.push(x.label)});
+  S.acts.forEach(function(a){var x=ACT[a];if(!x)return;if(x.kind==='night')night.push(x.label);else if(x.kind==='evening')eve.push(x.label);else if(x.kind==='stay')stay=1;else if(x.kind==='day')day.push(x.label+(x.dur?' ('+x.dur+')':''))});
   if(has('feel','lookup')&&!night.length&&ACT.stars)night.push(ACT.stars.label);
   var loc=[];if(has('local','hosts'))loc.push('Time with local hosts');if(has('local','farming')&&S.acts.indexOf('farming')<0)loc.push('Learning about farming');if(has('local','tradition'))loc.push('Something traditionally done here');if(has('local','stories'))loc.push('Stories about the place');if(has('local','suggest'))loc.push('A local moment we pick for you');
   day=day.concat(loc);
@@ -212,7 +213,7 @@ function flow(){
 
 function whoText(){var w=labs(WHO,S.who).join(' and ');return (S.n?S.n+(S.n===1?' person':' people'):'')+(w?(S.n?', ':'')+w.toLowerCase():'')+(S.ages.length?' (children '+labs(AGES,S.ages).join(', ').toLowerCase()+')':'')}
 function whenText(){if(S.when==='date'&&S.date){var d=new Date(S.date);return d.toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}if(S.when==='month'&&S.month)return S.month;return 'Flexible'}
-function rows(){return [['Who',whoText()||'Not sure yet'],['Looking for',labs(FEEL,S.feel).join(' + ')||'Open to ideas'],['Leave feeling',labs(LEAVE,S.leave).join(' + ')||'We’ll see'],['Time',(function(){var a=S.time&&S.time!=='flex'?lab(TIME,S.time):'',w=whenText();return a?a+', '+(w==='Flexible'?'flexible on dates':w):(w==='Flexible'?'Flexible':'Flexible on length, '+w)})()],['Doing',S.acts.map(function(a){return ACT[a]?ACT[a].label:a}).join(', ')||'Your call'],['Local layer',labs(LOCAL,S.local).join(', ')||'Not this time'],['Pace',lab(PACE,S.pace)||'Balanced']]}
+function rows(){return [['Who',whoText()||'Not sure yet'],['Looking for',labs(FEEL,S.feel).join(' + ')||'Open to ideas'],['Leave feeling',labs(LEAVE,S.leave).join(' + ')||'We’ll see'],['Time',(function(){var a=S.time&&S.time!=='flex'?lab(TIME,S.time):'',w=whenText();return a?a+', '+(w==='Flexible'?'flexible on dates':w):(w==='Flexible'?'Flexible':'Flexible on length, '+w)})()],['Doing',S.acts.map(function(a){return ACT[a]?ACT[a].label+(ACT[a].dur?' ('+ACT[a].dur+')':''):a}).join(', ')||'Your call'],['Local layer',labs(LOCAL,S.local).join(', ')||'Not this time'],['Pace',lab(PACE,S.pace)||'Balanced']]}
 function rupees(n){return '₹'+Number(n).toLocaleString('en-IN')}
 function summaryText(R,F){
   var t='Hi Rock & Anchor, I used Curate on your website. Here’s what we’re imagining:\n\n'+rows().map(function(r){return r[0]+': '+r[1]}).join('\n');

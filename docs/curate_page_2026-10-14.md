@@ -1,6 +1,6 @@
 # Curate your own experience (14 Oct 2026)
 
-Branch: `about-redesign`. Status: **on staging** (version 51934542), not live.
+Branch: `about-redesign`. Status: **on staging** (version 7067213f), not live.
 https://staging-rockandanchor-site.adityashah-06.workers.dev/curate
 
 ## Files changed
@@ -84,3 +84,4 @@ Website Page Photos now has empty rows (Page = Curate or Values) for curate.hero
 - Tree planting: no tree planting photo exists in Airtable or the website images folder. It shows a plain green card until a photo is added to curate.act.trees.
 - New activities, always shown: Swimming (curate.act.swim) and Chocolate fondue (curate.act.fondue). Both show a plain green card until photos are added.
 - Staging version 51934542.
+- Added "Teaching village children" (1 hour, always shown). The hour shows in the example day and the summary. Photo: curate.act.teach if set, otherwise the About page's village school photo (about.ground.schools). Staging version 7067213f.
