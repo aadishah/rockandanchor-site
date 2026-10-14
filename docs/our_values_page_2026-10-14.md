@@ -1,0 +1,49 @@
+# Our Values page (14 Oct 2026)
+
+Branch: `about-redesign`, fast-forwarded to the current live line (`changes-after-3-page-audit`, acd9354) before building, so the page sits on the current site. The live line itself is untouched.
+Status: built and checked locally. **Not on staging and not live.** Staging deploy was blocked because the computer and Chrome were offline at the time.
+
+## Files changed
+- `src/values.js` (new): the whole page, its data (VALUES, PRACTICES, LEARN, ESSENTIALS, ASK), CSS and a small script.
+- `src/template.js`: `__VALUES__` include, `/values` route, `/our-values` redirect, sitemap entry, "Our Values" in the top nav (after Team) and the footer, and a slightly tighter nav gap between 821 and 1060px so six links fit.
+- `build.py`: includes `src/values.js`.
+- `scripts/test.mjs`: tests `/values` and `/our-values`.
+- `dist/worker.js`: rebuilt.
+
+## What the page contains
+1. Hero: "Our values are things we are willing to act on."
+2. Intro: what we do because we care; what our values shape.
+3. The five values: Sustainability, Simplicity, Cultural authenticity, Experiential learning, Respect for ecosystems. Each card has a core line, an explanation, "On the ground", "What it is not", and links to the practice it becomes.
+4. Values in practice: Leave No Trace, Say No to Geotagging, Respect wildlife, Respect communities, Learn before you interfere. Each shows "Comes from" tags that link back to the values.
+5. Learn before you go: a map of value → knowledge → what it helps you understand, then Leave No Trace (7 principles, Sahyadri wording) and Say No to Geotagging (four questions before you post).
+6. The 10 Essentials: a tickable checklist (no storage), plus the two Rock & Anchor adds (Communication, Attitude and judgment).
+7. What we ask of you: the ten asks.
+8. We are still learning: closing, with Explore our experiences and a WhatsApp "Plan one for your group" button.
+
+## Left untouched on purpose
+About (`src/about.js`), Impact (`src/impact.js`), Team (`src/team.js`), Airtable schema, data loading, policies. No Learning page was built. The shared header and footer now show "Our Values" on every page, including About.
+
+## Sources
+- Five values and their field meaning: guide handbook, Part 3 (Our Values), Parts 14 and 15.
+- Leave No Trace: Leaders Guide Module 8 (seven principles, Sahyadri application).
+- 10 Essentials: Leaders Guide Module 20, "The Sahyadri Essentials" (the standard ten plus Communication and Attitude and judgment).
+- Touch, Move, Inspire: the About page.
+- Say No to Geotagging, Respect wildlife, Respect communities, Learn before you interfere, What we ask of you: the brief, plus the handbook's community rules.
+
+## Assumptions
+- `/values` as the address (with `/our-values` redirecting).
+- No Curate route exists yet, so the second closing button opens WhatsApp.
+- The learning content sits in `LEARN` and `ESSENTIALS` as plain data, so a future Learning page can reuse it.
+
+## Photos
+Fallbacks come from experience photos. Each spot can be replaced from Airtable (Website Page Photos) using these slot keys:
+`values.hero`, `values.sustainability`, `values.simplicity`, `values.culture`, `values.learning`, `values.ecosystems`, `values.end`.
+
+## Check before publishing
+- "We do not publish exact locations" (Say No to Geotagging). True for the website; confirm it also holds for Instagram and other channels.
+- "Our guides, hosts and cooks come from the villages we work in." Confirm this is true for every role, or soften it to "many of".
+- "Saying no to a booking that would damage a place we cannot repair." Taken from the handbook as a standard; confirm you are happy to say it publicly.
+- "Each experience also has its own packing list, which we share before you come." Packing lists are hidden on most experience pages; confirm they are always shared after booking.
+- "The Ten Essentials … used since the 1930s." From the Leaders Guide.
+- The essentials text says the leader carries the first aid kit and the means to make heat. Confirm that this holds on every experience.
+- Photo choices, especially the culture card (a village home with children) and the closing group photo.

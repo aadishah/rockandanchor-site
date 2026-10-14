@@ -381,6 +381,7 @@ header.site .wrap{display:flex;align-items:center;justify-content:space-between;
 nav.main{display:flex;gap:28px;align-items:center}
 nav.main a{text-decoration:none;font-weight:500;font-size:16px}nav.main a:hover,nav.main a.on{color:var(--clay)}
 nav.main .btn{padding:10px 16px;color:#fff}
+@media (max-width:1060px){nav.main{gap:18px}nav.main a{font-size:15px}}
 .menu{display:none}
 @media (max-width:820px){nav.main{display:none}.menu{display:block}
 .menu summary{list-style:none;cursor:pointer;padding:10px;margin-right:-10px}.menu summary::-webkit-details-marker{display:none}
@@ -551,7 +552,7 @@ const FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com"><link 
 
 function layout({ title, desc, path, body, image, data, contact }) {
   const full = title ? `${title} | Rock & Anchor` : 'Rock & Anchor | Authentic outdoor experiences in the Sahyadris';
-  const nav = [['/experiences', 'Experiences'], ['/impact', 'Impact Created'], ['/about', 'About Us'], ['/team', 'Team'], ['/contact', 'Contact']];
+  const nav = [['/experiences', 'Experiences'], ['/impact', 'Impact Created'], ['/about', 'About Us'], ['/team', 'Team'], ['/values', 'Our Values'], ['/contact', 'Contact']];
   const navHtml = nav.map(([h, l]) => `<a href="${h}"${path.startsWith(h) ? ' class="on"' : ''}>${l}</a>`).join('');
   const wa = waLink('Hi Rock & Anchor, I would like to know more about your experiences.');
   // On an experience with its own contact number, the header, menu and floating WhatsApp buttons use that number.
@@ -568,7 +569,7 @@ function layout({ title, desc, path, body, image, data, contact }) {
 <main>${body}</main>
 <footer class="site"><div class="wrap"><div class="cols">
 <div><img class="logo" src="/logo.png" alt="Rock & Anchor"><p>Curated outdoor experiences in the Sahyadris, led by certified outdoor educators and the villagers who call these mountains home.</p>${socialRow()}</div>
-<div><h4>Explore</h4><a href="/experiences">Experiences</a><a href="/impact">Impact Created</a><a href="/about">About Us</a><a href="/team">Team</a><a href="/contact">Contact</a></div>
+<div><h4>Explore</h4><a href="/experiences">Experiences</a><a href="/impact">Impact Created</a><a href="/about">About Us</a><a href="/team">Team</a><a href="/values">Our Values</a><a href="/contact">Contact</a></div>
 <div><h4>Talk to us</h4><a href="tel:${SITE.tel}">${SITE.phone}</a><a href="${wa}">WhatsApp</a><a href="mailto:${SITE.email}">${SITE.email}</a><a href="https://instagram.com/${SITE.insta}">Instagram @${SITE.insta}</a></div>
 </div><div class="fine">© ${new Date().getFullYear()} Rock & Anchor · <a style="display:inline" href="/terms">Terms</a> · <a style="display:inline" href="/privacy">Privacy</a> · <a style="display:inline" href="/cancellation-and-refunds">Cancellation and refunds</a><br>Bookings are confirmed over call or WhatsApp on ${SITE.phone}.</div></div></footer>
 <a class="float-wa" href="${pwa}" aria-label="WhatsApp Rock & Anchor">${ICON.wa}</a>
@@ -743,6 +744,8 @@ __IMPACT__
 
 __TEAM__
 
+__VALUES__
+
 function contactPage(data) {
   const body = `<section class="page-head"><div class="wrap"><p class="eyebrow">Contact</p><h1>Let's plan your day outdoors</h1>
 <p class="lead">Bookings happen over call or WhatsApp. Tell us the experience, your group size and preferred dates, and we will take it from there. WhatsApp is usually the fastest.</p></div></section>
@@ -773,7 +776,7 @@ function notFound(data) {
 
 // ---------- routing ----------
 const REDIRECTS = {
-  '/about-us': '/about', '/contact-us': '/contact', '/join-an-experience': '/experiences', '/shop': '/experiences',
+  '/about-us': '/about', '/our-values': '/values', '/contact-us': '/contact', '/join-an-experience': '/experiences', '/shop': '/experiences',
   '/privacy-policy': '/privacy', '/terms-conditions': '/terms', '/cancellation-policy': '/cancellation-and-refunds',
   '/refund-returns': '/cancellation-and-refunds', '/shipping-policy': '/terms', '/special-offer': '/experiences',
   '/trip-review': '/', '/media': '/', '/cart': '/experiences', '/checkout': '/experiences', '/my-account': '/',
@@ -811,7 +814,7 @@ async function handle(request, env, ctx) {
 
     const data = await getData(env, ctx);
     if (path === '/sitemap.xml') {
-      const urls = ['/', '/experiences', '/impact', '/about', '/team', '/contact', ...data.experiences.map((e) => `/experiences/${e.slug}`)];
+      const urls = ['/', '/experiences', '/impact', '/about', '/team', '/values', '/contact', ...data.experiences.map((e) => `/experiences/${e.slug}`)];
       return new Response(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map((u) => `<url><loc>${SITE.url}${u}</loc></url>`).join('')}</urlset>`, { headers: { 'Content-Type': 'application/xml' } });
     }
     if (path === '/') return html(home(data), 200, data.source);
@@ -828,6 +831,7 @@ async function handle(request, env, ctx) {
     if (path === '/__timing' && url.hostname.startsWith('staging-')) return new Response(JSON.stringify({ ageSeconds: MEMO ? Math.round((Date.now() - MEMO.t) / 1000) : null, refreshing: !!REFRESHING, lastError: LAST_ERR, timing: data.timing, events: (data.events || []).length }), { headers: { 'content-type': 'application/json' } });
     if (path === '/team') return html(teamPage(data, { drafts: url.hostname.startsWith('staging-') }), 200, data.source);
     if (path === '/impact') return html(impactPage(data, { drafts: url.hostname.startsWith('staging-') }), 200, data.source);
+    if (path === '/values') return html(valuesPage(data), 200, data.source);
     if (path === '/contact') return html(contactPage(data));
     if (POLICIES[path.slice(1)]) return html(policyPage(path.slice(1), data));
     return html(notFound(data), 404);
