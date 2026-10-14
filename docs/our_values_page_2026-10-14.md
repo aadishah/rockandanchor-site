@@ -1,7 +1,7 @@
 # Our Values page (14 Oct 2026)
 
 Branch: `about-redesign`, fast-forwarded to the current live line (`changes-after-3-page-audit`, acd9354) before building, so the page sits on the current site. The live line itself is untouched.
-Status: **on staging** (version 26908fc6, 14 Oct 2026), not live. https://staging-rockandanchor-site.adityashah-06.workers.dev/values
+Status: **LIVE** (version 26908fc6, pushed 14 Oct 2026 14:15 IST, deployment 9a750e0f). https://rockandanchor.in/values https://staging-rockandanchor-site.adityashah-06.workers.dev/values
 
 ## Files changed
 - `src/values.js` (new): the whole page, its data (VALUES, PRACTICES, LEARN, ESSENTIALS, ASK), CSS and a small script.
@@ -69,3 +69,6 @@ Version 604d17ad uploaded to the staging alias only. Live is still ce1d5fa8.
 - Removed the value-to-knowledge map and its intro paragraph under "Being responsible outdoors starts before you arrive".
 - Nav and footer label is now "Values" (page title stays "Our Values").
 - Staging version 26908fc6. Live unchanged (ce1d5fa8).
+
+## Pushed live
+14 Oct 2026: version 26908fc6 at 100% (deployment 9a750e0f), replacing ce1d5fa8. `changes-after-3-page-audit` fast-forwarded to match.
