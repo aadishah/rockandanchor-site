@@ -26,7 +26,7 @@ About (`src/about.js`), Impact (`src/impact.js`), Team (`src/team.js`), Airtable
 ## Sources
 - Five values and their field meaning: guide handbook, Part 3 (Our Values), Parts 14 and 15.
 - Leave No Trace: Leaders Guide Module 8 (seven principles, Sahyadri application).
-- 10 Essentials: Leaders Guide Module 20, "The Sahyadri Essentials" (the standard ten plus Communication and Attitude and judgment).
+- 10 Essentials: the Appalachian Mountain Club's list, in AMC's order (Hydration, Nutrition, Navigation, Emergency shelter, Layers, Illumination, Firestarter, First aid kit, Repair kit, Sun protection), from outdoors.org "The 10 Essentials: What to Pack For a Backcountry Hike". Wording adapted for Sahyadri day treks. The two extras (Communication, Attitude and judgment) come from Leaders Guide Module 20.
 - Touch, Move, Inspire: the About page.
 - Say No to Geotagging, Respect wildlife, Respect communities, Learn before you interfere, What we ask of you: the brief, plus the handbook's community rules.
 
@@ -44,6 +44,8 @@ Fallbacks come from experience photos. Each spot can be replaced from Airtable (
 - "Our guides, hosts and cooks come from the villages we work in." Confirm this is true for every role, or soften it to "many of".
 - "Saying no to a booking that would damage a place we cannot repair." Taken from the handbook as a standard; confirm you are happy to say it publicly.
 - "Each experience also has its own packing list, which we share before you come." Packing lists are hidden on most experience pages; confirm they are always shared after booking.
-- "The Ten Essentials … used since the 1930s." From the Leaders Guide.
 - The essentials text says the leader carries the first aid kit and the means to make heat. Confirm that this holds on every experience.
 - Photo choices, especially the culture card (a village home with children) and the closing group photo.
+
+## Update (14 Oct 2026, later)
+Switched the 10 Essentials to the AMC list on request. The AMC Outdoor Leader Handbook in the project does not list the Ten Essentials, so the list was taken from AMC's own article on outdoors.org: https://www.outdoors.org/resources/amc-outdoors/outdoor-resources/the-10-essentials-what-to-pack-for-a-backcountry-hike/

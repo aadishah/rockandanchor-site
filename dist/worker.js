@@ -1636,19 +1636,20 @@ const LEARN = [
   },
 ];
 
-// The Ten Essentials (a long standing outdoor checklist), with the two our leaders add for the Sahyadris,
-// as taught in the Rock & Anchor Leaders Guide (Module 20, The Sahyadri Essentials).
+// The 10 Essentials as published by the Appalachian Mountain Club (AMC), in AMC's order:
+// outdoors.org, "The 10 Essentials: What to Pack For a Backcountry Hike". Wording adapted for Sahyadri day treks.
+// The two extra items come from the Rock & Anchor Leaders Guide (Module 20, The Sahyadri Essentials).
 const ESSENTIALS = [
-  ['Navigation', 'A phone with offline maps, downloaded before you lose network.'],
-  ['Sun protection', 'Sunscreen, sunglasses and a cap or hat.'],
-  ['Insulation', 'A warm layer and a rain jacket. Avoid cotton in the monsoon.'],
-  ['Illumination', 'A headlamp with spare batteries. A phone torch is not enough.'],
-  ['First aid', 'Your own medicines. Your leader carries the full first aid kit.'],
-  ['Fire', 'A way to make heat in an emergency. Your leader carries this.'],
+  ['Hydration', 'Enough water for the day in a reusable bottle, and a way to purify more. Drink before you feel thirsty.'],
+  ['Nutrition', 'More food than you think you need: dates, nuts, jaggery, fruit, plus a little extra.'],
+  ['Navigation', 'A map of the route and a phone with offline maps. Know how to use them, and do not rely on the phone alone.'],
+  ['Emergency shelter', 'Something to keep off rain and wind if you have to stop: an emergency blanket or a poncho.'],
+  ['Layers', 'A warm layer and a rain jacket. Avoid cotton, especially in the monsoon.'],
+  ['Illumination', 'A headlamp with spare batteries, in case the day runs past sunset. A phone torch is not enough.'],
+  ['Firestarter', 'A way to make heat and light in an emergency. Your leader carries this.'],
+  ['First aid kit', 'Your own medicines, and a kit you know how to use. Your leader carries the full group kit.'],
   ['Repair kit', 'Duct tape, safety pins and spare cord. Small fixes save long walks.'],
-  ['Nutrition', 'Enough food for the day and a little extra: dates, nuts, jaggery, fruit.'],
-  ['Hydration', 'Water in a reusable bottle, filled before you start. Drink before you feel thirsty.'],
-  ['Emergency shelter', 'An emergency blanket or a poncho.'],
+  ['Sun protection', 'Sunscreen, sunglasses and a cap or hat.'],
 ];
 const ESSENTIALS_PLUS = [
   ['Communication', 'A fully charged phone, emergency numbers saved, and a whistle. Three blasts means help.'],
@@ -1737,14 +1738,14 @@ function valuesPage(data) {
 
 <section class="vl-ten" id="learn-essentials"><div class="wrap">
   <div class="vl-ten-head"><div><p class="vl-kicker rv">Understanding how to prepare</p><h2 class="vl-h rv">The 10 Essentials.</h2></div>
-  <div class="rv"><p class="vl-lead">Preparation is part of adventure.</p><p class="vl-p">The Ten Essentials is a checklist outdoor people have used since the 1930s. It is about being ready, not about being afraid. Each experience also has its own packing list, which we share before you come.</p></div></div>
+  <div class="rv"><p class="vl-lead">Preparation is part of adventure.</p><p class="vl-p">This is the Appalachian Mountain Club’s list of 10 Essentials, a checklist outdoor people around the world pack by. It is about being ready, not about being afraid. Each experience also has its own packing list, which we share before you come.</p></div></div>
   <div class="vl-check" data-check>
     <p class="vl-count" aria-live="polite"><span data-n>0</span> of ${ESSENTIALS.length} ready</p>
     <ol>${ESSENTIALS.map(([h, t], i) => `<li><label><input type="checkbox"><span class="vl-box" aria-hidden="true"></span><span class="vl-n">${i + 1}</span><span class="vl-ct"><b>${esc(h)}</b><span>${esc(t)}</span></span></label></li>`).join('')}</ol>
   </div>
   <div class="vl-plus rv"><p class="vl-plus-h">In the Sahyadris, our leaders carry two more.</p>
     <ol start="11">${ESSENTIALS_PLUS.map(([h, t]) => `<li><b>${esc(h)}</b><span>${esc(t)}</span></li>`).join('')}</ol>
-    <p class="vl-credit">The first ten are the widely used outdoor checklist. The last two are Rock &amp; Anchor’s own, from how we train our leaders. They are not values. They are how we prepare to act on them.</p></div>
+    <p class="vl-credit">The first ten follow the Appalachian Mountain Club’s 10 Essentials. The last two are Rock &amp; Anchor’s own, from how we train our leaders. They are not values. They are how we prepare to act on them.</p></div>
 </div></section>
 
 <section class="vl-ask-sec" id="ask"><div class="wrap">
