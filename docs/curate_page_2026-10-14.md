@@ -1,6 +1,6 @@
 # Curate your own experience (14 Oct 2026)
 
-Branch: `about-redesign`. Status: **on staging** (version 7067213f), not live.
+Branch: `about-redesign`. Status: **LIVE** (version 7067213f, pushed 14 Oct 2026 15:19 IST, deployment 709f9892). https://rockandanchor.in/curate
 https://staging-rockandanchor-site.adityashah-06.workers.dev/curate
 
 ## Files changed
