@@ -749,6 +749,8 @@ __VALUES__
 
 __CURATE__
 
+__QUIZ__
+
 function contactPage(data) {
   const body = `<section class="page-head"><div class="wrap"><p class="eyebrow">Contact</p><h1>Let's plan your day outdoors</h1>
 <p class="lead">Bookings happen over call or WhatsApp. Tell us the experience, your group size and preferred dates, and we will take it from there. WhatsApp is usually the fastest.</p></div></section>
@@ -815,6 +817,11 @@ async function handle(request, env, ctx) {
     if (m) return Response.redirect(new URL(`/experiences/${OLD_PRODUCTS[m[1]] || m[1]}`, url).toString(), 301);
     if (path.startsWith('/wp-') || path.startsWith('/product-category')) return Response.redirect(new URL('/', url).toString(), 301);
 
+    // Post-training quiz: staging (and local tests) only, no site data needed.
+    if ((path === '/quiz' || path.startsWith('/quiz/')) && (url.hostname.startsWith('staging-') || url.hostname === 'localhost' || url.hostname === '127.0.0.1')) {
+      if (path.startsWith('/quiz/api/')) return quizApi(request, env, path);
+      if (path === '/quiz') return new Response(quizPage(), { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
+    }
     const data = await getData(env, ctx);
     if (path === '/sitemap.xml') {
       const urls = ['/', '/experiences', '/impact', '/about', '/team', '/values', '/curate', '/contact', ...data.experiences.map((e) => `/experiences/${e.slug}`)];
