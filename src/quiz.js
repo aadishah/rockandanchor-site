@@ -281,7 +281,7 @@ function quizPage() {
 <title>Post-Training Quiz | Rock &amp; Anchor</title><link rel="icon" type="image/png" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <meta name="theme-color" content="#2c4535"><style>${QUIZ_CSS}</style></head><body>
-<header class="qz-top"><img src="/logo.png" alt="Rock &amp; Anchor" width="44" height="36"><div class="qz-lang" id="qz-lang" role="group" aria-label="Language"></div></header>
+<header class="qz-top"><a href="/" aria-label="Rock &amp; Anchor home"><img src="/logo.png" alt="Rock &amp; Anchor" width="53" height="44"></a><div class="qz-lang" id="qz-lang" role="group" aria-label="Language"></div></header>
 <main id="qz" aria-live="polite"><noscript><p class="qz-card">Please open this page in Chrome with JavaScript turned on.</p></noscript></main>
 <script type="application/json" id="qz-data">${json}</script><script>${QUIZ_JS}</script></body></html>`;
 }
@@ -364,7 +364,7 @@ const QUIZ_CSS = `
 body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.5 "DM Sans","Noto Sans Devanagari",system-ui,sans-serif}
 [lang=hi],[lang=mr],html[lang=hi] body,html[lang=mr] body{font-family:"Noto Sans Devanagari","DM Sans",system-ui,sans-serif}
 .qz-top{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;background:var(--forest)}
-.qz-top img{height:36px;width:auto;background:#fff;border-radius:6px;padding:2px}
+.qz-top img{height:44px;width:auto;display:block}
 .qz-lang{display:flex;gap:6px}.qz-lang[hidden]{display:none}
 .qz-lang button{border:1.5px solid rgba(255,255,255,.4);background:transparent;color:#fff;border-radius:999px;padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
 .qz-lang button.on{background:#fff;color:var(--forest);border-color:#fff;font-weight:700}
@@ -390,7 +390,7 @@ h2{font-size:21px;line-height:1.35;margin:0 0 14px}
 .qz-btn:disabled{opacity:.6}
 .qz-err{color:var(--bad);font-weight:700;background:#fbeae5;border-radius:10px;padding:10px 12px}
 .qz-link{background:none;border:0;color:var(--clay);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
-.qz-bar{position:sticky;top:56px;z-index:4;background:var(--paper);padding:8px 0;display:flex;gap:14px;align-items:center}
+.qz-bar{position:sticky;top:64px;z-index:4;background:var(--paper);padding:8px 0;display:flex;gap:14px;align-items:center}
 .qz-timer{background:var(--forest);color:#fff;border-radius:12px;padding:6px 12px;text-align:center;min-width:92px}
 .qz-timer span{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.8}.qz-timer b{font-size:22px;font-variant-numeric:tabular-nums}
 .qz-timer.low{background:var(--bad)}
