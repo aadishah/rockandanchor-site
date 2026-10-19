@@ -2524,7 +2524,7 @@ async function quizApi(request, env, path) {
         if (st.status === 'In progress' && Date.now() > st.started + QUIZ_MINUTES * 60000 + 15000) await qfinish(env, st, 'Timed out');
       } else {
         const now = new Date().toISOString();
-        const rec = await qat(env, 'POST', '?returnFieldsByFieldId=true', { typecast: true, fields: { [QA.title]: `${name} · Quiz ${quiz}`, [QA.name]: name, [QA.phone]: phone, [QA.quiz]: QUIZZES[quiz].name, [QA.lang]: QUIZ_LANGS[lang], [QA.status]: 'In progress', [QA.started]: now, [QA.outOf]: QUIZZES[quiz].qs.length, [QA.data]: '{}', [QA.key]: qrand() } });
+        const rec = await qat(env, 'POST', '', { typecast: true, returnFieldsByFieldId: true, fields: { [QA.title]: `${name} · Quiz ${quiz}`, [QA.name]: name, [QA.phone]: phone, [QA.quiz]: QUIZZES[quiz].name, [QA.lang]: QUIZ_LANGS[lang], [QA.status]: 'In progress', [QA.started]: now, [QA.outOf]: QUIZZES[quiz].qs.length, [QA.data]: '{}', [QA.key]: qrand() } });
         st = qstate(rec); fresh = true;
       }
       return qjson({ ...qpublic(st, lang), fresh });
