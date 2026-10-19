@@ -2531,7 +2531,10 @@ async function quizApi(request, env, path) {
     }
     if (path === '/quiz/api/answer' || path === '/quiz/api/finish') {
       if (!/^rec[A-Za-z0-9]{14}$/.test(String(b.id || ''))) return qjson({ error: 'id' }, 400);
-      const rec = await qat(env, 'GET', `/${b.id}?returnFieldsByFieldId=true`);
+      // The single-record endpoint returns fields by name, so look the record up through the list endpoint instead.
+      const got = await qat(env, 'GET', `?returnFieldsByFieldId=true&maxRecords=1&filterByFormula=${encodeURIComponent(`RECORD_ID()='${b.id}'`)}`);
+      const rec = got.records && got.records[0];
+      if (!rec) return qjson({ error: 'id' }, 404);
       const st = qstate(rec);
       if (!st.key || st.key !== b.key) return qjson({ error: 'key' }, 403);
       const late = Date.now() > st.started + QUIZ_MINUTES * 60000 + 15000;
