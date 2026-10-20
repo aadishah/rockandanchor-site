@@ -751,6 +751,8 @@ __CURATE__
 
 __QUIZ__
 
+__QUIZ_HG__
+
 function contactPage(data) {
   const body = `<section class="page-head"><div class="wrap"><p class="eyebrow">Contact</p><h1>Let's plan your day outdoors</h1>
 <p class="lead">Bookings happen over call or WhatsApp. Tell us the experience, your group size and preferred dates, and we will take it from there. WhatsApp is usually the fastest.</p></div></section>

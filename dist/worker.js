@@ -2647,7 +2647,7 @@ function quizPage() {
   const pub = {};
   for (const k of Object.keys(QUIZZES)) {
     const Q = QUIZZES[k];
-    pub[k] = { title: Q.title, read: Q.read, task: Q.task, qs: Q.qs.map((q) => ({ star: q.star, img: q.img ? QUIZ_IMG[q.img] : '', en: { q: q.en.q, o: q.en.o }, hi: { q: q.hi.q, o: q.hi.o }, mr: { q: q.mr.q, o: q.mr.o } })) };
+    pub[k] = { title: Q.title, read: Q.read, task: Q.task, qs: Q.qs.map((q) => ({ star: q.star, img: q.img ? QUIZ_IMG[q.img] : '', en: { q: q.en.q, o: q.en.o }, hi: { q: q.hi.q, o: q.hi.o }, mr: { q: q.mr.q, o: q.mr.o }, hg: q.hg ? { q: q.hg.q, o: q.hg.o } : undefined })) };
   }
   const json = JSON.stringify({ quizzes: pub, ui: QUIZ_UI, minutes: QUIZ_MINUTES, wa: QUIZ_TRAINER_WA }).replace(/</g, '\\u003c');
   return `<!doctype html><html lang="en-IN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
@@ -2665,14 +2665,16 @@ var L='ABCD',lang=ls('qz-lang')||'',S=null,cur=0,timer=null,skew=0,busy=false,pi
 function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){return null}}
 function h(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function t(k,r){var s=(D.ui[lang||'en']||D.ui.en)[k];if(r)for(var x in r)s=s.split('{'+x+'}').join(r[x]);return s}
+var LANGS=['en','hi','mr','hg'];
+function htmlLang(k){return k==='en'?'en-IN':k==='hg'?'hi-Latn':k}
 function Q(){return D.quizzes[S.quiz]}
 function nextQ(){var n=Object.keys(D.quizzes).length;return S.quiz%n+1}
 function txt(q){return q[lang]||q.en}
 // same shuffled answer order every time for this attempt (seeded by the attempt key)
 function order(n){var seed=0,k=S.key+'|'+n;for(var i=0;i<k.length;i++)seed=(seed*31+k.charCodeAt(i))>>>0;var a=[0,1,2,3];for(var j=3;j>0;j--){seed=(seed*1103515245+12345)>>>0;var r=seed%(j+1);var tmp=a[j];a[j]=a[r];a[r]=tmp}return a}
 function api(p,body){body.lang=lang||'en';return fetch('/quiz/api/'+p,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().then(function(j){if(!r.ok){j=j||{};j.srv=1;throw j}return j})})}
-function drawLang(){langBar.innerHTML=['en','hi','mr'].map(function(k){return '<button type="button" data-lang="'+k+'" class="'+(lang===k?'on':'')+'" lang="'+k+'">'+D.ui[k].lang+'</button>'}).join('');langBar.hidden=!lang}
-function setLang(k){lang=k;ls('qz-lang',k);document.documentElement.lang=k==='en'?'en-IN':k;drawLang();render()}
+function drawLang(){langBar.innerHTML=LANGS.map(function(k){return '<button type="button" data-lang="'+k+'" class="'+(lang===k?'on':'')+'" lang="'+k+'">'+D.ui[k].lang+'</button>'}).join('');langBar.hidden=!lang}
+function setLang(k){lang=k;ls('qz-lang',k);document.documentElement.lang=htmlLang(k);drawLang();render()}
 function mmss(ms){ms=Math.max(0,ms);var s=Math.ceil(ms/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
 function left(){return S.deadline-(Date.now()+skew)}
 function tick(){var el=document.getElementById('qz-time');if(!S||S.status!=='In progress'){clearInterval(timer);timer=null;return}var ms=left();if(el){el.textContent=mmss(ms);el.parentNode.classList.toggle('low',ms<120000)}if(ms<=0){clearInterval(timer);timer=null;finish()}}
@@ -2680,7 +2682,7 @@ function startTimer(){if(!timer)timer=setInterval(tick,500);tick()}
 function firstOpen(){var n=Q().qs.length;for(var i=0;i<n;i++)if(!S.answered[i])return i;return n}
 function load(j){S=j;skew=j.now-Date.now();if(S.status==='In progress'){ls('qz-att',JSON.stringify({id:S.id,key:S.key,quiz:S.quiz,phone:pick.phone,name:pick.name}));cur=Math.min(firstOpen(),Q().qs.length-1);if(firstOpen()<Q().qs.length&&S.answered[cur])cur=firstOpen();startTimer()}else{ls('qz-att',null)}render()}
 function render(){
-  if(!lang){root.innerHTML='<section class="qz-card qz-pick"><p class="qz-k">Rock &amp; Anchor</p><h1>Choose your language<br><span lang="hi">अपनी भाषा चुनें</span><br><span lang="mr">तुमची भाषा निवडा</span></h1><div class="qz-langs">'+['en','hi','mr'].map(function(k){return '<button type="button" class="qz-big" data-lang="'+k+'" lang="'+k+'">'+D.ui[k].lang+'</button>'}).join('')+'</div></section>';return}
+  if(!lang){root.innerHTML='<section class="qz-card qz-pick"><p class="qz-k">Rock &amp; Anchor</p><h1>Choose your language<br><span lang="hi">अपनी भाषा चुनें</span><br><span lang="mr">तुमची भाषा निवडा</span><br><span lang="hi-Latn">Apni bhasha chunein</span></h1><div class="qz-langs">'+LANGS.map(function(k){return '<button type="button" class="qz-big" data-lang="'+k+'" lang="'+k+'">'+D.ui[k].lang+'</button>'}).join('')+'</div></section>';return}
   if(!S){
     root.innerHTML='<section class="qz-card"><p class="qz-k">'+h(t('sub'))+'</p><h1>'+h(t('title'))+'</h1>'+(msg?'<p class="qz-err" role="alert">'+h(msg)+'</p>':'')+
     '<label class="qz-f"><span>'+h(t('name'))+'</span><input id="qz-name" autocomplete="name" value="'+h(pick.name)+'"></label>'+
@@ -2727,7 +2729,7 @@ root.addEventListener('click',function(e){var b=e.target.closest('button');if(!b
 langBar.addEventListener('click',function(e){var b=e.target.closest('button');if(b&&b.dataset.lang)setLang(b.dataset.lang)});
 // resume an attempt on this device after a refresh
 var saved=null;try{saved=JSON.parse(ls('qz-att')||'null')}catch(e){}
-if(lang){document.documentElement.lang=lang==='en'?'en-IN':lang}
+if(lang&&!D.ui[lang])lang='';if(lang){document.documentElement.lang=htmlLang(lang)}
 drawLang();
 if(saved&&saved.phone&&saved.name){pick={name:saved.name,phone:saved.phone,quiz:saved.quiz};busy=true;render();api('start',{name:saved.name,phone:saved.phone,quiz:saved.quiz}).then(function(j){busy=false;load(j)}).catch(function(){busy=false;render()})}else render();
 })();`;
@@ -2741,6 +2743,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.5 "DM San
 .qz-top img{height:46px;width:auto;display:block}
 .qz-lang{display:flex;gap:6px}.qz-lang[hidden]{display:none}
 .qz-lang button{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
+@media(max-width:420px){.qz-lang{gap:4px}.qz-lang button{padding:5px 8px;font-size:13px}}
 .qz-lang button.on{background:var(--forest);color:#fff;border-color:var(--forest);font-weight:700}
 main{max-width:640px;margin:0 auto;padding:16px 16px 48px}
 .qz-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 18px;margin-top:12px}
@@ -2795,6 +2798,97 @@ h2{font-size:21px;line-height:1.35;margin:0 0 14px}
 .qz-other{background:var(--forest)}
 .qz-thanks{color:var(--ink2);text-align:center;margin-top:18px}
 `;
+
+
+// ---------- Hinglish (Hindi in English letters) for the post-training quiz ----------
+// Fourth language option, added 21 Oct 2026 at Aaditya's request. Same order of questions and options as English.
+// Merged into QUIZZES and QUIZ_UI below, so every place that reads q[lang] or ui[lang] gets 'hg' too.
+
+const QUIZ_HG_UI = { lang: 'Hinglish', title: 'Training ke baad ka Quiz', sub: 'Foundation Training, 15 se 17 October 2026', chooseLang: 'Apni bhasha chunein', name: 'Aapka naam', phone: 'Aapka mobile number', phoneHint: '10 digit. Isse har vyakti har quiz ek hi baar deta hai.', chooseQuiz: 'Quiz chunein', rulesTitle: 'Yeh kaise kaam karta hai',
+  rules: ['Kul 3 quiz hain. Teeno quiz, kisi bhi order mein, 23 October raat 11:59 baje tak poori karein. Aap inhe alag-alag din kar sakte hain.', 'Har quiz {min} minute ki hai. Timer tabhi shuru hota hai jab aap Start dabate hain, aur phir rukta nahi.', 'Har baar wahi mobile number daalein.', 'Aisi jagah baithein jahan network achha ho aur phone charge ho. Agar page band ho jaaye, to wahi link kholein aur wahi number daalein. Time bacha ho to aapki quiz wahin se aage chalegi.', 'Har quiz sirf ek baar de sakte hain. Jawab chunte hi woh lock ho jaata hai aur aap peeche nahi ja sakte. Phir aapko dikhega ki sahi jawab sahi kyun hai.', '★ ka matlab safety wala sawaal hai. Agar koi galat hua, to aapke trainer aapko call karke us par baat karenge.', 'Ismein pass ya fail nahi hai. Aapke jawab aapke trainer dekhte hain. Har jawab aapke manual mein hai ya training mein karwaya gaya tha.'],
+  closed: 'Quiz 23 October raat 11:59 baje band ho gayi. Kripya apne trainer ko message karein.',
+  start: 'Quiz shuru karein', next: 'Agla sawaal', finish: 'Mera result dekhein', timeLeft: 'Bacha time', qOf: 'Sawaal {i} / {n}', right: 'Sahi.', wrong: 'Sahi jawab {L} hai.', why: 'Kyun', source: 'Manual section', star: 'Safety sawaal',
+  doneTitle: 'Quiz poori karne ke liye shabaash.', timedOut: 'Time khatam ho gaya.', score: 'Aapke {n} mein se {s} jawab sahi hain.', starAll: 'Aapne har ★ safety sawaal sahi kiya.', starMissed: '★ safety sawaal jin par trainer se baat karni hai: {list}. Aapke trainer 2 din ke andar aapko call karenge.', learning: 'Yeh score seekhne ke liye hai, comparison ke liye nahi.',
+  taskTitle: 'Ek aur kaam (marks nahi, par zaroori hai)', taskBtn: 'WhatsApp par bhejein', other: 'Aage badhein: {quiz}', already: 'Aap yeh quiz pehle hi de chuke hain. Yeh raha aapka result.', resume: 'Phir se swagat hai. Aapki quiz abhi chal rahi hai.', errName: 'Kripya apna naam likhein.', errPhone: 'Kripya 10 digit ka mobile number likhein.', errQuiz: 'Kripya quiz chunein.', errNet: 'Connect nahi ho paaya. Internet check karke phir try karein.', errSrv: 'Abhi quiz save nahi ho paayi. Kripya apne trainer ko batayein, phir try karein.', retry: 'Phir try karein', notAnswered: 'Jawab nahi diya', thanks: 'Dhanyavaad. Pahadon mein aapke saath chalne wale log is bharose par hain ki aapko yeh pata hai.', saving: 'Save ho raha hai…', back: 'Peeche' };
+
+const QUIZ_HG = {
+  1: {
+    title: 'Quiz 1: Logon ko safe rakhna',
+    read: 'Pehle Module 5, 6, 7 aur 16 padhein.',
+    task: 'Apne trainer ko 1 minute ka voice note bhejein: "Rock & Anchor ka emergency number ____ hai. Ambulance ka number ____ hai. Agle trek par, shuru karne se pehle, main ____ karunga/karungi."',
+    qs: [
+      { q: 'Aapko bijli dikhti hai aur garaj sunaayi dene tak aap 20 second ginte hain. Iska kya matlab hai?', o: ['Toofan 20 km door hai. Choti tak pahunchne ka time hai.', 'Toofan lagbhag 4 km door hai. Turant kadam uthayein.', 'Toofan lagbhag 10 km door hai. Nazar rakhte rahein.', 'Garaj se doori ka kuch pata nahi chalta.'], why: 'Second ko 5 se divide karein, to doori km mein milti hai. 20 ÷ 5 = 4 km. 6 km se kam (30 second se kam) ka matlab hai turant kadam uthayein.' },
+      { q: 'Khule maidan mein group bijli wale toofan mein phans gaya hai. Manual body ki kaun-si position sikhata hai?', o: ['Zameen par seedhe let jaayein.', 'Sabse paas ke oonche ped ke neeche sthir khade rahein.', 'Neeche jhuk kar baithein, pair aapas mein milaakar, wazan panjon par, haath ghutnon par, sir neeche.', 'Baith jaayein aur chattan ke chhajje ke neeche tik jaayein.'], why: 'Letne se zameen se contact badhta hai. Akele ped aur chattan ke chhajje zameen ka current le aate hain.' },
+      { q: 'Bijli ke time jab group pahad ki dhaar se neeche utarta hai, to logon ko ek-doosre se kitni doori par failna chahiye, aur kyun?', o: ['2 meter, taaki koi kho na jaaye.', 'Kam se kam 10 meter, taaki ek baar bijli girne se kai log ghayal na hon.', 'Paas-paas rahein, taaki leader sabko gin sake.', 'Doori se koi fark nahi padta.'], why: 'Fail kar chalne se ek hi bijli se kai log ghayal nahi hote.' },
+      { q: 'Aakhri garaj ke baad, khuli jagah par phir se chalne se pehle kitni der rukte hain?', o: ['5 minute', '10 minute', 'Poore 30 minute', 'Baarish rukne tak'], why: '' },
+      { q: 'Sahyadri trek par chot lagne ka sabse bada kaaran kya hai?', o: ['Saanp ka kaatna', 'Phisalne wali basalt chattan', 'Garmi', 'Raasta bhatak jaana'], why: 'Us hisse se pehle group ko rokein, khatra dikhayein, pair kahan rakhna hai yeh dikhayein, aur jo ladkhada rahe hain unke saath-saath chalein.' },
+      { q: 'Aap group ke sabse peeche sweep hain. Kaale baadal ghir rahe hain aur aapko garaj sunaayi deti hai. Aage chal rahe Leader ne dhyan nahi diya hai. Aap kya karenge?', o: ['Khud hi group ko wapas mod dein.', 'Turant Leader ka dhyan kheenchein, saaf-saaf batayein ki aapne kya suna aur dekha, phir Leader ke faisle ka saath dein.', 'Ruk kar dekhein ki haalat aur bigadti hai ya nahi.', 'Group se poochhein ki woh aage jaana chahte hain ya nahi.'], why: 'Co-Leader ke roop mein aap jaldi notice karte hain, bolte hain aur faisle ka saath dete hain. Wapas lautne ka faisla kabhi bhi group ki voting se nahi hota.' },
+      { q: 'Jharne par, seeti ki do awaazon ka kya matlab hai?', o: ['Koi kho gaya hai.', 'Khana taiyaar hai.', 'Sab log turant paani se bahar niklein.', 'Rassi ki taraf tairein.'], why: 'Ise teen seeti se na milayein. Teen seeti duniya bhar mein emergency ka signal hai: mujhe madad chahiye.' },
+      { q: 'Tairte waqt ek haath upar uthane ka kya matlab hai?', o: ['"Mujhe photo leni hai."', '"Paani ka bahaav mujhe kheench raha hai."', '"Main bahar nikal raha hoon."', '"Mujhe thand lag rahi hai."'], why: '' },
+      { q: 'Jagah ki jaanch ke time aapko paani ke kund ka tal saaf nahi dikhta. Rule kya hai?', o: ['Dhyan rakhein to dive karna theek hai.', 'Sirf achhe tairak kood sakte hain.', 'Na diving, na koodna. Bas.', 'Sirf neechi chattanon se koodein.'], why: 'Paani ke andar ki chattanein upar se dikhaayi nahi detin.' },
+      { q: 'Monsoon mein, jharne par paani ka level kitni jaldi badal sakta hai?', o: ['Kuch dinon mein', '10 se 15 minute mein', 'Sirf raat bhar mein', 'Din mein nahi badalta'], why: '' },
+      { q: 'Ek participant kehta hai, "Paani theek lag raha hai, main achha tairak hoon." Sabse achha jawab kya hai?', o: ['"Theek hai, aap rassi ke aage ja sakte hain."', '"Upar se paani shaant dikhta hai, lekin jharne ke paas bahaav tez hai. Aaj safe jagah sabke liye ek hi hai."', 'Kuch na kahein aur unhe khud faisla karne dein.', '"Baaki participants se poochh lijiye."'], why: 'Tairak behte paani mein apni capacity ko zyada aankte hain. Shaant surface ke neeche khatarnaak kheechaav chhupa ho sakta hai. Agar woh zid karein, to Leader ko bulayein.' },
+      { q: 'Ek participant ko gehra cut laga hai. Jis kapde se aap daba rahe hain, woh khoon se bheeg raha hai. Aap kya karenge?', o: ['Ghaav dekhne ke liye kapda uthayein.', 'Kapda hata kar naya kapda lagayein.', 'Mazbooti se dabaaye rakhein, kapda uthaaye bina upar aur kapda rakhein, aur haath ya pair ko upar uthayein.', 'Naale ke paani se dhoyein aur intezaar karein.'], why: '10 se 15 minute tak seedha, mazboot dabaav. Kapda uthane se khoon phir se behne lagta hai. Agar khoon na ruke, to evacuation (marij ko bahar le jaana) zaroori hai.' },
+      { q: 'Inmein se kismein TURANT evacuation zaroori hai?', o: ['Tez bukhaar', 'Lagaataar ulti', 'Saanp ka kaatna', 'Takhne ki chot ki wajah se chal nahi pa raha'], why: 'Baaki teen mein "jaldi bahar le jaayein". Saanp ke kaatne par turant: vyakti ko sthir rakhein, time note karein, bahar le jaayein.' },
+      { q: 'Koi gambhir roop se ghayal hai aur phone mein network nahi hai. Aap kya karenge?', o: ['Sabse tez vyakti ko akele network dhoondhne bhejein.', 'Do logon ko saath mein network ki taraf bhejein, jagah, haalat aur ab tak kya kiya gaya, yeh likh kar dein.', 'Sab log saath mein bahar chale jaayein aur marij ko aaraam karne dein.', 'Network wapas aane ka intezaar karein.'], why: 'Kabhi kisi ek vyakti ko akele na bhejein. Kabhi marij ko akela na chhodein.' },
+      { q: 'Aap ek ghayal vyakti tak pahunchte hain. Sabse pehla kadam kya hai?', o: ['108 par call karein.', 'Paas jaane se pehle pakka karein ki jagah safe hai.', 'Unhe paani dein.', 'Report ke liye photo lein.'], why: 'Agar jagah safe nahi hai, to jaldi hi do marij ho sakte hain.' },
+    ],
+  },
+  2: {
+    title: 'Quiz 2: Experience ko lead karna',
+    read: 'Pehle Module 2, 4, 8 aur 12 padhein.',
+    task: 'Ghar ya gaon mein kisi ko ek Leave No Trace rule sikhayein: koi bachcha, maa-baap, dost. Phir apne trainer ko voice note ya photo bhejein: aapne kise sikhaya, kaun-sa rule, aur unhone kya jawab diya.',
+    qs: [
+      { q: 'Inmein se kaun-sa Rock & Anchor ke 10 Essentials mein nahi hai?', o: ['Navigation (raasta pehchanna)', 'Emergency shelter', 'Trekking pole (chhadi)', 'Extra paani'], why: '' },
+      { q: 'Trek din mein hai. Kya phir bhi headlamp chahiye?', o: ['Nahi, din hai.', 'Nahi, phone ki torch kaafi hai.', 'Haan. Der ya chot se din ka trek raat ki situation ban sakta hai. Phone ki light sirf backup hai.', 'Sirf monsoon mein.'], why: '' },
+      { q: 'Leader team ko milne ki jagah par kitni jaldi pahunchna chahiye?', o: ['Time par, participants ke saath', 'Participants se 15 minute pehle', '2 ghante pehle', 'Koi fark nahi padta'], why: 'Is time mein din ki taiyaari dohrayein: khaas pal, khatre aur sikhane ke mauke.' },
+      { q: 'Raaste mein group ki ginti kitni baar karte hain?', o: ['Sirf shuruaat aur aakhir mein', 'Har 20 se 30 minute mein, chupchaap, chalte hue ya jahan apne aap rukte hain wahan', 'Har 2 ghante mein ek baar', 'Sirf tab jab koi gaayab lage'], why: '' },
+      { q: 'Group ki speed kiski chaal se tay hoti hai?', o: ['Leader ki', 'Average vyakti ki', 'Sabse tez vyakti ki', 'Sabse dheeme vyakti ki. Hamesha.'], why: '' },
+      { q: 'Zyaadatar haadse kab hote hain?', o: ['Shuruaat mein, jab log ghabraaye hote hain', 'Choti par', 'Wapasi mein, jab log thake hote hain aur raasta jaana-pehchana lagta hai', 'Milne ki jagah par'], why: 'Chhote kadam, ghutne thode mude hue, dheemi aur sambhli hui chaal, bachchon aur buzurgon par zyada dhyan.' },
+      { q: 'Group destination par pahunchta hai. Aap sabse pehle kya karenge?', o: ['Group photo lein.', 'Sabki ginti karein.', 'Jagah ki kahani sunayein.', 'Sabko ghoomne dein.'], why: '' },
+      { q: 'Kaun-sa instruction AIRC ko sabse achhe se follow karta hai?', o: ['"Paani ke paas dhyan rakhna."', '"Sab log, yahan rukiye aur meri taraf dekhiye. Naale se pehle rukna hai. Ek baar mein ek hi vyakti paar karega. Mere ishaare ka intezaar karein. Paani ke neeche ke patthar hilte hain. Rahul, batao: naale par humein kya karna hai?"', '"Jaldi paar karo, hum late hain."', '"Sabko samajh aaya?"'], why: 'Ismein sabka dhyan liya gaya, saaf instruction aur zaroori information di gayi (patthar hilte hain), aur naam lekar ek vyakti se confirm kiya gaya. Poori AIRC briefing mein chhah step hote hain: Attention, Instruction, Information, Reason, Review, Confirmation.' },
+      { q: 'Logon ko samajh aaya ya nahi, yeh pakka karne ka sabse achha tareeka kya hai?', o: ['"Sab theek hain?"', 'Kisi ek vyakti ka naam lekar usse poochhein ki aage kya karna hai.', 'Instruction zor se dohrayein.', 'Maan lein ki chup rehne ka matlab haan hai.'], why: '' },
+      { q: 'Ek participant santre ka chhilka girata hai aur kehta hai, "Yeh to apne aap sad jaayega." Sabse achha jawab kya hai?', o: ['"Theek hai, sad jaayega."', '"Zara use utha lenge? Yahan santre ka chhilka sadne mein lagbhag 2 saal lagte hain, aur jaanwar use kha kar beemaar padte hain. Sab kuch bag mein jaata hai."', 'Kuch kahe bina khud utha lein.', 'Sabke saamne daantein.'], why: 'Rule se pehle "kyun" batayein. Samjhayein, daantein nahi.' },
+      { q: 'Jharne wale trek par kaun-sa LNT (Leave No Trace) tareeka sahi hai?', o: ['Herbal ho to saabun theek hai.', 'Paani mein saabun ya shampoo nahi. Shauch paani se kam se kam 60 meter door. Khaane ka kachra wapas le jaayein.', 'Bacha hua khana naale mein daal sakte hain.', 'Toilet paper kund ke paas gaad sakte hain.'], why: '' },
+      { q: 'Participants ko bandaron ko kabhi khana kyun nahi khilana chahiye?', o: ['Khana mehenga hai.', 'Khilane se woh jhapat kar khana chheenne lagte hain aur khatarnaak ho jaate hain.', 'Bandar insaanon ka khana nahi khaate.', 'Phal ho to theek hai.'], why: '' },
+      { q: 'Group choti se 40 minute door hai aur dopahar ke 2:30 baje hain. Group aam taur par choti par lagbhag 30 minute rukta hai, aur neeche utarne mein lagbhag 2 ghante lagte hain. Teen log baar-baar ruk rahe hain, aur shaam 6 baje andhera ho jaata hai. Fit participants aapse kehte hain, "Chalo, upar tak chalte hain." Co-Leader ke roop mein aap kya karenge?', o: ['Unse sehmat hokar unhe upar le jaayein.', 'Fit participants ko batayein ki faisla Leader ka hai, Leader ko time aur thake hue logon ke baare mein apni sachchi raay dein, phir Leader ke faisle ka poora saath dein.', 'Poore group se vote karwayein.', 'Sabko chalaate rehne ke liye kahein "bas pahunch hi gaye".'], why: '40 minute upar + 30 minute choti par + 2 ghante neeche = kam se kam shaam 5:40, aur thake hue teen log isse bhi dheeme chalenge. Yaani andhere mein neeche utarna. Sabse kamzor member se faisla tay hota hai, aur sabse tez log kabhi group ke liye faisla nahi karte.' },
+      { q: '9 saal ka ek bachcha raaste mein baith kar ro raha hai aur kehta hai ki use ghar jaana hai. Aap sabse pehle kya karenge?', o: ['Usse kahein ki baaki bachche to nahi ro rahe.', 'Use god mein utha kar chalte rahein.', 'Uski aankhon ke barabar neeche baithein, shaanti se poochhein ki kya hua, aur paani aur kuch khaane ko dein.', 'Andekha karein aur group ko chalaate rahein.'], why: 'Bhookh, pyaas, chhaala ya darr aksar asli kaaran hote hain.' },
+      { q: 'Aapka group tair raha hai, tabhi gaon ki mahilayein kapde dhone talaab par aati hain. Inmein se kaun-si baat galti hai?', o: ['Unka izzat se abhivaadan karna: "Namaskar tai. Aap aaram se kaam karein."', 'Participants ko chupchaap dekhne dena, khamoshi ko baaton se na bharna.', 'Bina poochhe mahilaon ki photo lena.', 'Baad mein poochhna, "Isse aapke liye kya badla?"'], why: 'Bina ijaazat ke, ek asli pal tourists ka tamasha ban jaata hai.' },
+    ],
+  },
+  3: {
+    title: 'Quiz 3: Maidan ke hunar',
+    read: 'Hazard walk, maps, camp ki raat aur skits ko yaad karein.',
+    task: 'Apne gaon ya kisi jaane-pehchane raaste ka ek simple map banayein. Usmein north disha, raasta, paani, ek khatra, aur kam se kam 4 chinhon wali legend dikhayein. Uski photo apne trainer ko bhejein.',
+    qs: [
+      { q: 'Inmein se kaun-sa insaanon se bana khatra (human hazard) hai?', o: ['Bhaari baarish ke baad chattan ke neeche dheele patthar', 'Pahad ki dhaar par bijli', 'Raaste ke paas logon ka chhoda hua toota kaanch', 'Baarish ke baad tezi se badhta naala'], why: 'Natural khatre zameen aur mausam se aate hain: girte patthar, bijli, tez paani. Human khatre log banate ya chhod jaate hain: toota kaanch, kachra, jalti chhodi aag, sadak par gaadiyan.' },
+      { q: 'Aapko aage ek khatra dikhta hai. Leader ko kaun-si report sabse kaam ki hai?', o: ['"Upar kuch khatarnaak hai."', '"Raaste ke left side dheele patthar hain, bade ped ke lagbhag 50 meter baad. Koi phisal kar gir sakta hai. Maine group ko yahin rok diya hai."', 'Abhi kuch na kahein, din ke aakhir mein batayein.', 'Photo le kar group chat mein daal dein.'], why: 'Jis report par Leader turant kadam utha sake, usmein hota hai: khatra kya hai, theek kahan hai, kitna gambhir hai, aur aapne ab tak kya kiya.' },
+      { q: 'Map par legend kya hoti hai?', o: ['Upar likha map ka naam', 'Woh box jo batata hai ki har chinh aur rang ka matlab kya hai', 'North disha dikhane wala teer', 'Doori dikhane wali line'], why: 'Legend ke bina koi aur aapke chinh nahi padh sakta. Doosron ke liye banaye map mein legend hamesha chahiye.' },
+      { q: 'Is tasveer mein ek pahadi ki contour lines hain. Pahadi ki kaun-si side zyada khadi (steep) hai?', o: ['Left side, jahan lines paas-paas hain', 'Right side, jahan lines door-door hain', 'Dono side ek jaisi hain', 'Contour lines se dhalaan ka pata nahi chalta'], why: 'Har contour line ek jaisi oonchai wali jagahon ko jodti hai. Paas-paas lines matlab kam doori mein oonchai tezi se badalti hai: khadi chadhai. Door-door lines matlab halki dhalaan.' },
+      { q: 'Usi tasveer mein, beech ka sabse chhota gol ghera kya dikhata hai?', o: ['Ek talaab', 'Pahadi ki choti', 'Ek gaon', 'Raaste ki shuruaat'], why: 'Chhote hote jaate ghere dikhate hain ki zameen upar uth rahi hai. Sabse chhota ghera sabse oonchi jagah hai: choti.' },
+      { q: 'Lambe time tak tairne aur phir baarish ke baad, ek participant zor se kaanp raha hai, dheere bol raha hai aur ladkhada raha hai. Sabse zyada sambhavna kya hai?', o: ['Garmi se thakaavat (heat exhaustion)', 'Hypothermia: body ki garmi kam ho rahi hai', 'Bas thakaan', 'Zyada khana'], why: 'Kaanpna, ladkhadana, dheema ya atakta bolna aur uljhan ka matlab hai body ki garmi kam ho rahi hai. Hawa aur geelepan se hatayein, sookhe kapde pehnayein, emergency blanket mein lapetein, poori tarah hosh mein ho to garam meetha drink dein. Agar uljhan badhe, to bahar le jaayein (evacuation).' },
+      { q: 'Garmi ka mausam, dopahar ki chadhai. Ek participant ko sirdard hai, chakkar aur ulti jaisa lag raha hai, aur bahut paseena aa raha hai. Aap sabse pehle kya karenge?', o: ['Jaldi aage badhein taaki aur garmi hone se pehle upar pahunch jaayein', 'Rukein, unhe chhaon mein le jaayein, paani se thanda karein, ORS wala paani dein, aur aaraam karayein', 'Unhe garam chai dein', 'Unhe emergency blanket mein lapetein'], why: 'Yeh garmi se thakaavat (heat exhaustion) ke lakshan hain. Pehle thanda karein aur aaraam karayein. Agar uljhan ho, paseena band ho jaaye ya haalat bigde, to yeh gambhir hai: bahar le jaayein.' },
+      { q: 'Raat ke camp ke liye sabse achhi jagah kaun-si hai?', o: ['Sookhe naale ke tal mein, kyunki woh samtal hai', 'Kisi bade sookhe ped ke neeche, chhaon ke liye', 'Samtal zameen par, paani behne ke raaston se door, jahan upar koi sookha ped ya dheele patthar na hon', 'Theek paani ke kinare'], why: 'Raat ki baarish sookhe naale ko minuton mein bhar sakti hai. Sookhi daaliyan aur dheele patthar girte hain. Samtal, thodi oonchi, saaf zameen hi safe hai.' },
+      { q: 'Campfire jalaane se pehle aapko kya karna zaroori hai?', o: ['Pehle se bani aag ki jagah use karein ya 1 meter ke ghere se patte aur sookha saamaan hatayein, aur aag poori tarah bujhane ke liye paani taiyaar rakhein', 'Tents ke paas jalayein taaki sabko garmi mile', 'Aag shuru karne ke liye plastic use karein', 'Angaare raat bhar jalte chhodne ki sochein'], why: 'Saal ke zyaadatar time jungle ki zameen sookhi rehti hai aur ek chingaari door tak ja sakti hai. Sab kuch raakh hone tak jalayein aur sone ya jaane se pehle poori tarah bujhayein.' },
+      { q: 'Camp ki raat aapke group ko jagah chunni thi, khaane ka plan banana tha aur tay karna tha ki kaun lead karega. Team ki tarah kaam karne ka sabse achha tareeka kya hai?', o: ['Sabse taaqatwar vyakti sab kuch kare', 'Ek leader par sehmat hon, jo har vyakti ko saaf kaam de aur beech-beech mein unse poochhta rahe', 'Har koi jo chahe woh kare', 'Sab kuch tay karne ke liye trainer ka intezaar karein'], why: 'Kaam baantne (delegation) ka matlab hai ek vyakti poori tasveer dekhta hai aur har vyakti ko apna theek-theek kaam pata hota hai. Kuch chhoot-ta nahi aur koi akela sab nahi karta.' },
+      { q: 'Kaun-si team trip ka record rakhti hai: photos, notes, haaziri aur trip report?', o: ['Pantry team', 'Documentation team', 'Load ferry team', 'Technical team'], why: 'Documentation team trip ka record rakhti hai. Pantry team khana aur khana banane ka kaam sambhalti hai. Load ferry team group ka saamaan dhoti hai. Technical team rassi, safety ka saamaan aur gear sambhalti hai.' },
+      { q: 'Aap kisi participant se pehli baar milte hain. Kaun-sa sawaal unhe sabse achhi tarah jaanne mein madad karta hai?', o: ['"Aap theek hain?"', '"Paani laaye hain?"', '"Aaj pahadon par aane ka mann kyun hua?"', '"Kya yeh aapka pehla trek hai?"'], why: 'Khule sawaal (kya, kyun, kaise) logon ko apni baat kehne ka mauka dete hain. Haan ya na wale sawaalon se baatcheet ruk jaati hai. Achhe se poochhna ek hunar hai, aur rishte aise hi shuru hote hain. Apne baare mein bhi kuch batayein.' },
+      { q: 'Group pahad ki dhaar par hai aur bijli shuru ho jaati hai. Aap kaun-si leadership style apnayenge?', o: ['Stepping back: group ko tay karne dein', 'Facilitating: group ko kaam dein aur dekhein', 'Directive: chhote, saaf order, koi behas nahi', 'Guiding: apna idea batayein aur unki raay poochhein'], why: 'Safety aur emergency mein leader poori command leta hai: "Sab ruko. Abhi. Yahan wapas aao. Hum is taraf se neeche jaayenge."' },
+      { q: 'Camp ki raat trainer ne poora kaam aapke group ko diya aur khud peeche rahe, sirf safety ke liye beech mein aaye. Woh kaun-si leadership style thi?', o: ['Directive', 'Guiding', 'Stepping back', 'Koi leadership nahi'], why: 'Stepping back naye leaders taiyaar karne ke liye hai: kaam unhe dein, khud peeche rahein, sirf safety ke liye beech mein aayein. Aise hi lead karna seekhte hain, kyunki koi aur aapke liye nahi karta.' },
+      { q: 'AIRC briefing mein chhah step hote hain. Sahi order kaun-sa hai?', o: ['Attention, Instruction, Information, Reason, Review, Confirmation', 'Instruction, Attention, Reason, Information, Confirmation, Review', 'Reason, Attention, Information, Instruction, Review, Confirmation', 'Attention, Reason, Review, Instruction, Information, Confirmation'], why: 'Pehle sabka dhyan lein. Phir batayein kya karna hai, kya jaanna zaroori hai, aur kyun. Phir khaas baatein dobara dohrayein, aur kisi ek ka naam lekar poochh kar confirm karein.' },
+    ],
+  },
+};
+
+// Merge Hinglish into the main data, checking counts so a mismatch fails loudly at start-up.
+QUIZ_UI.hg = QUIZ_HG_UI;
+QUIZ_LANGS.hg = 'Hinglish';
+for (const k of Object.keys(QUIZ_HG)) {
+  const Q = QUIZZES[k], H = QUIZ_HG[k];
+  if (!Q || Q.qs.length !== H.qs.length) throw new Error(`Hinglish quiz ${k} does not match`);
+  Q.title.hg = H.title; Q.read.hg = H.read; Q.task.hg = H.task;
+  H.qs.forEach((h, i) => { if (h.o.length !== Q.qs[i].en.o.length) throw new Error(`Hinglish ${k}.${i + 1} options`); Q.qs[i].hg = h; });
+}
 
 
 function contactPage(data) {

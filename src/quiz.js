@@ -356,7 +356,7 @@ function quizPage() {
   const pub = {};
   for (const k of Object.keys(QUIZZES)) {
     const Q = QUIZZES[k];
-    pub[k] = { title: Q.title, read: Q.read, task: Q.task, qs: Q.qs.map((q) => ({ star: q.star, img: q.img ? QUIZ_IMG[q.img] : '', en: { q: q.en.q, o: q.en.o }, hi: { q: q.hi.q, o: q.hi.o }, mr: { q: q.mr.q, o: q.mr.o } })) };
+    pub[k] = { title: Q.title, read: Q.read, task: Q.task, qs: Q.qs.map((q) => ({ star: q.star, img: q.img ? QUIZ_IMG[q.img] : '', en: { q: q.en.q, o: q.en.o }, hi: { q: q.hi.q, o: q.hi.o }, mr: { q: q.mr.q, o: q.mr.o }, hg: q.hg ? { q: q.hg.q, o: q.hg.o } : undefined })) };
   }
   const json = JSON.stringify({ quizzes: pub, ui: QUIZ_UI, minutes: QUIZ_MINUTES, wa: QUIZ_TRAINER_WA }).replace(/</g, '\\u003c');
   return `<!doctype html><html lang="en-IN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
@@ -374,14 +374,16 @@ var L='ABCD',lang=ls('qz-lang')||'',S=null,cur=0,timer=null,skew=0,busy=false,pi
 function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){return null}}
 function h(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function t(k,r){var s=(D.ui[lang||'en']||D.ui.en)[k];if(r)for(var x in r)s=s.split('{'+x+'}').join(r[x]);return s}
+var LANGS=['en','hi','mr','hg'];
+function htmlLang(k){return k==='en'?'en-IN':k==='hg'?'hi-Latn':k}
 function Q(){return D.quizzes[S.quiz]}
 function nextQ(){var n=Object.keys(D.quizzes).length;return S.quiz%n+1}
 function txt(q){return q[lang]||q.en}
 // same shuffled answer order every time for this attempt (seeded by the attempt key)
 function order(n){var seed=0,k=S.key+'|'+n;for(var i=0;i<k.length;i++)seed=(seed*31+k.charCodeAt(i))>>>0;var a=[0,1,2,3];for(var j=3;j>0;j--){seed=(seed*1103515245+12345)>>>0;var r=seed%(j+1);var tmp=a[j];a[j]=a[r];a[r]=tmp}return a}
 function api(p,body){body.lang=lang||'en';return fetch('/quiz/api/'+p,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().then(function(j){if(!r.ok){j=j||{};j.srv=1;throw j}return j})})}
-function drawLang(){langBar.innerHTML=['en','hi','mr'].map(function(k){return '<button type="button" data-lang="'+k+'" class="'+(lang===k?'on':'')+'" lang="'+k+'">'+D.ui[k].lang+'</button>'}).join('');langBar.hidden=!lang}
-function setLang(k){lang=k;ls('qz-lang',k);document.documentElement.lang=k==='en'?'en-IN':k;drawLang();render()}
+function drawLang(){langBar.innerHTML=LANGS.map(function(k){return '<button type="button" data-lang="'+k+'" class="'+(lang===k?'on':'')+'" lang="'+k+'">'+D.ui[k].lang+'</button>'}).join('');langBar.hidden=!lang}
+function setLang(k){lang=k;ls('qz-lang',k);document.documentElement.lang=htmlLang(k);drawLang();render()}
 function mmss(ms){ms=Math.max(0,ms);var s=Math.ceil(ms/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
 function left(){return S.deadline-(Date.now()+skew)}
 function tick(){var el=document.getElementById('qz-time');if(!S||S.status!=='In progress'){clearInterval(timer);timer=null;return}var ms=left();if(el){el.textContent=mmss(ms);el.parentNode.classList.toggle('low',ms<120000)}if(ms<=0){clearInterval(timer);timer=null;finish()}}
@@ -389,7 +391,7 @@ function startTimer(){if(!timer)timer=setInterval(tick,500);tick()}
 function firstOpen(){var n=Q().qs.length;for(var i=0;i<n;i++)if(!S.answered[i])return i;return n}
 function load(j){S=j;skew=j.now-Date.now();if(S.status==='In progress'){ls('qz-att',JSON.stringify({id:S.id,key:S.key,quiz:S.quiz,phone:pick.phone,name:pick.name}));cur=Math.min(firstOpen(),Q().qs.length-1);if(firstOpen()<Q().qs.length&&S.answered[cur])cur=firstOpen();startTimer()}else{ls('qz-att',null)}render()}
 function render(){
-  if(!lang){root.innerHTML='<section class="qz-card qz-pick"><p class="qz-k">Rock &amp; Anchor</p><h1>Choose your language<br><span lang="hi">अपनी भाषा चुनें</span><br><span lang="mr">तुमची भाषा निवडा</span></h1><div class="qz-langs">'+['en','hi','mr'].map(function(k){return '<button type="button" class="qz-big" data-lang="'+k+'" lang="'+k+'">'+D.ui[k].lang+'</button>'}).join('')+'</div></section>';return}
+  if(!lang){root.innerHTML='<section class="qz-card qz-pick"><p class="qz-k">Rock &amp; Anchor</p><h1>Choose your language<br><span lang="hi">अपनी भाषा चुनें</span><br><span lang="mr">तुमची भाषा निवडा</span><br><span lang="hi-Latn">Apni bhasha chunein</span></h1><div class="qz-langs">'+LANGS.map(function(k){return '<button type="button" class="qz-big" data-lang="'+k+'" lang="'+k+'">'+D.ui[k].lang+'</button>'}).join('')+'</div></section>';return}
   if(!S){
     root.innerHTML='<section class="qz-card"><p class="qz-k">'+h(t('sub'))+'</p><h1>'+h(t('title'))+'</h1>'+(msg?'<p class="qz-err" role="alert">'+h(msg)+'</p>':'')+
     '<label class="qz-f"><span>'+h(t('name'))+'</span><input id="qz-name" autocomplete="name" value="'+h(pick.name)+'"></label>'+
@@ -436,7 +438,7 @@ root.addEventListener('click',function(e){var b=e.target.closest('button');if(!b
 langBar.addEventListener('click',function(e){var b=e.target.closest('button');if(b&&b.dataset.lang)setLang(b.dataset.lang)});
 // resume an attempt on this device after a refresh
 var saved=null;try{saved=JSON.parse(ls('qz-att')||'null')}catch(e){}
-if(lang){document.documentElement.lang=lang==='en'?'en-IN':lang}
+if(lang&&!D.ui[lang])lang='';if(lang){document.documentElement.lang=htmlLang(lang)}
 drawLang();
 if(saved&&saved.phone&&saved.name){pick={name:saved.name,phone:saved.phone,quiz:saved.quiz};busy=true;render();api('start',{name:saved.name,phone:saved.phone,quiz:saved.quiz}).then(function(j){busy=false;load(j)}).catch(function(){busy=false;render()})}else render();
 })();`;
@@ -450,6 +452,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.5 "DM San
 .qz-top img{height:46px;width:auto;display:block}
 .qz-lang{display:flex;gap:6px}.qz-lang[hidden]{display:none}
 .qz-lang button{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:14px;cursor:pointer}
+@media(max-width:420px){.qz-lang{gap:4px}.qz-lang button{padding:5px 8px;font-size:13px}}
 .qz-lang button.on{background:var(--forest);color:#fff;border-color:var(--forest);font-weight:700}
 main{max-width:640px;margin:0 auto;padding:16px 16px 48px}
 .qz-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 18px;margin-top:12px}
