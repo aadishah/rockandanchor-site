@@ -819,10 +819,10 @@ async function handle(request, env, ctx) {
     if (m) return Response.redirect(new URL(`/experiences/${OLD_PRODUCTS[m[1]] || m[1]}`, url).toString(), 301);
     if (path.startsWith('/wp-') || path.startsWith('/product-category')) return Response.redirect(new URL('/', url).toString(), 301);
 
-    // Post-training quiz: staging (and local tests) only, no site data needed.
-    if ((path === '/quiz' || path.startsWith('/quiz/')) && (url.hostname.startsWith('staging-') || url.hostname === 'localhost' || url.hostname === '127.0.0.1')) {
+    // Post-training quiz (live from 21 Oct 2026). Not in the menu or sitemap, kept out of search engines, no site data needed.
+    if (path === '/quiz' || path.startsWith('/quiz/')) {
       if (path.startsWith('/quiz/api/')) return quizApi(request, env, path);
-      if (path === '/quiz') return new Response(quizPage(), { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
+      if (path === '/quiz') return new Response(quizPage(), { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
     }
     const data = await getData(env, ctx);
     if (path === '/sitemap.xml') {
