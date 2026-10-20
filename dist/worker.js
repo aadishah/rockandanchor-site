@@ -2295,7 +2295,7 @@ body:has(.cu) .float-wa{bottom:96px}
 // Rules: one attempt per phone number per quiz, timed, answers locked once chosen, the right answer and
 // the "why" are only sent after an answer is saved. Attempts are stored in the Airtable table Quiz Attempts.
 
-const QUIZ_MINUTES = 15;
+const QUIZ_MINUTES = 20;
 const QUIZ_TRAINER_WA = '919167954430';
 const QA = { table: 'tblcpS9xrANciDtX3', title: 'flddA6DbDLq4uFUbN', name: 'flddhZkbDazlbfXj0', phone: 'fldUgyatJUUzzXZZh', quiz: 'fld7eGC76O3J27Rna',
   lang: 'fldsNoVDncBxfJSb7', status: 'fldezGeH8ZpR8db81', started: 'fldNytmuEeH4531ue', finished: 'fldMbMed8Qd9a3oiX', score: 'fldId9N8406tucnEu',
