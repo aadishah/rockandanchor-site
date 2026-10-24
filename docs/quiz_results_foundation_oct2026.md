@@ -51,3 +51,6 @@ Kazi and Nilesh missed no safety question.
 1. Call the five people above about their ★ questions. Ask them to explain the right answer back in their own words.
 2. At the next meet-up, practise three things by doing: the 30-minute lightning wait, counting first at every stop, and the AIRC confirmation with one named person.
 3. Before the quiz is used again: rewrite Q2.15 as a positive question, and replace the "Is this your first trek?" option in Q3.12.
+
+## Group WhatsApp follow-up (24 Oct 2026)
+Aaditya wanted to share the right answers without blaming anyone. Drafted one group message in Hinglish, Marathi and English: opens with recognition (all seven finished, 86 percent), then the right practice for every question the group missed, grouped as Lightning, Water, Injuries, Group, People, Leadership. No names, no scores per person. Ends with a 5-minute call for everyone (so nobody is singled out), a request to reply with one thing they will do on the next trek, and a reminder about the end-of-quiz tasks.
