@@ -1,10 +1,10 @@
 // One-Year Check-In form (rockandanchor.in/check-in). Added 26 Oct 2026.
 // A client types an access code (one per company, in the Airtable table "Check-In Codes") and passes a Cloudflare Turnstile check.
 // The server then gives a signed 60 minute pass, and the answers are saved to "Check-In Responses".
-// Secrets and variables needed (Cloudflare dashboard, Worker settings):
-//   TURNSTILE_SITEKEY  (variable, public)     TURNSTILE_SECRET  (secret)
+// On rockandanchor.in it needs two Worker settings (Cloudflare dashboard): TURNSTILE_SITEKEY (variable) and TURNSTILE_SECRET (secret).
+// On workers.dev addresses (staging and preview) Turnstile does not accept those hostnames, so Cloudflare's published always-pass test keys are used there.
 // The Airtable token needs write access to both tables.
-// Opens on rockandanchor.in only when CK_LIVE is true. Until then it answers only on workers.dev addresses.
+// Until CK_LIVE is true the form answers only on workers.dev addresses. Once CK_LIVE is true it answers only on the real domain.
 const CK_LIVE = false;
 const CK = {
   codes: 'tblpkiQ9oTbIS7Y3g', resp: 'tbl8vGG97JWpxZeWa',
@@ -13,6 +13,10 @@ const CK = {
 };
 const CK_PERMS = ['Share with our company name', 'Share without our name', 'Short quotes only', 'Private feedback only'];
 const CK_PASS_MINUTES = 60;
+const CK_TEST_SITE = '1x00000000000000000000AA', CK_TEST_SECRET = '1x0000000000000000000000000000000AA'; // public test values from Cloudflare docs
+const ckTest = (request) => new URL(request.url).hostname.endsWith('.workers.dev');
+const ckCfg = (env, request) => (ckTest(request) ? { site: CK_TEST_SITE, secret: CK_TEST_SECRET } : { site: env.TURNSTILE_SITEKEY || '', secret: env.TURNSTILE_SECRET || '' });
+const ckAllowed = (request) => (CK_LIVE ? !ckTest(request) : ckTest(request));
 
 const ckjson = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
 async function ckat(env, table, method, path, body) {
@@ -24,7 +28,7 @@ async function ckat(env, table, method, path, body) {
 const ckb64 = (bytes) => btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const ckunb64 = (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0));
 async function ckKey(env) {
-  return crypto.subtle.importKey('raw', new TextEncoder().encode('checkin|' + env.TURNSTILE_SECRET), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  return crypto.subtle.importKey('raw', new TextEncoder().encode('checkin|' + env.AIRTABLE_TOKEN), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
 }
 async function ckSign(env, payload) {
   const body = ckb64(new TextEncoder().encode(JSON.stringify(payload)));
@@ -43,7 +47,7 @@ async function ckVerify(env, pass) {
 }
 async function ckTurnstile(env, request, token) {
   if (!token) return false;
-  const form = new URLSearchParams({ secret: env.TURNSTILE_SECRET, response: String(token).slice(0, 2048) });
+  const form = new URLSearchParams({ secret: ckCfg(env, request).secret, response: String(token).slice(0, 2048) });
   const ip = request.headers.get('CF-Connecting-IP'); if (ip) form.set('remoteip', ip);
   const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: form });
   const j = await r.json().catch(() => ({}));
@@ -53,7 +57,8 @@ const cktext = (v) => String(v == null ? '' : v).replace(/\r/g, '').trim().slice
 
 async function checkinApi(request, env, path) {
   if (request.method !== 'POST') return ckjson({ error: 'method' }, 405);
-  if (!env.TURNSTILE_SECRET || !env.TURNSTILE_SITEKEY) return ckjson({ error: 'off' }, 503);
+  const cfg0 = ckCfg(env, request);
+  if (!cfg0.secret || !cfg0.site) return ckjson({ error: 'off' }, 503);
   let b; try { b = await request.json(); } catch (e) { return ckjson({ error: 'bad' }, 400); }
   try {
     if (path === '/check-in/api/code') {
@@ -95,9 +100,10 @@ async function checkinApi(request, env, path) {
   return ckjson({ error: 'path' }, 404);
 }
 
-function checkinPage(env) {
-  const on = !!(env.TURNSTILE_SECRET && env.TURNSTILE_SITEKEY);
-  const cfg = JSON.stringify({ on, site: env.TURNSTILE_SITEKEY || '', perms: CK_PERMS, wa: '918928794380' }).replace(/</g, '\\u003c');
+function checkinPage(env, request) {
+  const k = ckCfg(env, request);
+  const on = !!(k.secret && k.site);
+  const cfg = JSON.stringify({ on, site: k.site, perms: CK_PERMS, wa: '918928794380' }).replace(/</g, '\\u003c');
   return `<!doctype html><html lang="en-IN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
 <title>A year later | Rock &amp; Anchor</title><link rel="icon" type="image/png" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
