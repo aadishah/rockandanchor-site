@@ -750,6 +750,7 @@ __VALUES__
 __CURATE__
 
 __QUIZ__
+__CHECKIN__
 
 __QUIZ_HG__
 
@@ -823,6 +824,13 @@ async function handle(request, env, ctx) {
     if (path === '/quiz' || path.startsWith('/quiz/')) {
       if (path.startsWith('/quiz/api/')) return quizApi(request, env, path);
       if (path === '/quiz') return new Response(quizPage(), { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
+    }
+    // One-Year Check-In form. Answers only on workers.dev addresses until CK_LIVE is switched on in src/checkin.js.
+    if (path === '/check-in' || path.startsWith('/check-in/api/')) {
+      if (CK_LIVE || url.hostname.endsWith('.workers.dev')) {
+        if (path.startsWith('/check-in/api/')) return checkinApi(request, env, path);
+        return new Response(checkinPage(env), { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' } });
+      }
     }
     const data = await getData(env, ctx);
     if (path === '/sitemap.xml') {
