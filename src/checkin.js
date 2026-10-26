@@ -5,7 +5,7 @@
 // On workers.dev addresses (staging and preview) Turnstile does not accept those hostnames, so Cloudflare's published always-pass test keys are used there.
 // The Airtable token needs write access to both tables.
 // Until CK_LIVE is true the form answers only on workers.dev addresses. Once CK_LIVE is true it answers only on the real domain.
-const CK_LIVE = false;
+const CK_LIVE = true;
 const CK = {
   codes: 'tblpkiQ9oTbIS7Y3g', resp: 'tbl8vGG97JWpxZeWa',
   c: { code: 'fldzReSkvnIWGkFZt', company: 'fldJFYrOw3p2VGHxz', month: 'fld4RwKfhSL7CrFpZ' },
