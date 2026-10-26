@@ -68,3 +68,14 @@ npx wrangler deploy
 Or paste `dist/worker.js` into the Cloudflare dashboard editor for the Worker and click Deploy.
 
 Bookings are not taken online. Every page points to call or WhatsApp on +91 89287 94380.
+
+## One-Year Check-In form (`/check-in`)
+
+A short form for companies that did an experience with us a year ago (owner: 5 questions and a share permission, team members: 3 anonymous questions). Code: `src/checkin.js`.
+
+- The client types an access code (table **Check-In Codes**, one row per company, untick Active to switch it off) and passes a Cloudflare Turnstile check. The Worker then gives a signed 60 minute pass and saves answers to **Check-In Responses** (linked to the code).
+- Airtable tables: Check-In Codes `tblpkiQ9oTbIS7Y3g`, Check-In Responses `tbl8vGG97JWpxZeWa`.
+- The Airtable token in `AIRTABLE_TOKEN` must be able to **write** (`data.records:write`), not only read.
+- On rockandanchor.in it needs the variable `TURNSTILE_SITEKEY` and the secret `TURNSTILE_SECRET` (Turnstile widget "Rock and Anchor Check-In", hostname rockandanchor.in). On workers.dev addresses Cloudflare's public test keys are used, because Turnstile does not accept workers.dev hostnames.
+- `CK_LIVE` in `src/checkin.js` is `false`: the form answers only on workers.dev addresses. To open it on the real domain set it to `true`, add the two settings above and deploy. After that it answers only on the real domain.
+- Not in the menu or sitemap, kept out of search engines.

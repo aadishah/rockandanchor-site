@@ -2897,7 +2897,7 @@ async function checkinApi(request, env, path) {
       await ckat(env, CK.resp, 'POST', '', { typecast: true, fields: f });
       return ckjson({ ok: true });
     }
-  } catch (e) { return ckjson({ error: 'srv' }, 500); }
+  } catch (e) { console.error('check-in', e && e.message); return ckjson(ckTest(request) ? { error: 'srv', detail: String(e && e.message).slice(0, 300) } : { error: 'srv' }, 500); }
   return ckjson({ error: 'path' }, 404);
 }
 
