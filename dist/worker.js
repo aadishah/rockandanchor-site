@@ -232,22 +232,33 @@ function upcoming(data, exp) {
     .sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
 }
 const waLink = (msg) => `https://wa.me/${SITE.wa}?text=${encodeURIComponent(msg)}`;
+// Offers. In the Prices field, a line "Label | new price | regular price" is an offer row, and a line
+// "Offer until 2026-11-30: text" is the banner and the last day. After that day the site quietly shows the regular price.
+function offerState(text) {
+  const m = String(text || '').match(/^\s*offer(?:\s+until\s+(\d{4}-\d{2}-\d{2}))?\s*:\s*(.+)$/im);
+  const today = new Date(Date.now() + 5.5 * 3600 * 1000).toISOString().slice(0, 10);
+  return { banner: m ? m[2].trim() : '', until: m && m[1] ? m[1] : '', active: !!m && (!m[1] || today <= m[1]) };
+}
 function priceInfo(e) {
-  let min = null, group = false, free = '', minLabel = '';
+  let min = null, group = false, free = '', minLabel = '', minOld = null;
+  const off = offerState(e.prices);
   for (const raw of String(e.prices || '').split('\n')) {
     const i = raw.indexOf('|');
     if (i < 0) continue;
-    const label = raw.slice(0, i).trim(), val = raw.slice(i + 1);
+    const label = raw.slice(0, i).trim(); let val = raw.slice(i + 1);
+    const parts = val.split('|');
+    let old = null;
+    if (parts.length > 1) { const o = (parts[1].match(/(?:₹|rs\.?|inr)\s*([\d,]+)/i) || [])[1]; if (o) old = Number(o.replace(/,/g, '')); val = off.active ? parts[0] : parts[1]; if (!off.active) old = null; }
     if (/optional|add.?on|^transport|^travel/i.test(label)) continue;
     // A line such as "Villagers | Free" is shown as "Free for villagers".
     if (/^\s*free\b/i.test(val)) { if (!free) free = label; continue; }
     const m = val.match(/(?:₹|rs\.?|inr)\s*([\d,]+)/i);
     if (!m) continue;
     const n = Number(m[1].replace(/,/g, ''));
-    if (n && (min === null || n < min)) { min = n; minLabel = label; group = /people|group/i.test(label) && !/per person/i.test(val); }
+    if (n && (min === null || n < min)) { min = n; minOld = old; minLabel = label; group = /people|group/i.test(label) && !/per person/i.test(val); }
   }
   if (min === null && e.fromPrice && !/price on request/i.test(e.prices || '')) min = e.fromPrice;
-  return { min, group, free, minLabel };
+  return { min, group, free, minLabel, minOld };
 }
 const priceOnRequest = (e) => priceInfo(e).min === null && !priceInfo(e).free;
 const freeFor = (e) => priceInfo(e).free;
@@ -320,15 +331,24 @@ function itineraryHtml(text) {
   return html;
 }
 function pricesHtml(text) {
-  const rows = [], notes = [];
+  const rows = [], notes = [], off = offerState(text);
+  let offerRows = 0;
   for (const raw of String(text || '').split('\n')) {
     const l = raw.trim();
-    if (!l || /^includes?\b/i.test(l)) continue;
+    if (!l || /^includes?\b/i.test(l) || /^offer(\s+until\s+[\d-]+)?\s*:/i.test(l)) continue;
     const i = l.indexOf('|');
-    if (i > 0) rows.push(`<tr><th>${esc(l.slice(0, i).trim())}</th><td>${esc(l.slice(i + 1).trim())}</td></tr>`);
-    else notes.push(`<p class="note">${esc(l)}</p>`);
+    if (i > 0) {
+      const label = esc(l.slice(0, i).trim()), parts = l.slice(i + 1).split('|').map((x) => x.trim());
+      if (parts.length > 1 && off.active) {
+        offerRows++;
+        const n = Number((parts[0].match(/[\d,]+/) || ['0'])[0].replace(/,/g, '')), o = Number((parts[1].match(/[\d,]+/) || ['0'])[0].replace(/,/g, ''));
+        rows.push(`<tr class="offer"><th>${label}</th><td class="was"><s>${esc(parts[1])}</s></td><td class="now">${esc(parts[0])}${o > n && n ? `<small>Save ${rupees(o - n)}</small>` : ''}</td></tr>`);
+      } else rows.push(`<tr><th>${label}</th><td${off.active && offerRows ? ' colspan="2"' : ''}>${esc(parts.length > 1 ? parts[1] : parts[0])}</td></tr>`);
+    } else notes.push(`<p class="note">${esc(l)}</p>`);
   }
-  return (rows.length ? `<table class="prices">${rows.join('')}</table>` : '') + notes.join('');
+  const head = offerRows ? '<thead><tr><th></th><th>Regular</th><th>Offer</th></tr></thead>' : '';
+  const banner = off.active && offerRows && off.banner ? `<div class="offer-banner">${esc(off.banner)}</div>` : '';
+  return banner + (rows.length ? `<table class="prices${offerRows ? ' has-offer' : ''}">${head}${rows.join('')}</table>` : '') + notes.join('');
 }
 function faqsHtml(text) {
   return String(text || '').split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean).map((b) => {
@@ -495,6 +515,11 @@ section{padding:64px 0}section.tight{padding:48px 0}section.first{padding-top:44
 .prices th,.prices td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
 .prices th{font-weight:500}.prices td{font-weight:700;white-space:nowrap;text-align:right}
 .prices tr:last-child th,.prices tr:last-child td{border-bottom:0}
+.prices thead th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#6b6b6b);font-weight:600;text-align:right;padding:10px 16px}.prices thead th:first-child{text-align:left}
+.prices .was{color:var(--muted,#6b6b6b);font-weight:500;text-align:right}.prices .was s{text-decoration-thickness:2px;text-decoration-color:#b3402e}
+.prices .now{color:#2d4a3e;font-size:1.08em;text-align:right}.prices .now small{display:block;font-size:12px;font-weight:600;color:#2d4a3e;opacity:.8}
+.offer-banner{background:#2d4a3e;color:#fff;border-radius:var(--r);padding:11px 16px;font-weight:600;margin:6px 0 10px}
+.side-card .from s{color:#6b6b6b;font-weight:500;margin-right:4px}
 .note{color:var(--ink2);font-size:15px}
 .clamp3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .faq{border-bottom:1px solid var(--line);padding:4px 0}
@@ -729,7 +754,7 @@ ${block('pricing', 'Price', priceOnRequest(e) ? fallback('Price depends on your 
 ${block('faqs', 'FAQs', e.faqs ? faqsHtml(e.faqs) : fallback('Have a question? WhatsApp us and a real person will answer.'))}
 ${block('how', 'How to book', `<ol class="steps">${steps.map((t) => `<li>${t}</li>`).join('')}</ol><div class="row"><a class="btn btn-wa" href="${ask('')}">${ICON.wa}Book on WhatsApp</a><a class="btn btn-ghost" href="tel:${c.tel}">${ICON.phone}Call ${c.phone}</a></div>`)}
 </div>
-<aside class="side-card" id="book"><h3>${esc(e.title)}</h3><div class="from">${freeFor(e) ? `<b>Free</b> for ${esc(freeFor(e).toLowerCase())}${paidLine(e) ? `<br><small>${esc(paidLine(e))}</small>` : ''}` : priceOnRequest(e) ? 'Price on request' : `From <b>${rupees(lowest(e))}</b> ${priceInfo(e).group ? 'per group' : 'per person'}`}</div>
+<aside class="side-card" id="book"><h3>${esc(e.title)}</h3><div class="from">${freeFor(e) ? `<b>Free</b> for ${esc(freeFor(e).toLowerCase())}${paidLine(e) ? `<br><small>${esc(paidLine(e))}</small>` : ''}` : priceOnRequest(e) ? 'Price on request' : `From ${priceInfo(e).minOld ? `<s>${rupees(priceInfo(e).minOld)}</s> ` : ''}<b>${rupees(lowest(e))}</b> ${priceInfo(e).group ? 'per group' : 'per person'}${offerState(e.prices).active && offerState(e.prices).banner && priceInfo(e).minOld ? `<br><small>${esc(offerState(e.prices).banner)}</small>` : ''}`}</div>
 ${datesHtml}
 <a class="btn btn-wa" href="${ask('')}">${ICON.wa}Book on WhatsApp</a><a class="btn btn-ghost" href="tel:${c.tel}">${ICON.phone}Call ${c.phone}</a>
 <p class="small">No online payment. We confirm your spot over call or WhatsApp.</p></aside></div></div></section>
