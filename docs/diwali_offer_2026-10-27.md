@@ -9,7 +9,7 @@ Book between 1 and 30 November 2026.
 | Child (11 to 15) | ₹2,700 | ₹2,200 | ₹500 |
 | Child (4 to 10) | ₹2,000 | ₹1,500 | ₹500 |
 
-Regular prices are from the Airtable record "The Greatest Show On Earth (Winter)" (slug greatest-show-on-earth). The Summer record has different prices and is not part of this offer. [ROCK & ANCHOR INPUT REQUIRED: confirm the offer applies to the Winter experience only.]
+Regular prices are from the Airtable record "The Greatest Show On Earth (Winter)" (slug greatest-show-on-earth). The Summer record has different prices and is not part of this offer. 
 
 ## How the site shows it
 - A dark green banner above the price table: the offer wording.
@@ -35,5 +35,6 @@ Rules: "Label | offer price | regular price" makes an offer row. The first line 
 2. Airtable must be edited only after the code is live, because the live site reads Airtable and would show the raw text before then.
 3. Go live, then edit Airtable. The change shows within about 5 minutes.
 
-## Open question
-The offer is for bookings made between 1 and 30 November. The trip date can be later. [ROCK & ANCHOR INPUT REQUIRED: confirm that trips taking place after 30 November are included, and whether a booking counts once paid.]
+## Confirmed by Aaditya (27 Oct 2026)
+- Trips taking place after 30 November are included, as long as the booking is made between 1 and 30 November.
+- The village and trip leader payment per guest stays the same. The ₹500 reduction comes from Rock & Anchor (RAA), not from the village.
