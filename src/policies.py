@@ -25,7 +25,7 @@ A full 100% refund will be processed in the event of cancellations caused by:
 - Cancellation due to bad weather, communicated before the trip starts.
 Refunds are processed to the original payment method. For any questions, call or WhatsApp us on +91 89287 94380."""
 
-TERMS = """Version 2026-11-11. Last updated 11 November 2026.
+TERMS = """Version 2026-11-12. Last updated 12 November 2026.
 These terms apply to every Rock & Anchor experience: treks, stargazing, village experiences, outdoor learning, school and corporate programmes, and custom experiences. Details that differ from one experience to another, such as timings, age limits, food, stay and what to bring, are on each experience page and in its FAQs. Please read both before you book.
 ## Booking and payment
 - A booking is confirmed once our team confirms it to you and payment has been received as agreed.
@@ -37,7 +37,7 @@ These terms apply to every Rock & Anchor experience: treks, stargazing, village 
 - You can book places for other people on the same booking, such as your children or friends. The person who books and pays is responsible for the payment and for giving us correct details for everyone on the booking.
 - Only enter another adult's details with their permission. Adults you book for may be asked to confirm their own place before the experience.
 - To book for a child under 18, you must be their parent or legal guardian. You confirm this, and accept these terms and our Privacy Policy, when you add the child to your account and when you book for them.
-- Before each experience, the parent or guardian is asked to confirm the child's emergency contact and any medical information, so the experience leader has them.
+- Before each experience, the parent or guardian must confirm the child's emergency contact and any medical information. A child whose details have not been confirmed cannot take part.
 - If you travel on the same booking as your children, you cannot cancel your own place and leave them booked without you, unless the experience is one that children attend on their own.
 ## Cancellations, rescheduling and refunds
 Rescheduling, cancellation, medical and refund terms are set out in our Cancellation and Refunds policy.
@@ -71,7 +71,7 @@ Rescheduling, cancellation, medical and refund terms are set out in our Cancella
 For any questions about these terms, call or WhatsApp us on +91 89287 94380 or write to hello@rockandanchor.in.
 By confirming a booking with us you agree to these terms."""
 
-PRIVACY = """Version 2026-11-11. Last updated 11 November 2026.
+PRIVACY = """Version 2026-11-12. Last updated 12 November 2026.
 ## What we collect
 When you enquire or book with us, we collect the personal information you give us so we can plan and run your experience safely. This includes your name, phone number, email address and date of birth. For anyone on a trip, it can also include an emergency contact and any medical information, allergies or medication you choose to tell us about.
 We use date of birth to apply age limits and age-based prices, and to know who is under 18.
@@ -81,6 +81,7 @@ When you share personal information to make a booking, you consent to us using i
 You can withdraw your consent at any time by writing to hello@rockandanchor.in.
 ## Children and people you book for
 When a parent or guardian adds a child under 18 to their account, they give us the child's name, date of birth, emergency contact and any medical information, and they consent on the child's behalf. Only that parent or guardian, our team and the leaders of the child's experiences can see these details. Children do not have their own account, and we do not send a child's medical details by email.
+When you add a child, you choose how long we keep their details, including any medical information: until their trip is over, for one year after their last trip, or until you remove them. To change your choice, write to hello@rockandanchor.in.
 When you book for another adult, give us only the details we ask for, and only with their permission.
 A parent or guardian can ask us to correct a child's details, or to remove a child from their account, by writing to hello@rockandanchor.in. A child who has an upcoming booking stays on the account until that booking is cancelled or has taken place.
 ## Disclosure
