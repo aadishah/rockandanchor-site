@@ -25,7 +25,7 @@ A full 100% refund will be processed in the event of cancellations caused by:
 - Cancellation due to bad weather, communicated before the trip starts.
 Refunds are processed to the original payment method. For any questions, call or WhatsApp us on +91 89287 94380."""
 
-TERMS = """Version 2026-11-13. Last updated 13 November 2026.
+TERMS = """Version 2026-11-12.2. Last updated 12 November 2026.
 These terms apply to every Rock & Anchor experience: treks, stargazing, village experiences, outdoor learning, school and corporate programmes, and custom experiences. Details that differ from one experience to another, such as timings, age limits, food, stay and what to bring, are on each experience page and in its FAQs. Please read both before you book.
 ## Booking and payment
 - A booking is confirmed once our team confirms it to you and payment has been received as agreed.
@@ -71,7 +71,7 @@ Rescheduling, cancellation, medical and refund terms are set out in our Cancella
 For any questions about these terms, call or WhatsApp us on +91 89287 94380 or write to hello@rockandanchor.in.
 By confirming a booking with us you agree to these terms."""
 
-PRIVACY = """Version 2026-11-13. Last updated 13 November 2026.
+PRIVACY = """Version 2026-11-12.2. Last updated 12 November 2026.
 ## What we collect
 When you enquire or book with us, we collect the personal information you give us so we can plan and run your experience safely. This includes your name, phone number, email address and date of birth. For anyone on a trip, it can also include an emergency contact and any medical information, allergies or medication you choose to tell us about.
 We use date of birth to apply age limits and age-based prices, and to know who is under 18.
