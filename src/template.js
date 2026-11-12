@@ -839,6 +839,9 @@ async function handle(request, env, ctx) {
     let path = url.pathname.replace(/\/+$/, '') || '/';
     if (path === '/logo.png') return new Response(b64(LOGO), { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=604800' } });
     if (path === '/favicon.png' || path === '/favicon.ico') return new Response(b64(FAVICON), { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=604800' } });
+    // The exact Terms and Privacy text (src/policies.py), UTF-8, for anyone to check a recorded version against: the OS consent script hashes these
+    // (SHA-256) when it records a version, so the words a guardian accepted are provable.
+    if (path === '/terms.txt' || path === '/privacy.txt') return new Response(POLICIES[path.slice(1, -4)].body, { headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' } });
     if (path === '/robots.txt') return new Response(`User-agent: *\nAllow: /\nSitemap: ${SITE.url}/sitemap.xml\n`, { headers: { 'Content-Type': 'text/plain' } });
     if (REDIRECTS[path]) return Response.redirect(new URL(REDIRECTS[path], url).toString(), 301);
     let m = path.match(/^\/product\/([^/]+)/);
